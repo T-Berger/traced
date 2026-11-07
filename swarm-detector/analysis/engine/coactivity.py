@@ -47,3 +47,24 @@ def crowding(c: pd.DataFrame, window_s: float) -> pd.Series:
     own_sorted = np.sort(own_key)
     own = np.searchsorted(own_sorted, own_key + window_s, "right") - np.searchsorted(own_sorted, own_key - window_s, "left")
     return pd.Series(total - own, index=d.id.to_numpy())
+
+
+def follows(c: pd.DataFrame) -> pd.DataFrame:
+    """Per comment: who commented directly above it on the same root post (another account) and when.
+
+    Consecutive comments by the same account form a run; every comment in a run follows the last
+    comment before the run, so self-replies never count as following.
+    Columns: leader, delta_s (seconds since the leader's comment), delta_norm (delta_s divided by the
+    root post's median delta), indexed by comment id.
+    """
+    d, _ = _sorted_keys(c)
+    new_root = d.root_id.ne(d.root_id.shift())
+    run = (new_root | d.account.ne(d.account.shift())).cumsum()
+    first = d.groupby(run).cumcount() == 0
+    prev_t = d.t.shift().where(first & ~new_root)
+    prev_acc = d.account.shift().where(first & ~new_root)
+    d["leader"] = prev_acc.groupby(run).transform("first")
+    d["delta_s"] = (d.t - prev_t.groupby(run).transform("first")).dt.total_seconds()
+    med = d.groupby("root_id").delta_s.transform("median")
+    d["delta_norm"] = d.delta_s / med.clip(lower=1)
+    return d.set_index("id")[["account", "leader", "delta_s", "delta_norm"]]

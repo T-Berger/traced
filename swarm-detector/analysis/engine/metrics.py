@@ -72,6 +72,19 @@ class Ctx:
     def crowding(self) -> pd.Series:
         return coactivity.crowding(self.all, 30)
 
+    @cached_property
+    def follows(self) -> pd.DataFrame:
+        """Per comment: the other account directly above it on the same post, and the delay."""
+        return coactivity.follows(self.all)
+
+    @cached_property
+    def follow_pairs(self) -> pd.DataFrame:
+        """follower -> leader counts and median delay: input for the future swarm graph."""
+        f = self.follows.dropna(subset=["leader"])
+        return (f.groupby(["account", "leader"]).delta_s.agg(["size", "median"])
+                .rename(columns={"size": "n", "median": "median_delta_s"}).reset_index()
+                .rename(columns={"account": "follower"}).sort_values("n", ascending=False))
+
 
 def compute(ctx: Ctx, names: list[str] | None = None) -> pd.DataFrame:
     cols = {}
@@ -273,3 +286,74 @@ def max_partner_jaccard(ctx):
 def repeat_partners(ctx):
     p = ctx.pairs[ctx.pairs.shared_posts >= 3]
     return pd.concat([p.a, p.b]).value_counts().reindex(ctx.accounts, fill_value=0)
+
+
+# ---------------------------------------------------------------- timing, round 2
+
+@metric("timing", "log1p",
+        "Circular standard deviation, in hours, of the account's first-comment time on each local day "
+        "(needs 3+ active days).",
+        "A human's routine drifts from day to day; a scheduler or a shift starts at the same time.",
+        "A low mode near 0 h: accounts that start at the same minute every day.")
+def routine_drift(ctx):
+    local = ctx.c.t.dt.tz_convert(cfg.LOCAL_TZ)
+    first = (ctx.c.assign(day=local.dt.date, h=local.dt.hour + local.dt.minute / 60)
+             .groupby(["account", "day"]).h.min())
+    theta = 2 * np.pi * first / 24
+    z = pd.DataFrame({"c": np.cos(theta), "s": np.sin(theta)}).groupby(level="account")
+    m = z.mean()
+    r = np.hypot(m.c, m.s).clip(upper=1)
+    sd_h = np.sqrt(-2 * np.log(r.where(r > 0))) * 24 / (2 * np.pi)
+    return sd_h.where(z.size() >= 3)
+
+
+@metric("timing", "none",
+        "Median arrival rank on the post: 0 = first comment under the post, 1 = last.",
+        "Latency in seconds depends on how busy a post is; rank does not. Pushers are among the first.",
+        "A group near 0 separate from the bulk around 0.5; compare with median_post_latency.")
+def arrival_rank(ctx):
+    d = ctx.all.dropna(subset=["root_id"])
+    n = d.groupby("root_id").id.transform("size")
+    rank = (d.groupby("root_id").t.rank(method="first") - 1) / (n - 1)
+    return rank.where(n > 1).groupby(d.account).median()
+
+
+@metric("timing", "log1p",
+        "5th-percentile seconds between the account's own consecutive comments.",
+        "Even a fast human needs time to read and type; very short minimum gaps suggest automation.",
+        "A tail at only a few seconds.")
+def min_gap(ctx):
+    return ctx.g.gap_prev_s.quantile(0.05)
+
+
+@metric("timing", "log1p",
+        "Median seconds between own consecutive comments that land in DIFFERENT channels.",
+        "Switching channels takes a human time; a coordinated account hops channels within seconds.",
+        "Missing for single-channel accounts (most); among the rest, a mode at seconds to a minute.")
+def channel_switch_gap(ctx):
+    d = ctx.c.sort_values(["account", "t"])
+    switch = d.channel.ne(d.groupby("account").channel.shift()) & d.gap_prev_s.notna()
+    return d[switch].groupby("account").gap_prev_s.median()
+
+
+# ---------------------------------------------------------------- interaction, round 2
+
+@metric("interaction", "log1p",
+        "Median delay after the comment directly above it on the same post (by another account), divided by "
+        "that post's median delay.",
+        "Swarm members answer each other on cue, so they follow faster than the post's normal pace.",
+        "A group well below 1 (faster than the post's rhythm); 1 = typical pace.")
+def follow_gap(ctx):
+    f = ctx.follows
+    f = f[f.account.isin(ctx.accounts)]
+    return f.groupby("account").delta_norm.median()
+
+
+@metric("interaction", "none",
+        "Share of comments posted under 10 s after another account's comment on the same post.",
+        "Ten seconds is too short to read and reply; repeated sub-10 s follows point to coordination.",
+        "Most accounts near 0; a group with a clear share is a lead, especially with repeat partners.")
+def follow_fast_share(ctx):
+    f = ctx.follows.dropna(subset=["delta_s"])
+    f = f[f.account.isin(ctx.accounts)]
+    return (f.delta_s < 10).groupby(f.account).mean()
