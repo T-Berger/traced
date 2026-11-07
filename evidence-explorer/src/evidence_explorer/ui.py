@@ -196,8 +196,22 @@ def article_panel(article: dict | None, claims: list[dict]):
                 ],
                 className="article-byline",
             ),
-            source_link(
-                article.get("url", ""), "Fictional source URL ↗" if sample else "Open source ↗"
+            html.Div(
+                [
+                    source_link(
+                        article.get("url", ""),
+                        "Fictional source URL ↗" if sample else "Open source ↗",
+                    ),
+                    html.Button(
+                        "Add to Traced selection",
+                        id="explorer-handoff-add",
+                        value=str(article["id"]),
+                        className="button saved-feed-button",
+                        n_clicks=0,
+                    ),
+                    html.A("View selection", href="#explorer-handoff", className="source-link"),
+                ],
+                className="badge-row",
             ),
             *(
                 [provenance_panel(article)]

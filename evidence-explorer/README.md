@@ -49,6 +49,22 @@ See the [review workflow guide](REVIEW_MVP.md) for draft recovery, assessment ve
 and portable briefing/case export. The article collection dashboard below remains
 available for importing and analyzing news before sending it into review.
 
+### Bring selected articles into Traced
+
+1. Inspect an article in Explorer and choose **Add to Traced selection**.
+   Repeat for each article you want to review.
+2. Under **Use selected articles in Traced**, review the selection and choose
+   **Preview selected articles**. Check the saved text versions, sources, and
+   quoted claim counts, then choose **Download case package**. If evidence changes
+   before download, preview the updated selection again.
+3. In Traced, open **Cases → Gather evidence → Import case package** and choose
+   the ZIP. Check the receipt and continue your saved investigation plan.
+   **Attach collected evidence** and **Confirm scope** are separate actions.
+
+The ZIP carries up to 20 selected saved articles and their exact quotation references. It can
+be imported into a different Traced workspace. To snapshot an entire saved
+Explorer collection in the receiving workspace, use **Advanced import**.
+
 ## Start the offline demo
 
 Install [uv](https://docs.astral.sh/uv/getting-started/installation/), then run from this directory:

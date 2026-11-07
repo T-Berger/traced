@@ -52,6 +52,21 @@ def case_tools() -> html.Section:
                                     className="rv-button rv-button--outline",
                                 ),
                             ),
+                        ],
+                        className="rv-toolbar",
+                    ),
+                    html.P(
+                        "Import a case package from Explorer’s selected articles or another "
+                        "Traced workspace. Choose a ZIP or evidence JSON up to 64 MB.",
+                        className="rv-small rv-muted",
+                    ),
+                    html.Details(
+                        [
+                            html.Summary("Advanced import"),
+                            html.P(
+                                "Capture the entire saved Explorer collection in this workspace.",
+                                className="rv-small rv-muted",
+                            ),
                             html.Button(
                                 "Import Explorer collection",
                                 id="trail-explorer",
@@ -59,10 +74,7 @@ def case_tools() -> html.Section:
                                 className="rv-button rv-button--outline",
                             ),
                         ],
-                        className="rv-toolbar",
-                    ),
-                    html.P(
-                        "Case packages: ZIP or JSON, up to 64 MB.", className="rv-small rv-muted"
+                        className="rv-details",
                     ),
                     html.Div(id="trail-import-message", role="status", **{"aria-live": "polite"}),
                     source_import_tools(),

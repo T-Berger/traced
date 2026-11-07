@@ -90,8 +90,10 @@ class ClaimRepository:
                 + self._ACTIVE_WHERE
             ).fetchone()[0]
 
-    def active_model_keys(self) -> set[str]:
+    def active_model_keys(self, article_id: int | None = None) -> set[str]:
         """Retain successful empty-extraction provenance in default exports."""
+        article_filter = " AND a.id = ?" if article_id is not None else ""
+        parameters = (article_id,) if article_id is not None else ()
         with self._connection() as connection:
             return {
                 row[0]
@@ -103,7 +105,8 @@ class ClaimRepository:
                     "WHERE CASE WHEN json_valid(active.value) THEN "
                     "json_extract(active.value, '$.content_hash') = a.content_hash "
                     "AND json_extract(active.value, '$.model_key') NOT LIKE 'ollama:%@%:v1' "
-                    "ELSE 0 END"
+                    "ELSE 0 END" + article_filter,
+                    parameters,
                 )
                 if isinstance(row[0], str) and row[0]
             }

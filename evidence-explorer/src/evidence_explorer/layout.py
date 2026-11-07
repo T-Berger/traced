@@ -9,6 +9,7 @@ import dash_cytoscape as cyto
 from dash import dcc, get_asset_url, html
 
 from . import ui
+from .explorer_handoff_ui import handoff_panel
 from .feeds_ui import feeds_panel
 from .graphs import GRAPH_LAYOUT, graph_outline, graph_style, source_graph
 from .ingestion_ui import import_panel
@@ -341,6 +342,7 @@ def build_layout(service: ExplorerService):
                                                 ui.article_panel(selected, selected_claims),
                                                 id="article-detail",
                                             ),
+                                            handoff_panel(),
                                         ],
                                         className="panel evidence-panel",
                                     ),
