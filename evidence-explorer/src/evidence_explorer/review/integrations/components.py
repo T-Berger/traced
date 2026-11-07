@@ -13,6 +13,7 @@ from .packages import MAX_PACKAGE_BYTES
 
 def case_tools() -> html.Section:
     """Offer case import on Cases without adding actions to the review screen."""
+    from ...investigation.intake_ui import manual_draft_panel, saved_investigation_tools
     from .activity_ui import activity_panel
     from .brief_editor_ui import planning_brief_panel
     from .collection_ui import collection_tools
@@ -66,10 +67,12 @@ def case_tools() -> html.Section:
                     ),
                     html.Div(id="trail-import-message", role="status", **{"aria-live": "polite"}),
                     source_import_tools(),
+                    saved_investigation_tools(),
                 ],
                 id="trail-gather-evidence",
                 className="rv-details rv-investigation-step",
             ),
+            manual_draft_panel(),
             html.Details(
                 [
                     html.Summary("Compare activity over time (optional)"),

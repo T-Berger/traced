@@ -9,6 +9,7 @@ import io
 import json
 import tempfile
 import unittest
+from importlib import import_module
 from pathlib import Path
 from unittest.mock import patch
 
@@ -801,6 +802,27 @@ class OpenRouterModelTests(unittest.TestCase):
             model.complete([], InvestigationDraft, name="x", max_tokens=10)
         self.assertIn("HTTP 401", str(caught.exception))
         self.assertNotIn("test-only-secret", str(caught.exception))
+
+
+class LegacyImportTests(unittest.TestCase):
+    def test_legacy_imports_and_monkeypatches_share_the_packaged_engine(self):
+        for name in (
+            "bundle",
+            "checker",
+            "demo",
+            "evidence",
+            "investigator",
+            "model",
+            "reasoning",
+            "render",
+        ):
+            legacy = import_module(f"tools.investigation.{name}")
+            packaged = import_module(f"evidence_explorer.investigation.{name}")
+            self.assertIs(legacy, packaged)
+        with patch("tools.investigation.checker._now", return_value="fixture-time"):
+            self.assertEqual(
+                import_module("evidence_explorer.investigation.checker")._now(), "fixture-time"
+            )
 
 
 if __name__ == "__main__":

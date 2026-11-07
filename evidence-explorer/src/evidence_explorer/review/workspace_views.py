@@ -70,6 +70,8 @@ def _run_label(run: dict | None) -> str:
         "saved_source_collection": TYPE_LABELS["sources"],
         "evidence_explorer_repository_snapshot": TYPE_LABELS["investigation"],
         "external_claim_check": TYPE_LABELS["investigation"],
+        "traced_investigator": "Investigator draft",
+        "traced_investigation_checker": "Saved reasoning check",
     }.get(method, "Saved analysis")
 
 

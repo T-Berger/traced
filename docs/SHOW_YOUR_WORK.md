@@ -9,19 +9,68 @@ conclusion's chain is weak. The checker is the priority. It is cheap, mostly
 deterministic, and works on any bundle that uses the shared evidence contract,
 whatever the entity type.
 
-Code: `tools/investigation/`. Entry point: `./traced-investigate`. Tests:
-`tools/tests/test_investigation.py`. The package sits under `tools/` and has its
-own entry point while `evidence_explorer/**` and `tools/traced.py` are under the
-platform owner's coordination hold. It imports the Maltego data source, the
-evidence contract, the saved-source import, and the review verifier, and it
-edits none of them.
+The reusable engine is packaged in `evidence_explorer.investigation`, so the
+installed evidence viewer and the `./traced-investigate` command use the same
+checks. Existing `tools.investigation` imports remain compatible. Tests live in
+`evidence-explorer/tests/investigation/` and `tools/tests/test_investigation.py`.
+
+## In the evidence viewer
+
+Keep the existing **Plan investigation → Gather evidence → Confirm scope →
+Investigate findings → Review conclusions → Prepare and share briefing** flow.
+The investigation question and confirmed source scope stay in the saved plan.
+
+1. On **Cases → Gather evidence → Open saved investigator draft**, refresh the
+   drafts in the selected workspace, preview one, and choose **Open draft for
+   review**. The viewer imports that exact saved bundle and selects its claim's
+   analysis run. It keeps collection observations and earlier reviews intact.
+   JSON bundles from other agents still use the ordinary case import.
+2. To write a claim from already saved sources, open **Write a checkable claim**
+   on Cases. Start a draft for the selected case, choose a saved text record,
+   and supply a conclusion, reasoning step, exact quotation and any assumption.
+   Saving creates a new, explicitly manual draft run. It does not approve the
+   claim, confirm scope, change the source, or call a model. Switching cases
+   keeps the form but disables saving against the wrong evidence.
+3. On **Review → Check the reasoning**, choose **Check saved reasoning**.
+   Mechanical and rule-based checks run on the complete saved case, with
+   conclusions shown for the selected analysis run. The report puts unsupported
+   or conflicting dependencies first, shows the reasoning path, and opens the
+   exact saved source through the existing inspector. Long quotations retain
+   their full text. Missing original Maltego files remain visibly unverified.
+4. Record **Use**, **Qualify**, or **Withhold** using the existing decision
+   controls, then prepare the cited briefing and portable case as usual. Drafts
+   and decisions retain their exact run and finding identities. Download the
+   reasoning report separately when its detailed checks are useful to a reviewer.
+
+The interactive checker makes no network or model calls. Its report is held in
+memory and can be downloaded; changing the evidence or assessment requires a
+fresh check. Excluded evidence, unsupported media/text selectors, and cases above
+the interactive size/work limits make this check unavailable. Existing evidence
+inspection, specialist methods and review decisions remain accessible. Optional
+model assistance is still explicit through **Request an evidence check** or the
+CLI; a machine result never becomes a human decision.
+
+This supports the cited-claim and election-briefing use cases: move from a bounded
+saved sample to a substantive, checkable claim before a reviewer decides what to
+brief. Keep separately scoped events in separate cases. Neither a matching quote
+nor a clean reasoning report establishes historical completeness, factual truth,
+independent corroboration, intent, or a monitoring alert.
+
+For the NYC 2025 briefing exercise, keep the June 24 primary and November 4
+general election in separate cases, each with its own two-calendar-month window
+before and after the event and the `America/New_York` timezone. Confirm those
+bounds and the selected public sources in the existing plan. Draft claims from
+the actual saved sample, cite exact passages, expose assumptions, and let the
+reviewer decide what belongs in the briefing. A saved sample does not imply a
+complete election archive; live alerts and submissions remain separate actions.
 
 ## Status on 7 November 2026
 
 | | State |
 | --- | --- |
-| Implemented | Investigator (search → describe → validate → run, model draft, bundle), checker (mechanical, deterministic, optional model checks, dependency trace), planted-assumption demo, CLI, Markdown/JSON reports |
-| Verified locally | 38 offline tests (fixture records built by the real `build_record`, fake verifier, fake Data MCP source, mocked OpenRouter); the full `tools/tests` suite (84 tests) passes; ruff is clean. A checked bundle imports into a scratch review workspace |
+| Implemented | Packaged investigator/checker shared by the CLI and viewer; saved-draft intake, manual cited claims, explicit saved-reasoning checks, dependency traces, and downloadable reports. Existing human decisions and portable case export are reused |
+| Original CLI verification | 38 offline tests (fixture records built by the real `build_record`, fake verifier, fake Data MCP source, mocked OpenRouter) and the then-current 84 tool tests passed. A checked bundle imported into a scratch review workspace |
+| Viewer verification | Focused integration, import/binding, stale-state, note-preservation and UI checks; shared browser gate; all six distributions built and fresh-install checks passed. A fictional browser exercise verified saved-draft import, exact evidence navigation, manual drafting, planted contradiction, report download and case export/reopen at desktop and 390 px in light/dark themes. No source or model calls were made |
 | Verified live | Maltego on `maltego.com`: free search, describe, and three validate-only checks; two paid runs (historical WHOIS, IBM Watson WHOIS entities), 6 credits. Mechanical and deterministic checks of a hand-written draft over the three frozen records, and the planted assumption caught. See [Live run](#live-run-who-is-behind-maltegocom) |
 | Not run | The investigator's model draft and the model-based reasoning checks: OpenRouter is not configured (`OPENROUTER_API_KEY` and `EVIDENCE_REVIEW_MODEL` not set). Reports say so explicitly; [re-run commands](#re-run-with-the-model-once-openrouter-is-configured) are below |
 | Human review | None. Labels are machine checks for a reviewer, not review decisions |
@@ -277,20 +326,21 @@ launcher loads it as `./traced` does) or export them. Then, from the EDTH root:
 
 ## Coordination handoff
 
-New files only: `tools/investigation/` (`evidence`, `bundle`, `reasoning`,
-`checker`, `render`, `model`, `investigator`, `demo`, `cli`), `tools/investigate.py`,
-the `traced-investigate` wrapper, `tools/tests/test_investigation.py`,
-`tools/tests/investigation_fixtures.py`, and this guide. No shared contract,
-schema, worker registration, UI, lock, or `tools/traced.py` change. Investigation
-data goes to `<data dir>/investigations/` (self-ignoring) and to the existing
-Maltego record store.
+The engine lives in `evidence_explorer/investigation/`; `tools/investigation/`
+keeps compatible imports and the CLI. The viewer mounts intake on Cases and
+reasoning checks in the existing Review slot, with shared record navigation,
+review decisions and exports. It adds no schema, worker registration or model
+transport. Each manual draft appends a new immutable run; earlier evidence and
+reviews remain attached to their original snapshots. Browser reports remain
+bound to the exact case, run and assessment that was checked.
 
-Follow-ups for owners, once the hold allows:
+Saved investigation folders stay under the explicitly selected workspace's
+`investigations/` directory, alongside the existing Maltego record store. The
+Maltego source dependency and command smoke checks are included in the same PR.
+The public branch also incorporates the separately released Supabase source.
 
-- Mount the CLI as `./traced investigate`, one dispatch branch in `tools/traced.py`.
-- Move the package to `evidence_explorer/investigation/` if the platform owner
-  prefers.
-- Fold `tools/investigation/model.py` into a shared OpenRouter transport in
-  `review/verifier.py`; that class currently hard-wires the review prompt.
-- Show check labels in the review desk (the checked bundle already carries
-  `contradicts` and backing links), and add a worker job for lookups from the desk.
+Live lookup forms and queued investigator/model drafting in the viewer remain
+future work under the existing collection and worker owners. They should reuse
+the current source services and model transport. The CLI remains available for
+explicit lookups and model drafting. Operational runtime refresh and qualified
+human validation remain separate from isolated code/browser verification.

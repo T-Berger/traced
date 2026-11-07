@@ -173,6 +173,7 @@ For owners: the collection owner ("Make this multi-channel") holds the source
 contract, collection services, and connection controls; the coordination chat
 holds `SHARED_IMPLEMENTATION_PLAN.md`, `docs/coordination/state.json`, and the
 README; the UI owner audits the panel; the platform owner runs the combined gate.
-Open follow-ups: a registered worker job and desk lookup form; an investigator
-that writes claims with quoted evidence from these records; and checker coverage
-of the records' assumption and contradiction links.
+Live lookup forms and a registered lookup worker job remain follow-ups. The
+[investigator and checker](SHOW_YOUR_WORK.md) now support quoted claims, explicit
+assumptions, and dependency checks, with saved-draft intake and reasoning review
+inside the evidence viewer.
