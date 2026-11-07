@@ -11,6 +11,7 @@ import hashlib
 import html
 import json
 import re
+import sqlite3
 import unittest
 import zipfile
 from collections import Counter, defaultdict
@@ -25,6 +26,18 @@ MCP = "https://datamcp.maltego.com/mcp"
 DIWALI = "1980606111838355647"
 FOLLOWUP = "1980606660528804219"
 MUSK = "1985692613010502114"
+COLLECTOR_SHA256 = "805a9fd8837304d40712ea137bfcebadb412de9a322650e91a3e89f536439df5"
+COLLECTOR_CASE = "0afa1980-f58d-49d2-8b08-68bcb23ec764"
+BUSINESS_POSTS = (
+    "1994890085477601610",
+    "1994890243095314530",
+    "1994906376922173580",
+    "1995082155417092188",
+)
+ELECTION_CHILD = "1985642138177044502"
+ELECTION_PARENT = "1984725922528866654"
+PARENT_CAPABILITY = "ci_3Ea4-YAxI1G0xD1TQpR6g93YCi"
+COLLECTOR_SUPPLEMENT = f"{ENRICH}/collector-trace-supplement.json"
 
 
 def digest(raw):
@@ -67,6 +80,355 @@ def exact_quote(record, fragment):
         "quote": fragment["quote"],
         "text_sha256": record["content_hash"],
     }
+
+
+def extract_collector_supplement(database):
+    """Read five exact rows; expose four posts and one existing-post relation only."""
+    if not database.is_file() or digest(database.read_bytes()) != COLLECTOR_SHA256:
+        raise ValueError("Collector supplement requires the exact pinned SQLite snapshot")
+    requested = (*BUSINESS_POSTS, ELECTION_CHILD)
+    connection = sqlite3.connect(database.resolve().as_uri() + "?mode=ro&immutable=1", uri=True)
+    connection.row_factory = sqlite3.Row
+    try:
+        connection.execute("PRAGMA query_only=ON")
+        connection.execute("PRAGMA trusted_schema=OFF")
+        rows = connection.execute(
+            "SELECT c.id,c.platform_item_id,c.posted_at,c.collected_at,c.url,c.text,"
+            "c.is_reply,c.is_repost,c.is_quote,c.parent_item_id,c.conversation_id,"
+            "c.like_count,c.reply_count,c.repost_count,c.quote_count,c.view_count,"
+            "c.bookmark_count,a.platform_user_id,a.handle,a.display_name "
+            "FROM content_items c LEFT JOIN authors a ON a.id=c.author_id "
+            "WHERE c.case_id=? AND c.platform='twitter' AND c.platform_item_id IN (?,?,?,?,?) "
+            "ORDER BY c.posted_at,c.platform_item_id",
+            (COLLECTOR_CASE, *requested),
+        ).fetchall()
+    finally:
+        connection.close()
+    if len(rows) != len(requested) or {r["platform_item_id"] for r in rows} != set(requested):
+        raise ValueError("Exact collector supplement selection is incomplete or duplicated")
+    posts, relationships = [], []
+    for row in rows:
+        native_id = row["platform_item_id"]
+        if post_id(row["url"]) != native_id or not row["text"]:
+            raise ValueError("Supplement post identity or text unavailable")
+        if not row["handle"] or not re.fullmatch(r"[A-Za-z0-9_]+", row["handle"]):
+            raise ValueError("Supplement lacks an explicit public author handle")
+        relation = {
+            "native_id": native_id,
+            "collector_item_id": row["id"],
+            "text_sha256": digest(row["text"].encode()),
+            "published_at": utc(row["posted_at"]),
+            "acquired_at": utc(row["collected_at"]),
+            "parent_native_id": row["parent_item_id"],
+            "conversation_native_id": row["conversation_id"],
+            "collector_flags": {
+                key: bool(row[key]) for key in ("is_reply", "is_quote", "is_repost")
+            },
+        }
+        if any(row[key] not in (0, 1) for key in ("is_reply", "is_quote", "is_repost")):
+            raise ValueError("Unknown collector relationship flag")
+        if native_id == ELECTION_CHILD:
+            if (
+                relation["parent_native_id"] != ELECTION_PARENT
+                or not relation["collector_flags"]["is_quote"]
+            ):
+                raise ValueError("Expected election quote relation does not match pinned collector")
+            relationships.append(relation)
+            continue
+        item = {
+            **relation,
+            "platform": "x",
+            "author_id": row["platform_user_id"],
+            "author_handle": row["handle"],
+            "author_label": row["display_name"],
+            "source_url": row["url"],
+            "text": row["text"],
+            "snapshot_counts": {
+                key: row[key]
+                for key in (
+                    "like_count",
+                    "reply_count",
+                    "repost_count",
+                    "quote_count",
+                    "view_count",
+                    "bookmark_count",
+                )
+            },
+        }
+        item["projection_sha256"] = digest(canonical(item))
+        posts.append(item)
+    return {
+        "schema": "traced.bounded-collector-trace-supplement/1",
+        "snapshot": {
+            "sha256": COLLECTOR_SHA256,
+            "bytes": database.stat().st_size,
+            "repository": "jkasaudhan/traced-x-data-collector",
+            "revision": "ef2472b4df25368ebe59b0e716c8578cf28601b2",
+            "path": "dumps/disinfo-20261107.sqlite",
+            "url": "https://raw.githubusercontent.com/jkasaudhan/traced-x-data-collector/ef2472b4df25368ebe59b0e716c8578cf28601b2/dumps/disinfo-20261107.sqlite",
+        },
+        "collector_case_id": COLLECTOR_CASE,
+        "selection": {
+            "kind": "explicit_bounded_ids",
+            "new_post_ids": list(BUSINESS_POSTS),
+            "existing_post_relationship_ids": [ELECTION_CHILD],
+        },
+        "posts": posts,
+        "existing_post_relationships": relationships,
+        "limits": [
+            "Four explicitly requested saved posts, not a representative sample or corpus expansion.",
+            "Publication and acquisition times are preserved separately from the collector.",
+            "Reply flags with no parent ID do not establish a direct reply target; conversation IDs remain separate.",
+            "Counts are saved per-post snapshots, not velocity, unique reach, or current platform measurements.",
+            "No raw profile data, biography, locations, raw scraper payloads, or account-level metrics are projected.",
+            "No native case, selected sample, claims, scope confirmation, or human decisions are changed.",
+        ],
+        "actions_performed": {"source_writes": 0, "live_calls": 0, "new_reviews": 0},
+    }
+
+
+def project_collector_supplement(p, records, snapshot_sha256):
+    if not (p.root / COLLECTOR_SUPPLEMENT).is_file():
+        return [], []
+    supplement = p.read(COLLECTOR_SUPPLEMENT)
+    if (
+        supplement["schema"] != "traced.bounded-collector-trace-supplement/1"
+        or supplement["snapshot"]["sha256"] != snapshot_sha256
+        or snapshot_sha256 != COLLECTOR_SHA256
+        or supplement["collector_case_id"] != COLLECTOR_CASE
+        or {item["native_id"] for item in supplement["posts"]} != set(BUSINESS_POSTS)
+        or len(supplement["posts"]) != len(BUSINESS_POSTS)
+        or len(supplement["existing_post_relationships"]) != 1
+        or supplement["existing_post_relationships"][0]["native_id"] != ELECTION_CHILD
+        or supplement["existing_post_relationships"][0]["parent_native_id"] != ELECTION_PARENT
+    ):
+        raise ValueError("Collector supplement binding or bounded selection mismatch")
+    pending, members, group_edges = [], [], []
+    for item in supplement["posts"]:
+        if (
+            digest(canonical({k: v for k, v in item.items() if k != "projection_sha256"}))
+            != item["projection_sha256"]
+            or digest(item["text"].encode()) != item["text_sha256"]
+        ):
+            raise ValueError("Supplement projection or text hash mismatch")
+        refs = [
+            p.ref(
+                COLLECTOR_SUPPLEMENT,
+                collector_item_id=item["collector_item_id"],
+                snapshot_sha256=snapshot_sha256,
+                native_id=item["native_id"],
+                projection_sha256=item["projection_sha256"],
+            )
+        ]
+        capture = "capture:collector-supplement:" + item["native_id"]
+        p.node(
+            capture,
+            "capture",
+            "Collector supplement · @" + item["author_handle"],
+            native_id=item["native_id"],
+            record_id=None,
+            source_url=item["source_url"],
+            published_at=utc(item["published_at"]),
+            acquired_at=utc(item["acquired_at"]),
+            text_preview=item["text"][:280],
+            text_length=len(item["text"]),
+            text_sha256=item["text_sha256"],
+            snapshot_counts=item["snapshot_counts"],
+            collector_flags=item["collector_flags"],
+            declared_parent_native_id=item["parent_native_id"],
+            declared_conversation_native_id=item["conversation_native_id"],
+            capture_method="pinned_collector_dump_supplement",
+            native_case_imported=False,
+            evidence_refs=refs,
+        )
+        post = p.captured(capture, item, refs)
+        group_edges.append(p.edges[-1]["id"])
+        p.account(post, item["author_id"], item["author_handle"], item["author_label"], refs)
+        members.extend([post, capture])
+        if item["parent_native_id"]:
+            pending.append((item, refs))
+        if item["conversation_native_id"] == BUSINESS_POSTS[0]:
+            conversation = "conversation:x:" + BUSINESS_POSTS[0]
+            if conversation not in p.nodes:
+                p.node(
+                    conversation,
+                    "conversation",
+                    "Small Business Saturday · declared conversation",
+                    platform="x",
+                    conversation_native_id=BUSINESS_POSTS[0],
+                    source_url=None,
+                    direct_reply_target_unknown=True,
+                    evidence_refs=[],
+                )
+            p.nodes[conversation]["evidence_refs"].extend(refs)
+            members.append(conversation)
+            group_edges.append(
+                p.edge(
+                    post,
+                    conversation,
+                    "declared_conversation_member",
+                    "Collector-declared conversation membership",
+                    "Exact shared conversation ID in the pinned collector. The reply-marked second post has no supplied parent ID; no direct reply edge is inferred.",
+                    refs,
+                    conversation_native_id=item["conversation_native_id"],
+                    collector_flags=item["collector_flags"],
+                    direct_parent_native_id=item["parent_native_id"],
+                )
+            )
+    for assertion in supplement["existing_post_relationships"]:
+        matching = [
+            r for r in records.values() if r["metadata"].get("native_id") == assertion["native_id"]
+        ]
+        if (
+            len(matching) != 1
+            or matching[0]["content_hash"] != assertion["text_sha256"]
+            or utc(matching[0]["published_at"]) != assertion["published_at"]
+        ):
+            raise ValueError("Existing child relationship does not bind the exact native record")
+        refs = [
+            p.ref(
+                COLLECTOR_SUPPLEMENT,
+                collector_item_id=assertion["collector_item_id"],
+                native_record_id=matching[0]["id"],
+                snapshot_sha256=snapshot_sha256,
+            )
+        ]
+        pending.append((assertion, refs))
+    return pending, [(members, group_edges)]
+
+
+def project_election_vetric(p, described, describe_path):
+    path = f"{ENRICH}/live-vetric-election-quote/1-maltego_run.json"
+    if not (p.root / path).is_file():
+        return None
+    receipt, result = p.receipt(path)
+    args = receipt["arguments"]
+    if (
+        result.get("status") != "ok"
+        or result.get("run_status") != "SUCCEEDED"
+        or args["capability_id"] != PARENT_CAPABILITY
+        or args.get("entity_type") != "maltego.Twit"
+        or args.get("entity_properties", {}).get("id") != ELECTION_CHILD
+        or post_id(args["entity_value"]) != ELECTION_CHILD
+    ):
+        raise ValueError("Election parent lookup has unexpected request or status")
+    posts = [e for e in result["entities"] if e["type"] == "maltego.Twit"]
+    if len(posts) != 1 or posts[0]["id"] != ELECTION_PARENT:
+        raise ValueError("Election lookup did not return one exact expected parent")
+    entity = posts[0]
+    handle = entity["author"]
+    if not re.fullmatch(r"[A-Za-z0-9_]+", handle):
+        raise ValueError("Unexpected returned public author handle")
+    profiles = [
+        e
+        for e in result["entities"]
+        if e["type"] == "maltego.affiliation.Twitter"
+        and e.get("twitter.screen-name", "").casefold() == handle.casefold()
+        and e.get("affiliation.profile-url") == entity["author_uri"]
+    ]
+    if len(profiles) != 1 or not re.fullmatch(r"\d+", profiles[0]["twitter_id"]):
+        raise ValueError("Returned author has no unambiguous public ID")
+    profile = profiles[0]
+    text = entity["content"]
+    if not isinstance(text, str) or not text.strip() or len(text) > 50000:
+        raise ValueError("Parent text unavailable or over limit")
+    refs = [
+        p.ref(
+            path,
+            result_sha256=receipt["result_sha256"],
+            entity_ref=entity["ref"],
+            entity_sha256=digest(canonical(entity)),
+            requested_native_id=ELECTION_CHILD,
+        )
+    ]
+    item = {
+        "native_id": entity["id"],
+        "source_url": f"https://x.com/{handle}/status/{entity['id']}",
+        "published_at": utc(parsedate_to_datetime(entity["pubdate"]).isoformat()),
+    }
+    node = "capture:vetric:" + digest(entity["ref"].encode())[:24]
+    p.node(
+        node,
+        "capture",
+        "Vetric · @" + handle,
+        record_id=None,
+        native_id=entity["id"],
+        source_url=item["source_url"],
+        published_at=item["published_at"],
+        acquired_at=utc(receipt["completed_at"]),
+        text_preview=text[:280],
+        text_length=len(text),
+        text_sha256=digest(text.encode()),
+        capture_method="vetric_via_maltego_datamcp",
+        native_case_imported=False,
+        snapshot_counts={
+            k: entity[k]
+            for k in ("retweet_count", "likes_count", "reply_count", "view_count")
+            if k in entity
+        },
+        evidence_refs=refs,
+    )
+    post = p.captured(node, item, refs)
+    p.account(
+        post,
+        profile["twitter_id"],
+        handle,
+        profile["person.name"],
+        refs + [p.ref(path, entity_ref=profile["ref"], public_author_id=profile["twitter_id"])],
+    )
+    child = "post:x:" + ELECTION_CHILD
+    if child not in p.nodes:
+        raise ValueError("Election quote child is absent from exact saved evidence")
+    p.edge(
+        child,
+        post,
+        "provider_returned_parent",
+        "Vetric returned original post",
+        described[PARENT_CAPABILITY]["description"]
+        + " Input and returned IDs are preserved separately; quote subtype is supplied by the collector, not inferred from the parent post's own flags.",
+        refs + [p.ref(describe_path, capability_id=PARENT_CAPABILITY)],
+        requested_native_id=ELECTION_CHILD,
+        returned_native_id=ELECTION_PARENT,
+        capability_id=PARENT_CAPABILITY,
+    )
+    return {
+        "receipt_path": path,
+        "status": "succeeded",
+        "requested_native_id": ELECTION_CHILD,
+        "returned_native_id": ELECTION_PARENT,
+        "provider_estimated_credits": result.get("credits", {}).get("consumed"),
+    }
+
+
+def parent_family_groups(p):
+    families = defaultdict(list)
+    for edge in p.edges:
+        if edge["kind"] in {"declared_parent", "provider_returned_parent"}:
+            families[(edge["source"], edge["target"])].append(edge)
+    for (child, parent), edges in sorted(families.items()):
+        child_id, parent_id = child.rsplit(":", 1)[1], parent.rsplit(":", 1)[1]
+        if (child_id, parent_id) == (FOLLOWUP, DIWALI):
+            ident, label = "group:diwali-parent", "Diwali · declared and returned parent"
+        else:
+            ident = f"group:parent:{child_id}:{parent_id}"
+            label = (
+                "Election-day quote · declared and returned parent"
+                if child_id == ELECTION_CHILD
+                else "Small Business Saturday · declared quote target"
+                if child_id in BUSINESS_POSTS
+                else "Saved parent relationship"
+            )
+        p.group(
+            ident,
+            label,
+            "parent_relationship_comparison",
+            [child, parent],
+            [e["id"] for e in edges],
+            "Only saved typed relationships for this exact ordered child/parent pair; each source assertion remains separate.",
+            [
+                "A parent/quote relationship does not establish coordination, intent, or account control."
+            ],
+        )
 
 
 class Projection:
@@ -328,6 +690,9 @@ def build(root):
             [p.ref(dash_path, json_pointer="/relationships/declared_parent_links", **link)],
             collector_flags={k: v for k, v in link.items() if k.startswith("collector_is_")},
         )
+    collector_pending, business_groups = project_collector_supplement(
+        p, records, binding["snapshot_sha256"]
+    )
 
     # New captures remain outside the native package and carry no native record IDs.
     vm_path = f"{ENRICH}/vetric-source-import.manifest.json"
@@ -463,6 +828,51 @@ def build(root):
                     )
                 )
         p.account(post, numeric, handle, item["channel_name"], account_refs)
+
+    election_lookup = project_election_vetric(p, described, describe_path)
+    unresolved_relationships = []
+    for assertion, refs in collector_pending:
+        child = "post:x:" + assertion["native_id"]
+        parent = "post:x:" + assertion["parent_native_id"]
+        if parent not in p.nodes:
+            unresolved_relationships.append(
+                {
+                    "source": child,
+                    "declared_parent_native_id": assertion["parent_native_id"],
+                    "status": "parent_capture_unavailable",
+                    "evidence_refs": refs,
+                }
+            )
+            continue
+        edge_id = p.edge(
+            child,
+            parent,
+            "declared_parent",
+            "Collector-declared quote target"
+            if assertion["collector_flags"]["is_quote"]
+            else "Collector-declared parent",
+            "Exact parent_item_id and relationship flags in the pinned collector snapshot. The post's direct parent is not inferred from conversation ID.",
+            refs,
+            collector_flags=assertion["collector_flags"],
+            source_native_id=assertion["native_id"],
+            target_native_id=assertion["parent_native_id"],
+        )
+        if assertion["native_id"] in BUSINESS_POSTS:
+            for _, edge_ids in business_groups:
+                edge_ids.append(edge_id)
+    for members, edge_ids in business_groups:
+        p.group(
+            "group:small-business-conversation",
+            "Small Business Saturday · conversation and quotes",
+            "declared_conversation_and_quotes",
+            members,
+            edge_ids,
+            "Four exact saved posts. Two share the supplied conversation ID; two separately name the root as their quoted parent.",
+            [
+                "The reply-marked same-conversation post has no supplied direct-parent ID; no direct reply edge is drawn.",
+                "These four examples do not establish prevalence, coordination, automation, independent corroboration, or intent.",
+            ],
+        )
 
     archive_path = f"{ENRICH}/live-archive/1-maltego_run.json"
     receipt, archive_result = p.receipt(archive_path)
@@ -668,21 +1078,7 @@ def build(root):
                     "Same post identity does not mean identical captured text or independent corroboration."
                 ],
             )
-    paired = ["post:x:" + FOLLOWUP, "post:x:" + DIWALI]
-    parent_edges = [
-        e for e in p.edges if e["kind"] in {"declared_parent", "provider_returned_parent"}
-    ]
-    p.group(
-        "group:diwali-parent",
-        "Diwali · declared and returned parent",
-        "parent_relationship_comparison",
-        paired,
-        [e["id"] for e in parent_edges],
-        "Collector parent ID and separate Vetric original-post response resolve the same exact selected pair.",
-        [
-            "Parent/quote relationships alone do not establish coordination, intent, or account control."
-        ],
-    )
+    parent_family_groups(p)
     incoming = defaultdict(list)
     for edge in p.edges:
         if edge["kind"] in {"declared_draft_evidence", "draft_dependency"}:
@@ -736,11 +1132,20 @@ def build(root):
             "selected_collector_posts": dashboard["scope"]["selected_collector_posts"],
             "saved_corpus_rows": dashboard["scope"]["saved_corpus_rows"],
             "coverage_gaps": dashboard["scope"]["coverage_gaps"],
-            "projection_basis": "All 36 native case records plus six new public/provider post captures, five archive pointers, three deduplicated web leads, and saved BOE CSV metadata; no full corpus expansion.",
+            "projection_basis": "All native case records plus explicitly bounded collector and provider supplements, archive pointers, deduplicated web leads, and saved BOE CSV metadata. Original native sample and corpus counts remain unchanged.",
+            "collector_supplement_posts": sum(
+                n.get("capture_method") == "pinned_collector_dump_supplement"
+                for n in p.nodes.values()
+            ),
+            "provider_post_captures": sum(
+                n.get("capture_method") == "vetric_via_maltego_datamcp" for n in p.nodes.values()
+            ),
         },
         "nodes": list(p.nodes.values()),
         "edges": p.edges,
         "clusters": p.clusters,
+        "unresolved_relationships": unresolved_relationships,
+        "supplementary_lookups": [election_lookup] if election_lookup else [],
         "similarity": {
             "status": "not_computed",
             "candidate_clusters": [],
@@ -822,14 +1227,45 @@ class ProjectionTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             validate_graph(graph)
 
+    def test_second_parent_pair_has_its_own_group(self):
+        projection = Projection(Path.cwd())
+        pairs = ((FOLLOWUP, DIWALI), (ELECTION_CHILD, ELECTION_PARENT))
+        for child, parent in pairs:
+            for native_id in (child, parent):
+                projection.node("post:x:" + native_id, "post", native_id)
+            for kind in ("declared_parent", "provider_returned_parent"):
+                projection.edge(
+                    "post:x:" + child,
+                    "post:x:" + parent,
+                    kind,
+                    "Fixture relationship",
+                    "Exact fixture IDs",
+                    [{"fixture": True}],
+                )
+        parent_family_groups(projection)
+        graph = {
+            "nodes": list(projection.nodes.values()),
+            "edges": projection.edges,
+            "clusters": projection.clusters,
+        }
+        validate_graph(graph)
+        self.assertEqual(len(projection.clusters), 2)
+        for group, expected in zip(projection.clusters, pairs, strict=True):
+            self.assertEqual(set(group["member_ids"]), {"post:x:" + v for v in expected})
+            self.assertEqual(len(group["edge_ids"]), 2)
+
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument(
-        "--root", type=Path, help="Directory containing the saved case and receipts"
-    )
+    parser.add_argument("--root", type=Path)
     parser.add_argument("--output", type=Path)
     parser.add_argument("--self-test", action="store_true")
+    parser.add_argument(
+        "--extract-collector-supplement",
+        type=Path,
+        metavar="SQLITE",
+        help="Read the exact pinned snapshot and save the bounded four-post trace supplement before building.",
+    )
     args = parser.parse_args()
     if args.self_test:
         suite = unittest.defaultTestLoader.loadTestsFromTestCase(ProjectionTests)
@@ -837,6 +1273,14 @@ def main():
         raise SystemExit(0 if result.wasSuccessful() else 1)
     if args.root is None:
         parser.error("--root is required when building the trace graph")
+    if args.extract_collector_supplement:
+        supplement = extract_collector_supplement(args.extract_collector_supplement)
+        supplement_path = args.root / COLLECTOR_SUPPLEMENT
+        supplement_data = (json.dumps(supplement, ensure_ascii=False, indent=2) + "\n").encode()
+        if supplement_path.exists() and supplement_path.read_bytes() != supplement_data:
+            raise ValueError("Refusing to replace a different existing collector supplement")
+        if not supplement_path.exists():
+            supplement_path.write_bytes(supplement_data)
     graph = build(args.root.resolve())
     output = args.output or args.root / CASE_DIR / "trace-graph.json"
     if not output.resolve().is_relative_to(args.root.resolve()):

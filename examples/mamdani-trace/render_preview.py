@@ -187,7 +187,7 @@ def render(archive: Path, output: Path):
         else ""
     )
     trace_nav = (
-        '<a href="trace-explorer.html">Interactive trace</a>'
+        '<a href="trace-explorer.html">Evidence workspace</a>'
         if dashboard and archive.with_name("trace-explorer.html").is_file()
         else ""
     )

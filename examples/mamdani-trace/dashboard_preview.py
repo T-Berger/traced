@@ -62,12 +62,15 @@ CSS = """
 .db-trace-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
 .db-trace-grid>div{min-width:0}
 .db-native{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.db-explorer{justify-content:space-between}
+.db-explorer>div{flex:1 1 340px}
+.db-explorer p{margin-top:6px}
 @media(max-width:900px){.db-workflow{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:620px){.db-lanes,.db-chart,.db-trace-grid{grid-template-columns:1fr}.db-workflow{grid-template-columns:repeat(2,minmax(0,1fr))}.db-timeline,.db-trace{padding:16px}.db-bars{height:92px}}
 """
 
 
-def workflow(count, scope):
+def workflow(count, scope, trace_workspace=None):
     scope_state = (
         "Scope confirmation saved" if scope["planning_confirmations"] else "Human confirmation due"
     )
@@ -80,7 +83,12 @@ def workflow(count, scope):
         ("plan", "Plan", "Draft saved", "#use-flow"),
         ("gather", "Gather evidence", f"{count} records saved", "#saved-material"),
         ("scope", "Confirm scope", scope_state, "#scope"),
-        ("investigate", "Investigate", "Timeline and source trace", "#case-timeline"),
+        (
+            "investigate",
+            "Investigate",
+            "Evidence workspace" if trace_workspace else "Timeline and source trace",
+            trace_workspace or "#case-timeline",
+        ),
         ("decide", "Record decisions", decision_state, "#input-output"),
         ("brief", "Prepare briefing", "Review before export", "#package-trace"),
     ]
@@ -287,7 +295,7 @@ def public_supplement(archive, payload):
     )
 
 
-def maltego_supplement(archive):
+def maltego_supplement(archive, trace_file=None):
     base = archive.parent.parent / "maltego-enrichment"
     archive_receipt = base / "live-archive" / "1-maltego_run.json"
     search_receipt = base / "live-web-search" / "1-maltego_run.json"
@@ -397,6 +405,29 @@ def maltego_supplement(archive):
             '<a href="https://x.com/ZohranKMamdani/status/1980606660528804219">the follow-up</a> returned '
             '<a href="https://x.com/ZohranKMamdani/status/1980606111838355647">the same parent ID</a> recorded by the collector.</p>'
         )
+    election_path = base / "live-vetric-election-quote" / "1-maltego_run.json"
+    if election_path.is_file():
+        election = verified_result(
+            election_path, "ci_3Ea4-YAxI1G0xD1TQpR6g93YCi", "1985642138177044502"
+        )
+        if not any(
+            item["type"] == "maltego.Twit"
+            and item["id"] == "1984725922528866654"
+            and item.get("content")
+            for item in election["entities"]
+        ):
+            raise ValueError("The Vetric receipt lacks the saved Forbes original.")
+        outputs.append(election)
+        follow_trace = (
+            f' <a href="{esc(trace_file)}#focus-election-quote">Follow the quote in the evidence workspace</a>.'
+            if trace_file
+            else ""
+        )
+        posts += (
+            "<p><strong>Election Day quote:</strong> Vetric recovered "
+            '<a href="https://x.com/Forbes/status/1984725922528866654">the Forbes original</a> '
+            f"for the selected quote post.{follow_trace}</p>"
+        )
     usage = sum(output["credits"]["consumed"] for output in outputs)
     replay_note = (
         f"The {replays_without_post} checked Election Day replays displayed X error pages. "
@@ -414,7 +445,7 @@ def maltego_supplement(archive):
     )
 
 
-def render_trace(payload, record_link, excerpt, supplement):
+def render_trace(payload, record_link, excerpt, supplement, trace_file=None):
     items = payload["exact_source_observations"]
     comparisons = []
     language = []
@@ -440,11 +471,16 @@ def render_trace(payload, record_link, excerpt, supplement):
             f'<p class="small muted">{esc(relation["source_native_id"])} → {esc(relation["target_native_id"])}</p></div>'
         )
     structure = payload["coordination_and_automation"]["observed_structure"]
+    ballot_trace = (
+        f'<p><a href="{esc(trace_file)}#focus-ballot">Follow the ballot post in the evidence workspace</a></p>'
+        if trace_file
+        else ""
+    )
     return (
         '<article id="trace" class="card db-trace" aria-labelledby="case-trace-title">'
         '<span class="eyebrow">Open the inputs</span><h3 id="case-trace-title">Trace the evidence</h3>'
         '<div class="db-trace-grid"><div id="trace-claim"><h4>Claim and public-source check</h4>'
-        f"{''.join(comparisons)}{supplement}</div>"
+        f"{''.join(comparisons)}{ballot_trace}{supplement}</div>"
         '<div id="trace-coordination"><h4>Parent links and bot-analysis readiness</h4>'
         f"<p>The snapshot has {structure['records_with_parent_reference']:,} in-window posts with a parent reference. "
         f"{structure['parent_refs_unresolved_in_snapshot']:,} parent references are unresolved in the snapshot. "
@@ -498,9 +534,12 @@ def render_dashboard(archive, bundle, anchors, labels):
             raise ValueError("Dashboard excerpt does not match the saved case record.")
         return f"{record_link(record_id)}<blockquote>{esc(quote)}</blockquote>"
 
+    trace_file = (
+        "trace-explorer.html" if archive.with_name("trace-explorer.html").is_file() else None
+    )
     timeline = render_timeline(payload, record_link)
-    supplement = maltego_supplement(archive) + public_supplement(archive, payload)
-    trace = render_trace(payload, record_link, excerpt, supplement)
+    supplement = maltego_supplement(archive, trace_file) + public_supplement(archive, payload)
+    trace = render_trace(payload, record_link, excerpt, supplement, trace_file)
     count = len(records)
     sentiment = payload["sentiment"]
     bot = payload["coordination_and_automation"]
@@ -529,10 +568,14 @@ def render_dashboard(archive, bundle, anchors, labels):
             ),
         )
     )
+    trace_workspace = f"{trace_file}#tree" if trace_file else None
     explorer = (
-        '<div class="db-native"><a class="primary" href="trace-explorer.html">'
-        "Explore interactive tree, clusters and timeline ↗</a></div>"
-        if archive.with_name("trace-explorer.html").is_file()
+        '<article class="card db-native db-explorer" aria-labelledby="db-explorer-title">'
+        '<div><h3 id="db-explorer-title">Evidence workspace</h3>'
+        '<p class="muted">Follow a post through the relationship tree, evidence groups, '
+        "election timeline, and saved source records in one view.</p></div>"
+        f'<a class="primary" href="{trace_workspace}">Open evidence workspace</a></article>'
+        if trace_workspace
         else ""
     )
     return (
@@ -541,7 +584,8 @@ def render_dashboard(archive, bundle, anchors, labels):
         '<h2 id="case-dashboard-title">Mamdani case dashboard</h2>'
         f"<p>Follow the workflow, compare saved activity around Election Day, and trace the draft observations back to {count} case records.</p>"
         "</div></div>"
-        f'{workflow(count, payload["scope"])}{explorer}<div class="db-lanes">{lanes}</div>{timeline}{trace}'
+        f"{workflow(count, payload['scope'], trace_workspace)}{explorer}"
+        f'<div class="db-lanes">{lanes}</div>{timeline}{trace}'
         '<div class="db-native"><a class="primary" href="http://127.0.0.1:8053/">Open Traced to review ↗</a>'
         '<a href="#use-flow">Read the step-by-step walkthrough</a></div></section>'
     )
