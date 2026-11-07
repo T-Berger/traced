@@ -76,6 +76,10 @@ class CollectionService:
 
     @staticmethod
     def readiness(platform: str) -> dict:
+        if platform == "supabase":
+            from .supabase import configuration_status
+
+            return configuration_status()
         if platform in {"x", "reddit"}:
             from .apis import configuration_status
 

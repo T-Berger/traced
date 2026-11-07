@@ -23,6 +23,7 @@ _CONTENT_LABELS = {
     "article_text": "Article text",
     "feed_content": "Feed-supplied content",
     "feed_summary": "Feed summaries (not full articles)",
+    "database_row": "Database rows (original publication context unverified)",
     "unknown": "Unknown saved content type",
 }
 _WRAP_STYLE = {"minWidth": 0, "maxWidth": "100%", "overflowWrap": "anywhere"}

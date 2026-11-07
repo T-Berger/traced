@@ -48,6 +48,7 @@ class TracedConfigurationTests(unittest.TestCase):
         self.assertTrue(selected["data_source"])
         self.assertEqual(Path(os.environ["EVIDENCE_DATA_DIR"]), expected)
         self.assertIn(os.environ["PYTHON_DOTENV_DISABLED"].lower(), {"1", "true", "yes"})
+        self.assertEqual(os.environ["FLASK_SKIP_DOTENV"], "1")
 
     def test_default_preserves_existing_member_database_without_creating_paths(self):
         self.write_env(self.caller, "EVIDENCE_DATA_DIR=caller-data\n")
@@ -200,6 +201,20 @@ class TracedConfigurationTests(unittest.TestCase):
         self.assertNotIn("--with-worker", arguments)
         self.assertEqual(arguments[arguments.index("--host") + 1], "127.0.0.2")
         self.assertEqual(arguments[arguments.index("--port") + 1], "8097")
+
+    def test_supabase_dispatch_loads_settings_without_starting_worker_or_store(self):
+        self.write_env(self.root, "SUPABASE_PASSWORD=private-fixture\n")
+        with (
+            patch("evidence_explorer.collection.supabase_cli.main", return_value=0) as run,
+            patch.object(traced.runpy, "run_module") as review,
+            self.assertRaises(SystemExit) as result,
+        ):
+            traced.main(["supabase", "check", "--table", "public.content_items"], root=self.root)
+        self.assertEqual(result.exception.code, 0)
+        run.assert_called_once_with(["check", "--table", "public.content_items"])
+        review.assert_not_called()
+        self.assertEqual(os.environ["SUPABASE_PASSWORD"], "private-fixture")
+        self.assertFalse((self.member / "data").exists())
 
     def test_review_passes_case_arguments_without_adding_a_worker(self):
         forwarded = ["cases"]

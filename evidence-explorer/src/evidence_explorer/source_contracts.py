@@ -15,9 +15,16 @@ from datetime import UTC, datetime
 from typing import Any, Literal
 from urllib.parse import urlsplit
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    field_validator,
+    model_serializer,
+    model_validator,
+)
 
-Platform = Literal["telegram", "x", "reddit", "youtube", "news", "other", "maltego"]
+Platform = Literal["telegram", "x", "reddit", "youtube", "news", "other", "maltego", "supabase"]
 
 
 PLATFORM_LABELS = {
@@ -29,6 +36,7 @@ PLATFORM_LABELS = {
     "other": "Other",
     # Frozen Maltego Data MCP lookup results; never a scheduled channel.
     "maltego": "Maltego",
+    "supabase": "Supabase · Postgres",
 }
 
 
@@ -131,6 +139,35 @@ class SourceIdentity(SourceContract):
         return value
 
 
+class DatabaseRowSnapshot(SourceContract):
+    """The exact JSON row returned by Postgres, separate from its content's origin."""
+
+    project_ref: str = Field(min_length=1, max_length=100)
+    database: str = Field(min_length=1, max_length=63)
+    schema_name: str = Field(min_length=1, max_length=63)
+    table_name: str = Field(min_length=1, max_length=63)
+    id_column: str = Field(min_length=1, max_length=63)
+    text_column: str = Field(min_length=1, max_length=63)
+    row_json: str = Field(min_length=2, max_length=100_000)
+    row_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def intact_row(self):
+        if len(self.row_json.encode("utf-8")) > 100_000:
+            raise ValueError("Database row exceeds the snapshot size limit.")
+        if _text_hash(self.row_json) != self.row_sha256:
+            raise ValueError("Database row hash does not match its saved JSON.")
+        try:
+            row = json.loads(self.row_json)
+        except (ValueError, RecursionError):
+            raise ValueError("Database row must be a JSON object.") from None
+        if not isinstance(row, dict):
+            raise ValueError("Database row must be a JSON object.")
+        if self.id_column not in row or self.text_column not in row:
+            raise ValueError("Database row does not contain the declared identity and text.")
+        return self
+
+
 class SourceAcquisition(SourceContract):
     method: Literal[
         "saved_import",
@@ -141,6 +178,7 @@ class SourceAcquisition(SourceContract):
         "x_api",
         "reddit_api",
         "maltego_datamcp",
+        "supabase_postgres",
     ]
     content_scope: Literal[
         "post_text",
@@ -149,11 +187,29 @@ class SourceAcquisition(SourceContract):
         "feed_content",
         "feed_summary",
         "lookup_result",
+        "database_row",
     ]
     retrieved_url: str | None = None
     feed_url: str | None = None
     published_at_raw: str | None = Field(default=None, max_length=100)
     author_label: str | None = Field(default=None, max_length=300)
+    database_row: DatabaseRowSnapshot | None = None
+
+    @model_serializer(mode="wrap")
+    def preserve_existing_serialization(self, handler):
+        saved = handler(self)
+        if self.database_row is None:
+            saved.pop("database_row", None)
+        return saved
+
+    @model_validator(mode="after")
+    def database_provenance(self):
+        database_method = self.method == "supabase_postgres"
+        if database_method != (self.database_row is not None):
+            raise ValueError("Database acquisition requires its exact saved row snapshot.")
+        if database_method != (self.content_scope == "database_row"):
+            raise ValueError("Database acquisition requires database-row content scope.")
+        return self
 
     @field_validator("retrieved_url", "feed_url")
     @classmethod
@@ -172,6 +228,19 @@ class SourceItem(SourceIdentity):
     shared_urls: list[str] = Field(default_factory=list, max_length=100)
     repost_of: SourceIdentity | None = None
     provenance: SourceAcquisition | None = None
+
+    @model_validator(mode="after")
+    def database_text_matches_snapshot(self):
+        snapshot = self.provenance.database_row if self.provenance else None
+        if snapshot is not None:
+            row = json.loads(snapshot.row_json)
+            if (
+                self.platform != "supabase"
+                or self.text != row[snapshot.text_column]
+                or self.native_id != str(row[snapshot.id_column])
+            ):
+                raise ValueError("Database evidence must match its exact saved row.")
+        return self
 
     @field_validator("channel_name", "text", "author_id")
     @classmethod

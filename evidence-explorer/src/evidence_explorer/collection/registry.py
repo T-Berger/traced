@@ -10,7 +10,7 @@ from .models import CollectedBatch, CollectionFailure, CollectionSource
 
 # Saved-source platforms that live collection can poll. Maltego records come from
 # explicit, credit-consuming Data MCP lookups (`./traced maltego`), not a schedule.
-COLLECTABLE_PLATFORMS = ("telegram", "x", "reddit", "youtube", "news", "other")
+COLLECTABLE_PLATFORMS = ("telegram", "x", "reddit", "youtube", "news", "other", "supabase")
 
 
 def normalize_locator(platform: str, locator: str) -> str:
@@ -18,6 +18,10 @@ def normalize_locator(platform: str, locator: str) -> str:
         raise CollectionFailure(
             "Maltego records come from explicit Data MCP lookups; use './traced maltego'."
         )
+    if platform == "supabase":
+        from .supabase import normalize_locator as normalize_table
+
+        return normalize_table(locator)
     value = locator.strip()
     parsed = urlsplit(value)
     if platform in {"news", "other"}:
@@ -76,6 +80,10 @@ def normalize_locator(platform: str, locator: str) -> str:
 
 
 def collect(source: CollectionSource) -> CollectedBatch:
+    if source.platform == "supabase":
+        from .supabase import collect_supabase
+
+        return collect_supabase(source)
     if source.platform in {"x", "reddit"}:
         from .apis import collect_api
 

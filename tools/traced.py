@@ -56,6 +56,9 @@ def configure_environment(root: Path, data_dir: str | None = None) -> dict[str, 
     # Settings and providers must use this captured configuration, not discover
     # another .env from a package, caller, or parent directory later in startup.
     os.environ["PYTHON_DOTENV_DISABLED"] = "1"
+    # Flask reads dotenv_values directly, bypassing python-dotenv's disable flag.
+    # Do not let app.run discover a parent project's credentials after selection.
+    os.environ["FLASK_SKIP_DOTENV"] = "1"
     return {
         "project_root": str(root),
         "environment": str(root / ".venv"),
@@ -85,13 +88,16 @@ def main(argv: list[str] | None = None, *, root: Path | None = None) -> None:
             "start (default): integrated desk and combined worker; "
             "config: show paths without opening a database; "
             "review: forward to the existing review CLI; "
-            "maltego: sign in to the Maltego Data MCP and run explicit lookups. "
-            "Use '<command> --help' for details."
+            "maltego: sign in to the Maltego Data MCP and run explicit lookups; "
+            "supabase: check the read-only Postgres source. Use '<command> --help' for details."
         ),
     )
     parser.add_argument("--data-dir", help="Explicit store, relative to the EDTH root or absolute")
     parser.add_argument(
-        "command", choices=("start", "config", "review", "maltego"), nargs="?", default="start"
+        "command",
+        choices=("start", "config", "review", "maltego", "supabase"),
+        nargs="?",
+        default="start",
     )
     parser.add_argument("arguments", nargs=argparse.REMAINDER)
     args = parser.parse_args(argv)
@@ -122,6 +128,10 @@ def main(argv: list[str] | None = None, *, root: Path | None = None) -> None:
         from evidence_explorer.collection.maltego.cli import main as maltego_main
 
         raise SystemExit(maltego_main(args.arguments, data_dir=Path(configuration["data_dir"])))
+    if args.command == "supabase":
+        from evidence_explorer.collection.supabase_cli import main as supabase_main
+
+        raise SystemExit(supabase_main(args.arguments))
     assert start_args is not None
     host = start_args.host or os.getenv("EVIDENCE_HOST", "127.0.0.1")
     try:
