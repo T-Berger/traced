@@ -5,6 +5,7 @@ import hashlib
 import json
 import sqlite3
 from io import BytesIO
+from pathlib import Path
 from types import SimpleNamespace
 from urllib.parse import parse_qs, urlparse
 from zipfile import ZipFile
@@ -163,10 +164,33 @@ def test_media_route_returns_only_hash_verified_referenced_artifacts(desk):
         assert client.get("/trail-artifact", query_string=query).status_code == 404
 
 
-def test_restored_session_hydrates_assessment_selector_without_a_new_action(desk):
+@pytest.mark.parametrize("assessment", ["scenario", "local_baseline", "imported_baseline"])
+@pytest.mark.parametrize("picker", ["empty", "different", "already_selected"])
+def test_session_only_updates_assessment_selector_when_necessary(desk, assessment, picker):
     service, app, client = desk
     case_id = load_demo_bundle().case.id
-    scenario = service.start_scenario(case_id)
+    baseline = assessment != "scenario"
+    if assessment == "imported_baseline":
+        fixture = (
+            Path(__file__).resolve().parents[1]
+            / "fixtures/case_packages/mixed-reviewed-reference.zip"
+        )
+        case_id = service.import_package(fixture.read_bytes())
+        (scenario,) = (
+            item
+            for item in service.assessments(case_id)
+            if item["imported"] and item["is_baseline"]
+        )
+    elif baseline:
+        scenario = service.baseline_scenario(case_id)
+    else:
+        scenario = service.start_scenario(case_id)
+    selected = "baseline" if baseline else scenario["id"]
+    current = {
+        "empty": None,
+        "different": scenario["id"] if baseline else "baseline",
+        "already_selected": selected,
+    }[picker]
     key = next(
         key
         for key, item in app.callback_map.items()
@@ -184,12 +208,16 @@ def test_restored_session_hydrates_assessment_selector_without_a_new_action(desk
                 {"id": "trail-operation-message", "property": "children", "value": None},
                 {"id": "rv-session", "property": "data", "value": state},
             ],
-            "state": [],
+            "state": [{"id": "rv-scenario", "property": "value", "value": current}],
             "changedPropIds": ["rv-session.data"],
         },
     )
     assert response.status_code == 200
-    assert response.get_json()["response"]["rv-scenario"]["value"] == scenario["id"]
+    output = response.get_json()["response"]
+    if picker == "already_selected":
+        assert "rv-scenario" not in output
+    else:
+        assert output["rv-scenario"]["value"] == selected
 
 
 @pytest.mark.parametrize("change", ["tampered", "missing"])

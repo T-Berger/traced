@@ -483,13 +483,17 @@ def create_app(service: WorkspaceService):
         Output("rv-scenario", "value", allow_duplicate=True),
         Input("trail-operation-message", "children"),
         Input("rv-session", "data"),
+        State("rv-scenario", "value"),
         prevent_initial_call="initial_duplicate",
     )
-    def selected_assessment(_message, state):
+    def selected_assessment(_message, state, current_value):
         if not state or not state.get("case_id"):
             return no_update
         view = service.view(state["case_id"], state.get("scenario_id"))
-        return "baseline" if view.get("is_baseline") else state.get("scenario_id")
+        selected_value = "baseline" if view.get("is_baseline") else state.get("scenario_id")
+        # Ordinary review actions already synchronize the picker with the session.
+        # Echoing that value can overwrite a new selection while this request runs.
+        return no_update if selected_value == current_value else selected_value
 
     @app.callback(
         Output("trail-comparison", "children"),
