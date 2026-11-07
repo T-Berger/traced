@@ -39,6 +39,7 @@ class RuntimeHarnessTests(unittest.TestCase):
                 "PYTHONHOME": "/wrong-python",
                 "VIRTUAL_ENV": "/old-env",
                 "OTHER_TOKEN": "secret",
+                "TRACED_MALTEGO_TOKEN_FILE": "/operational/maltego-token.json",
             }
         )
         self.assertEqual(environment["PATH"], "/executables")
@@ -50,12 +51,16 @@ class RuntimeHarnessTests(unittest.TestCase):
             "PYTHONHOME",
             "VIRTUAL_ENV",
             "OTHER_TOKEN",
+            "TRACED_MALTEGO_TOKEN_FILE",
         ):
             self.assertNotIn(name, environment)
         self.assertEqual(environment["OPENROUTER_API_KEY"], "")
         self.assertEqual(environment["PYTHON_DOTENV_DISABLED"], "1")
         self.assertEqual(environment["UV_NO_SYNC"], "1")
         self.assertEqual(environment["UV_OFFLINE"], "1")
+        token_path = Path(self.runner.environment["TRACED_MALTEGO_TOKEN_FILE"])
+        self.assertTrue(token_path.is_relative_to(self.sandbox))
+        self.assertFalse(token_path.exists())
 
     def test_command_rejects_a_store_outside_owned_temporary_directory(self):
         for path in (self.root / "operational data", self.sandbox / ".." / "escaped"):

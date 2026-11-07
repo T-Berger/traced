@@ -9,6 +9,7 @@ from __future__ import annotations
 from dash import ALL, Dash, Input, Output, State, ctx, dcc, html, no_update
 from dash.exceptions import PreventUpdate
 
+from ...collection.registry import COLLECTABLE_PLATFORMS
 from ..presentation import badge, empty
 from .sources import PLATFORM_LABELS
 
@@ -86,8 +87,8 @@ def source_picker():
                                 dcc.Dropdown(
                                     id="live-platform",
                                     options=[
-                                        {"label": label, "value": key}
-                                        for key, label in PLATFORM_LABELS.items()
+                                        {"label": PLATFORM_LABELS[key], "value": key}
+                                        for key in COLLECTABLE_PLATFORMS
                                     ],
                                     value="news",
                                     clearable=False,

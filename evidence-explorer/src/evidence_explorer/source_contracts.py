@@ -24,7 +24,7 @@ from pydantic import (
     model_validator,
 )
 
-Platform = Literal["telegram", "x", "reddit", "youtube", "news", "other", "supabase"]
+Platform = Literal["telegram", "x", "reddit", "youtube", "news", "other", "maltego", "supabase"]
 
 
 PLATFORM_LABELS = {
@@ -34,6 +34,8 @@ PLATFORM_LABELS = {
     "youtube": "YouTube",
     "news": "News",
     "other": "Other",
+    # Frozen Maltego Data MCP lookup results; never a scheduled channel.
+    "maltego": "Maltego",
     "supabase": "Supabase · Postgres",
 }
 
@@ -175,6 +177,7 @@ class SourceAcquisition(SourceContract):
         "rss_content",
         "x_api",
         "reddit_api",
+        "maltego_datamcp",
         "supabase_postgres",
     ]
     content_scope: Literal[
@@ -183,6 +186,7 @@ class SourceAcquisition(SourceContract):
         "article_text",
         "feed_content",
         "feed_summary",
+        "lookup_result",
         "database_row",
     ]
     retrieved_url: str | None = None

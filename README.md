@@ -139,6 +139,18 @@ remain available under their current owner. See the
 [multi-source workflow and input format](evidence-explorer/REVIEW_MVP.md#combine-platforms-and-news-sources)
 for the 5 MiB / 2,000-item limits and steps to combine sources.
 
+### Maltego Data MCP lookups
+
+Each person signs in once with their own Maltego account (`./traced maltego login`),
+then runs explicit lookups: `search` and `describe` find and explain capabilities,
+`run` executes one on an entity and spends shared team credits. Every Data MCP call
+is frozen as a hashed record in the selected workspace; `./traced maltego case`
+turns records with result entities into a review case whose findings can cite an
+exact record line. A record shows what Maltego returned at a time, not a verified
+fact, and lookups run from the command line rather than a schedule. See the
+[Maltego data source guide](docs/MALTEGO_DATA_SOURCE.md) for setup, record format,
+credits, verification, and limits.
+
 ## Folder responsibilities
 
 ```text
