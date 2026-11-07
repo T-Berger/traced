@@ -117,31 +117,37 @@ def create_app(service: WorkspaceService):
         return root
 
     def _add_alerts_page(root):
-        """Integrated desk only: an Alerts tab and page beside the shared review pages."""
+        """Integrated desk only: Alerts and Policies tabs and pages beside the shared pages."""
         from dash import dcc
 
         from ...alerts.settings import AlertSettingsStore
         from ...alerts.ui import alerts_page
+        from ...policies.ui import policies_page
+
+        def tab(label, value):
+            return dcc.Tab(
+                label=label,
+                value=value,
+                className=f"rv-navigation-tab rv-navigation-tab--{value}",
+                selected_className=(
+                    f"rv-navigation-tab--selected rv-navigation-tab--selected-{value}"
+                ),
+            )
 
         for node in _walk(root):
             if getattr(node, "id", None) == "rv-page":
                 node.children = [
                     *node.children,
-                    dcc.Tab(
-                        label="Alerts",
-                        value="alerts",
-                        className="rv-navigation-tab rv-navigation-tab--alerts",
-                        selected_className=(
-                            "rv-navigation-tab--selected rv-navigation-tab--selected-alerts"
-                        ),
-                    ),
+                    tab("Alerts", "alerts"),
+                    tab("Policies", "policies"),
                 ]
             elif getattr(node, "className", None) == "rv-main":
                 children = list(node.children)
                 # Keep the shared footer last.
-                children.insert(
-                    len(children) - 1, alerts_page(AlertSettingsStore(service.settings.data_dir))
-                )
+                children[-1:-1] = [
+                    alerts_page(AlertSettingsStore(service.settings.data_dir)),
+                    policies_page(),
+                ]
                 node.children = children
 
     app.layout = layout
@@ -651,4 +657,7 @@ def create_app(service: WorkspaceService):
     from ...alerts.ui import register_alert_callbacks
 
     register_alert_callbacks(app, service)
+    from ...policies.ui import register_policy_callbacks
+
+    register_policy_callbacks(app)
     return app

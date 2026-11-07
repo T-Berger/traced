@@ -1,0 +1,166 @@
+{
+  "id": "twitter",
+  "name": "X (formerly Twitter)",
+  "last_reviewed": "2026-11-07",
+  "summary": "X reviews reports against the X Rules. It can leave a post up, restrict its reach, or remove it. Repeated or severe violations can lead to read-only mode or suspension of the account.",
+  "enforcement_model": {
+    "title": "Freedom of Speech, Not Reach",
+    "summary": "X groups moderation into three outcomes. For most rule-breaking posts that are not removed, a report can still lead to restricted reach, so ask for restriction as well as removal.",
+    "levels": [
+      {
+        "name": "Remain",
+        "detail": "The post does not break the X Rules and stays as it is."
+      },
+      {
+        "name": "Restrict",
+        "detail": "A restricted-reach label is applied. Possible measures: the post is left out of search, trends and recommended notifications; removed from the For you and Following timelines; visible only on the author's profile; ranked lower in replies; or likes, replies, reposts, quote posts, bookmarks, sharing, pinning or editing are restricted."
+      },
+      {
+        "name": "Remove",
+        "detail": "Used for severe harm such as targeted violent threats, targeted harassment or privacy violations. X suspends the account, or requires the post to be deleted before the account can be used again. Accounts of terrorist organisations, perpetrators of violent attacks, and accounts that affiliate with or promote them are suspended."
+      }
+    ],
+    "source": {
+      "title": "X Corp. New York Terms of Service Report, reporting period Jan–Jun 2026 (filed 1 Oct 2026)",
+      "url": "https://ag.ny.gov/sites/default/files/social-media-policy-report/2026-q1q2-x-corp-policy-1.pdf",
+      "local": "documents/2026-q1q2-x-corp-policy-1.pdf",
+      "verified": "2026-11-07",
+      "method": "fetched"
+    }
+  },
+  "policies": [
+    {
+      "id": "hateful-conduct",
+      "title": "Hateful conduct",
+      "covers": ["racism", "hate_speech"],
+      "summary": "No direct attacks on people based on race, ethnicity, national origin, caste, sexual orientation, gender, gender identity, religious affiliation, age, disability or serious disease. Inciting behaviour against these protected categories is also not allowed.",
+      "enforcement": "Restricted reach, post removal, read-only mode, or suspension for repeated or severe violations.",
+      "url": "https://help.x.com/en/rules-and-policies/hateful-conduct-policy",
+      "verified": "2026-11-07",
+      "method": "search index (help.x.com blocks automated access)"
+    },
+    {
+      "id": "abuse-harassment",
+      "title": "Abuse and harassment",
+      "covers": ["harassment"],
+      "summary": "No malicious, unreciprocated targeting of individuals, especially to humiliate or degrade. This includes sharing many posts in a short time or continuously replying with abusive content (pile-ons), and urging others to harass someone.",
+      "enforcement": "X may require removal and a period in read-only mode. Repeat violations can lead to suspension. X sometimes needs to hear from the targeted person before acting.",
+      "url": "https://help.x.com/en/rules-and-policies/abusive-behavior",
+      "verified": "2026-11-07",
+      "method": "search index (help.x.com blocks automated access)"
+    },
+    {
+      "id": "violent-entities",
+      "title": "Violent and hateful entities",
+      "covers": ["racism", "hate_speech", "disinformation"],
+      "summary": "Accounts may not affiliate with, or promote the activities of, violent entities (groups that use violence or violent rhetoric, such as terrorist organisations) or hateful entities (groups that systematically promote hateful conduct). Use this rule for posts that falsely tie a person to terrorist groups to incite hostility, or that promote such groups.",
+      "enforcement": "Accounts found in violation are permanently suspended. Anyone can report, with or without an X account. Educational, documentary and newsworthy discussion is allowed.",
+      "url": "https://help.x.com/en/rules-and-policies/violent-entities",
+      "verified": "2026-11-07",
+      "method": "search index (help.x.com blocks automated access)"
+    },
+    {
+      "id": "civic-integrity",
+      "title": "Civic integrity",
+      "covers": ["disinformation"],
+      "summary": "Misleading claims about how civic processes such as elections work, and threats against voting. Not all false political information is covered; X notes that untrue statements about politics are not automatically manipulation of a civic process.",
+      "enforcement": "Restricted reach and a label. Labels are reserved for critical cases, and Community Notes do not trigger enforcement.",
+      "url": "https://help.x.com/en/rules-and-policies/election-integrity-policy",
+      "verified": "2026-11-07",
+      "method": "search index (help.x.com blocks automated access)"
+    },
+    {
+      "id": "manipulated-media",
+      "title": "Synthetic and manipulated media",
+      "covers": ["disinformation"],
+      "summary": "No deceptively shared synthetic, manipulated or out-of-context media that is likely to cause harm, such as fabricated or doctored images or video presented as real.",
+      "enforcement": "A label, reduced visibility, or removal. Accounts that repeatedly share harmful misleading media can be locked or suspended.",
+      "url": "https://help.x.com/en/rules-and-policies/manipulated-media",
+      "verified": "2026-11-07",
+      "method": "search index (help.x.com blocks automated access)"
+    },
+    {
+      "id": "impersonation",
+      "title": "Misleading and deceptive identities",
+      "covers": ["disinformation"],
+      "summary": "No accounts that pose as another person, group or organisation in a confusing or deceptive way.",
+      "enforcement": "The account is suspended or must change its profile. Anyone can report from the profile; the person impersonated can use the impersonation report.",
+      "url": "https://help.x.com/en/safety-and-security/report-x-impersonation",
+      "verified": "2026-11-07",
+      "method": "search index (help.x.com blocks automated access)"
+    }
+  ],
+  "reporting": [
+    {
+      "id": "post",
+      "title": "Report a post",
+      "steps": [
+        "Open the post and tap the ⋯ (more) icon at the top of the post.",
+        "Select Report post.",
+        "Choose who it affects: Myself, Someone else or a specific group, or Everyone on X.",
+        "Pick the closest rule (for example Hate, Abuse & harassment, or a misleading-content option) and answer the follow-up questions.",
+        "If X asks for more context, add the related posts from the same account that you documented.",
+        "Submit. X shows a confirmation, which can take up to 24 hours to appear."
+      ],
+      "source": "https://help.x.com/en/safety-and-security/report-a-post"
+    },
+    {
+      "id": "account",
+      "title": "Report an account",
+      "steps": [
+        "Open the account's profile and tap the ⋯ (more) icon.",
+        "Select Report and choose who it affects.",
+        "Pick the rule. For impersonation, choose the impersonation option. Bystanders can report it, and you don't need an X account to do so.",
+        "Add the details X asks for, then submit."
+      ],
+      "source": "https://help.x.com/en/safety-and-security/report-x-impersonation"
+    },
+    {
+      "id": "harassment",
+      "title": "Report abusive behaviour or a pile-on",
+      "steps": [
+        "Report each abusive post from the post, profile or direct message, or use X's abusive-behaviour form.",
+        "When several posts come from one account, add them to the same report when X offers to include more posts.",
+        "If you are the person targeted, report it yourself: X sometimes needs to hear from the target before acting.",
+        "Keep your list of post URLs and times. Volume over a short period is what shows a pile-on."
+      ],
+      "source": "https://help.x.com/en/safety-and-security/report-abusive-behavior"
+    }
+  ],
+  "after_reporting": [
+    "A report does not automatically suspend an account. X reviews it against the rules.",
+    "Outcomes range from no action to restricted reach, removal of the post, read-only mode, or suspension.",
+    "X follows up if it needs more information or when it takes action. Mass reporting the same post does not add weight; one complete, well-documented report is more effective."
+  ],
+  "regulatory_reports": [
+    {
+      "title": "X Corp. NY Terms of Service Report: Jan–Jun 2026",
+      "date": "2026-10-01",
+      "url": "https://ag.ny.gov/sites/default/files/social-media-policy-report/2026-q1q2-x-corp-policy-1.pdf",
+      "local": "documents/2026-q1q2-x-corp-policy-1.pdf"
+    },
+    {
+      "title": "X Corp. NY Terms of Service Report: Q4 2025",
+      "date": "2026-03-31",
+      "url": "https://ag.ny.gov/sites/default/files/social-media-policy-report/2025-q4-x-corp-policy.pdf",
+      "local": "documents/2025-q4-x-corp-policy.pdf"
+    },
+    {
+      "title": "X Corp. NY Terms of Service Report: Q3 2025",
+      "date": "2025-10-01",
+      "url": "https://ag.ny.gov/sites/default/files/social-media-policy-report/2025-q3-x-corp-policy.pdf",
+      "local": "documents/2025-q3-x-corp-policy.pdf"
+    }
+  ],
+  "notes": [
+    "X's NY reports leave out the category definitions and enforcement figures the Stop Hiding Hate Act asks for. A federal court (S.D.N.Y., X Corp. v. James, No. 1:25-cv-05068) has paused enforcement of those parts against X while X's challenge is pending, so expect no enforcement numbers from X in these filings."
+  ],
+  "sources": [
+    {"title": "The X Rules", "url": "https://help.x.com/en/rules-and-policies/x-rules", "verified": "2026-11-07"},
+    {"title": "X Terms of Service", "url": "https://x.com/tos", "verified": "2026-11-07"},
+    {"title": "Report a post, List or direct message", "url": "https://help.x.com/en/safety-and-security/report-a-post", "verified": "2026-11-07"},
+    {"title": "Report abusive behaviour", "url": "https://help.x.com/en/safety-and-security/report-abusive-behavior", "verified": "2026-11-07"},
+    {"title": "X Transparency Center", "url": "https://transparency.x.com/", "verified": "2026-11-07"},
+    {"title": "X filings with the NY Attorney General", "url": "https://ag.ny.gov/resources/organizations/social-media-tos-reporting/reports?field_social_media_company_target_id=1583&field_child_companies_target_id=All", "verified": "2026-11-07"}
+  ]
+}
