@@ -50,3 +50,9 @@ FAST_REPLY_S = 120
 NIGHT_HOURS = range(1, 6)  # 01:00-05:59 Kyiv time
 
 SEED = 7
+
+# Semantic metrics: which stored vectors to use (run.py --emb model:kind overrides) and the
+# quantile of best-match similarity (within a length decile) above which a text counts as echoed.
+EMBED_MODEL = "e5"  # e5 matched real rewordings (also across uk/ru); MiniLM mostly same-topic
+EMBED_KIND = "content"
+PARAPHRASE_Q = 0.99

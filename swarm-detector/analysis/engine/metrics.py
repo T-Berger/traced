@@ -21,7 +21,7 @@ from functools import cached_property
 import numpy as np
 import pandas as pd
 
-from . import coactivity
+from . import coactivity, embeddings, semantic
 from . import config as cfg
 
 
@@ -71,6 +71,36 @@ class Ctx:
     @cached_property
     def crowding(self) -> pd.Series:
         return coactivity.crowding(self.all, 30)
+
+    # ---- semantic inputs (stored vectors; see engine/embeddings.py)
+
+    def _vectors(self, kind: str) -> tuple[pd.DataFrame, np.ndarray]:
+        """Comment table aligned with the centred vectors of `kind` for the configured model."""
+        mask = embeddings.embeddable(self.all)
+        v = embeddings.load(cfg.EMBED_MODEL, kind, self.all.id[mask])
+        meta = self.all.set_index("id").loc[v.ids, ["account", "root_id", "text_key", "text_len"]]
+        return meta.reset_index(), embeddings.centred(v.X)
+
+    @cached_property
+    def sem(self) -> tuple[pd.DataFrame, np.ndarray]:
+        return self._vectors(cfg.EMBED_KIND)
+
+    @cached_property
+    def paraphrase(self) -> pd.DataFrame:
+        """Long texts with their best match from another account (exact copies excluded) and the
+        chance threshold. Cached on disk per model and kind: the exact search takes a minute or two."""
+        meta, X = self.sem
+        keep = (meta.text_len >= cfg.DUP_MIN_CHARS).to_numpy()
+        m, Xl = meta[keep].reset_index(drop=True), X[keep]
+        acc = pd.factorize(m.account)[0]
+        txt = pd.factorize(m.text_key)[0]
+        path = cfg.CACHE / f"nn_{cfg.EMBED_MODEL}_{cfg.EMBED_KIND}_{embeddings.fingerprint(m.id)}.npy"
+        if path.exists():
+            nn = np.load(path)
+        else:
+            nn = semantic.nearest_other(Xl, acc, txt)
+            np.save(path, nn)
+        return m.assign(nn_sim=nn, threshold=semantic.echo_threshold(nn, m.text_len.to_numpy(), cfg.PARAPHRASE_Q))
 
     @cached_property
     def follows(self) -> pd.DataFrame:
@@ -357,3 +387,60 @@ def follow_fast_share(ctx):
     f = ctx.follows.dropna(subset=["delta_s"])
     f = f[f.account.isin(ctx.accounts)]
     return (f.delta_s < 10).groupby(f.account).mean()
+
+
+# ---------------------------------------------------------------- semantic (stored embeddings)
+
+@metric("semantic", "none",
+        f"Share of the account's texts ({cfg.DUP_MIN_CHARS}+ chars) whose closest match from another account is "
+        f"in the top {1 - cfg.PARAPHRASE_Q:.0%} of all texts of similar length: said again in other words. "
+        "Exact copies are excluded (cross_dup_share counts those).",
+        "Swarms reword a shared script so exact-match filters miss it; the meaning still lines up.",
+        "Near 0 for most; a group with a clear share is a lead, more so if those accounts are also repeat partners.")
+def paraphrase_share(ctx):
+    p = ctx.paraphrase
+    return (p.nn_sim >= p.threshold).groupby(p.account).mean()
+
+
+@metric("semantic", "none",
+        "Mean cosine similarity between the account's own comments (centred vectors).",
+        "A scripted account keeps saying the same thing in different words; people wander between topics.",
+        "A tail of accounts far above the bulk: single-message accounts.")
+def self_similarity(ctx):
+    meta, X = ctx.sem
+    return semantic.self_similarity(X, meta.account)
+
+
+@metric("semantic", "none",
+        "Mean cosine between the account's comments (content vectors) and the post they sit under.",
+        "Pasted talking points are often off-topic for the post; replies to the post are on-topic.",
+        "A low group: accounts whose comments ignore what the post is about.")
+def post_relevance(ctx):
+    mask = embeddings.embeddable(ctx.all)
+    vc = embeddings.load(cfg.EMBED_MODEL, "content", ctx.all.id[mask])
+    vp = embeddings.load(cfg.EMBED_MODEL, "posts")
+    mu = vc.X.mean(axis=0)
+    C = vc.X - mu
+    P = vp.X - mu
+    C /= np.linalg.norm(C, axis=1, keepdims=True).clip(min=1e-9)
+    P /= np.linalg.norm(P, axis=1, keepdims=True).clip(min=1e-9)
+    meta = ctx.all.set_index("id").loc[vc.ids, ["account", "root_id"]]
+    prow = vp.rows(meta.root_id.fillna(-1).astype("int64"))
+    ok = prow >= 0
+    sims = np.einsum("ij,ij->i", C[ok], P[prow[ok]])
+    return pd.Series(sims).groupby(meta.account.to_numpy()[ok]).mean()
+
+
+@metric("semantic", "none",
+        "Mean cosine between the account's average message and those of its repeat partners "
+        f"(accounts met on 3+ posts within {cfg.COACTIVITY_WINDOW_S} s).",
+        "Accounts that show up together AND say the same thing are acting together; co-timing alone can be "
+        "a shared interest.",
+        "High values only matter where repeat_partners > 0; that combination is the core swarm signature.")
+def partner_semantic_sim(ctx):
+    meta, X = ctx.sem
+    C = semantic.centroids(X, meta.account).drop(columns="_n")
+    p = ctx.pairs[(ctx.pairs.shared_posts >= 3) & ctx.pairs.a.isin(C.index) & ctx.pairs.b.isin(C.index)]
+    sim = np.einsum("ij,ij->i", C.loc[p.a].to_numpy(), C.loc[p.b].to_numpy())
+    both = pd.concat([pd.Series(sim, index=p.a.values), pd.Series(sim, index=p.b.values)])
+    return both.groupby(level=0).mean()

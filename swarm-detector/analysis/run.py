@@ -20,6 +20,7 @@ import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 from engine import config as cfg
+from engine import embeddings as emb
 from engine import evaluate, features, metrics, models, preprocess
 from engine.evaluate import CRITERIA
 from engine.metrics import REGISTRY
@@ -30,7 +31,7 @@ from sklearn.metrics import adjusted_rand_score
 warnings.filterwarnings("ignore", category=FutureWarning)
 
 GROUP_COLOR = {"activity": COLORS[5], "breadth": COLORS[0], "timing": COLORS[1], "content": COLORS[2],
-               "interaction": COLORS[3]}
+               "interaction": COLORS[3], "semantic": COLORS[4]}
 
 
 def cached(name: str, build, fresh: bool):
@@ -642,12 +643,35 @@ def report_metrics(N, mix, an, ev) -> Page:
 
 # ====================================================================== main
 
+def setup_semantic(args: list[str], pp: preprocess.Preprocessed) -> str:
+    """Pick the embedding variant, or drop semantic metrics. Fails early with the fix if vectors are missing."""
+    if "--no-semantic" in args:
+        for name in [n for n, m in REGISTRY.items() if m.group == "semantic"]:
+            del REGISTRY[name]
+        return "no semantic metrics"
+    if "--emb" in args:
+        cfg.EMBED_MODEL, cfg.EMBED_KIND = args[args.index("--emb") + 1].split(":")
+    ids = pp.comments.id[emb.embeddable(pp.comments)]
+    try:
+        for kind in {cfg.EMBED_KIND, "content"}:
+            emb.load(cfg.EMBED_MODEL, kind, ids)
+        emb.load(cfg.EMBED_MODEL, "posts")
+    except emb.EmbeddingsError as e:
+        sys.exit(f"\nSemantic metrics need stored embeddings.\n{e}\n")
+    return f"{cfg.EMBED_MODEL}:{cfg.EMBED_KIND}"
+
+
 def main() -> None:
     fresh = "--fresh" in sys.argv
     cfg.CACHE.mkdir(exist_ok=True)
-    cfg.RESULTS.mkdir(exist_ok=True)
     print("1/5 preprocessing")
     pp = cached("preprocessed", preprocess.run, fresh)
+    default_variant = f"{cfg.EMBED_MODEL}:{cfg.EMBED_KIND}"
+    variant = setup_semantic(sys.argv, pp)
+    default = variant in (default_variant, "no semantic metrics")
+    out_dir = cfg.RESULTS if default else cfg.RESULTS / variant.replace(":", "_")
+    out_dir.mkdir(parents=True, exist_ok=True)
+    print(f"   semantic vectors: {variant} -> {out_dir}")
     print("2/5 metrics")
     raw = metrics.compute(metrics.Ctx(pp.comments))  # always recomputed: new metrics show up at once
     N = features.normalise(raw)
@@ -663,10 +687,11 @@ def main() -> None:
     info = account_info(pp.comments, N.Z.index)
     for page in (report_preprocessing(pp, N), report_models(N, lat, mix, cl, an, sep, info),
                  report_metrics(N, mix, an, ev)):
-        print("  ", page.save(cfg.RESULTS))
+        page.subtitle += f" Semantic vectors: <code>{variant}</code>."
+        print("  ", page.save(out_dir))
     out = N.raw.join(info).assign(gmm=mix.labels, hdbscan=cl.hdb_labels, anomaly=an.combined, flagged=an.flag)
-    out.to_csv(cfg.RESULTS / "accounts.csv.gz")
-    print("  ", cfg.RESULTS / "accounts.csv.gz")
+    out.to_csv(out_dir / "accounts.csv.gz")
+    print("  ", out_dir / "accounts.csv.gz")
 
 
 if __name__ == "__main__":
