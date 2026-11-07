@@ -11,12 +11,19 @@ from datetime import UTC, date, datetime
 from io import StringIO
 from urllib.parse import urlsplit
 
+from investigation_icons import ICON_CSS, icon, signal_chip
+from notepad_platform_leads import render_platform_leads
+from review_scenarios import render_scenarios
+from sentiment_comparison import SENTIMENT_SIGNAL_CSS, render_sentiment
+from source_spans import SourceSpan
+
 
 def esc(value):
     return html.escape(str(value), quote=True)
 
 
-CSS = """
+CSS = (
+    """
 .case-dashboard{margin-top:28px;display:grid;gap:18px}
 .case-dashboard>div>p{max-width:82ch}
 .case-dashboard .section-heading{margin:0}
@@ -65,9 +72,54 @@ CSS = """
 .db-explorer{justify-content:space-between}
 .db-explorer>div{flex:1 1 340px}
 .db-explorer p{margin-top:6px}
+.db-journey{list-style:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:0;padding:0}
+.db-journey li{display:flex;flex-direction:column;align-items:flex-start;gap:9px;margin:0;padding:17px;border-top:3px solid var(--traced-color-moss)}
+.db-journey li:nth-child(2){border-top-color:var(--traced-color-slate)}
+.db-journey li:nth-child(3){border-top-color:var(--traced-color-trace)}
+.objective-label{display:flex;align-items:center;gap:9px;color:var(--traced-color-moss)}
+.objective-label .case-icon{width:27px;height:27px;padding:4px;border:1px solid var(--traced-border-subtle);border-radius:5px;background:var(--traced-surface-subtle)}
+.objective-label span{font:700 11px/1.3 var(--traced-font-mono);letter-spacing:.08em;text-transform:uppercase}
+.db-journey li>.signal-chip{margin-top:2px}
+.db-journey li p{font-size:14px}
+.db-journey li a{margin-top:auto;padding-top:4px;font-size:13px;font-weight:700}
+.db-journey li a .case-icon{margin-left:3px}
+.db-continuation{gap:8px 16px}
+.db-continuation a{font-size:14px}
+.db-support{border:1px solid var(--traced-border-subtle);border-radius:6px;background:var(--traced-surface);padding:12px 16px;margin:0}
+.db-support .db-workflow{margin-top:10px}
+.db-support>.card{margin-top:10px}
+.db-scenarios{display:grid;gap:14px}
+.db-scenarios>div:first-child p{max-width:75ch;margin-top:4px}
+.db-review-scenario{scroll-margin-top:10px}
+.db-review-scenario details{margin:0}
+.sentiment-review{display:grid;gap:10px}
+.sentiment-review>p{max-width:84ch;font-size:14px}
+.sentiment-windows{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.sentiment-window{min-width:0;border:1px solid var(--traced-border-subtle);border-radius:6px;padding:14px}
+.sentiment-window h4,.sentiment-window h5{margin:0}
+.sentiment-window h5{font-size:14px}
+.sentiment-window p{margin-bottom:5px}
+.sentiment-window details>div{padding-top:10px}
+.sentiment-window details>div:target{outline:2px solid var(--traced-focus-ring);outline-offset:3px}
+.sentiment-window blockquote{margin:4px 0;border-left:2px solid var(--traced-color-moss);padding-left:8px}
+.sentiment-bar{display:flex;gap:3px;margin:10px 0;border-radius:5px;overflow:hidden}
+.sentiment-bar a{display:block;flex-basis:0;text-align:center;color:var(--traced-foreground);font-size:12px;font-weight:700;padding:3px}
+.sentiment-bar a:focus-visible{outline-offset:-4px}
+.sentiment-critical{background:#f4cbac}
+.sentiment-favorable{background:#bfdbd4}
+.sentiment-other{background:#cddded}
+.sentiment-unclear{background:#e0e4e3}
+.sentiment-key{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 12px;margin:0;padding:0;list-style:none}
+.sentiment-key li{display:flex;align-items:center;gap:6px;margin:0;font-size:12px}
+.sentiment-key li span{width:9px;height:9px;flex:none;border-radius:2px}
+.sentiment-key strong{margin-left:auto}
+.sentiment-limit{padding:10px 12px;background:var(--traced-surface-subtle);border-left:3px solid var(--traced-color-slate)}
 @media(max-width:900px){.db-workflow{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media(max-width:620px){.db-lanes,.db-chart,.db-trace-grid{grid-template-columns:1fr}.db-workflow{grid-template-columns:repeat(2,minmax(0,1fr))}.db-timeline,.db-trace{padding:16px}.db-bars{height:92px}}
+@media(max-width:620px){.db-lanes,.db-chart,.db-trace-grid,.sentiment-windows,.db-journey{grid-template-columns:1fr}.db-workflow{grid-template-columns:repeat(2,minmax(0,1fr))}.db-timeline,.db-trace{padding:16px}.db-bars{height:92px}}
 """
+    + ICON_CSS
+    + SENTIMENT_SIGNAL_CSS
+)
 
 
 def workflow(count, scope, trace_workspace=None):
@@ -295,6 +347,27 @@ def public_supplement(archive, payload):
     )
 
 
+def verified_maltego_result(path, capability, post_id=None):
+    receipt = json.loads(path.read_bytes())
+    result = receipt["result"]
+    raw = json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()
+    if (
+        receipt["endpoint"] != "https://datamcp.maltego.com/mcp"
+        or receipt["tool"] != "maltego_run"
+        or receipt["arguments"]["capability_id"] != capability
+        or receipt["arguments"].get("validate_only")
+        or post_id is not None
+        and receipt["arguments"].get("entity_properties", {}).get("id") != post_id
+        or receipt["result_sha256"] != hashlib.sha256(raw).hexdigest()
+        or result.get("isError")
+    ):
+        raise ValueError("The Maltego lookup receipt could not be verified.")
+    output = result.get("structuredContent") or json.loads(result["content"][0]["text"])
+    if output["run_status"] != "SUCCEEDED" or len(output["entities"]) != output["count"]:
+        raise ValueError("The Maltego lookup did not return a complete saved result page.")
+    return output
+
+
 def maltego_supplement(archive, trace_file=None):
     base = archive.parent.parent / "maltego-enrichment"
     archive_receipt = base / "live-archive" / "1-maltego_run.json"
@@ -302,28 +375,8 @@ def maltego_supplement(archive, trace_file=None):
     if not archive_receipt.is_file() or not search_receipt.is_file():
         return ""
 
-    def verified_result(path, capability, post_id=None):
-        receipt = json.loads(path.read_bytes())
-        result = receipt["result"]
-        raw = json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()
-        if (
-            receipt["endpoint"] != "https://datamcp.maltego.com/mcp"
-            or receipt["tool"] != "maltego_run"
-            or receipt["arguments"]["capability_id"] != capability
-            or receipt["arguments"].get("validate_only")
-            or post_id is not None
-            and receipt["arguments"].get("entity_properties", {}).get("id") != post_id
-            or receipt["result_sha256"] != hashlib.sha256(raw).hexdigest()
-            or result.get("isError")
-        ):
-            raise ValueError("The Maltego lookup receipt could not be verified.")
-        output = result.get("structuredContent") or json.loads(result["content"][0]["text"])
-        if output["run_status"] != "SUCCEEDED" or len(output["entities"]) != output["count"]:
-            raise ValueError("The Maltego lookup did not return a complete saved result page.")
-        return output
-
-    result = verified_result(archive_receipt, "ci_Qxwz_uFRF52FsdHjK1q-L1tBvA")
-    search = verified_result(search_receipt, "ci_L__1U2Yf1njZLdfDn_3hTy0ick")
+    result = verified_maltego_result(archive_receipt, "ci_Qxwz_uFRF52FsdHjK1q-L1tBvA")
+    search = verified_maltego_result(search_receipt, "ci_L__1U2Yf1njZLdfDn_3hTy0ick")
     original = "https://x.com/elonmusk/status/1985692613010502114"
     snapshots = []
     replays_without_post = 0
@@ -365,10 +418,10 @@ def maltego_supplement(archive, trace_file=None):
     ballot_path = base / "live-vetric-ballot" / "1-maltego_run.json"
     diwali_path = base / "live-vetric-diwali" / "1-maltego_run.json"
     if ballot_path.is_file() and diwali_path.is_file():
-        ballot = verified_result(
+        ballot = verified_maltego_result(
             ballot_path, "ci_uqmVgJpK6q5RzVbK6DX_ah20tg", "1985692613010502114"
         )
-        diwali = verified_result(
+        diwali = verified_maltego_result(
             diwali_path, "ci_3Ea4-YAxI1G0xD1TQpR6g93YCi", "1980606660528804219"
         )
         outputs.extend((ballot, diwali))
@@ -407,7 +460,7 @@ def maltego_supplement(archive, trace_file=None):
         )
     election_path = base / "live-vetric-election-quote" / "1-maltego_run.json"
     if election_path.is_file():
-        election = verified_result(
+        election = verified_maltego_result(
             election_path, "ci_3Ea4-YAxI1G0xD1TQpR6g93YCi", "1985642138177044502"
         )
         if not any(
@@ -420,7 +473,7 @@ def maltego_supplement(archive, trace_file=None):
         outputs.append(election)
         follow_trace = (
             f' <a href="{esc(trace_file)}#focus-election-quote">Follow the quote in the evidence workspace</a>.'
-            if trace_file
+            if trace_file is not None
             else ""
         )
         posts += (
@@ -473,7 +526,7 @@ def render_trace(payload, record_link, excerpt, supplement, trace_file=None):
     structure = payload["coordination_and_automation"]["observed_structure"]
     ballot_trace = (
         f'<p><a href="{esc(trace_file)}#focus-ballot">Follow the ballot post in the evidence workspace</a></p>'
-        if trace_file
+        if trace_file is not None
         else ""
     )
     return (
@@ -492,7 +545,108 @@ def render_trace(payload, record_link, excerpt, supplement, trace_file=None):
     )
 
 
-def render_dashboard(archive, bundle, anchors, labels):
+def evidence_journey(payload, has_sentiment):
+    observations = {item["id"] for item in payload["exact_source_observations"]}
+    steps = []
+    if "source-observation-1" in observations:
+        steps.append(
+            (
+                "Check the ballot claim",
+                "The certified recap shows two party lines in a vote-for-one contest. The saved records leave duplicate counting unsubstantiated.",
+                "#misinformation-scenario",
+                "Compare the allegation and election records",
+                "Verify",
+                "document",
+                "Repeated listing confirmed",
+                "check",
+                "found",
+            )
+        )
+    if "source-observation-5" in observations:
+        steps.append(
+            (
+                "Identify the target of the rhetoric",
+                "Three dated posts use different political and religious framing. The target and context matter to any policy judgment.",
+                "#hateful-rhetoric-scenario",
+                "Read the dated excerpts",
+                "Trace",
+                "target",
+                "Target and context under review",
+                "question",
+                "review",
+            )
+        )
+    if has_sentiment:
+        steps.append(
+            (
+                "Test the apparent sentiment shift",
+                "Direct criticism fell across the selected posts and rose in the rank-spaced subset. The direction of public sentiment remains unresolved.",
+                "#sentiment-shift",
+                "Compare the counts and exact posts",
+                "Compare",
+                "split",
+                "Direction depends on selection",
+                "split",
+                "context",
+            )
+        )
+    numbered = "".join(
+        f'<li class="card"><div class="objective-label">{icon(symbol)}'
+        f"<span>Objective {index:02d} · {esc(stage)}</span></div>"
+        f"<h3>{esc(title)}</h3><p>{esc(summary)}</p>"
+        f"{signal_chip(status, status_icon, state)}"
+        f'<a href="{esc(anchor)}">{esc(action)} {icon("arrow")}</a></li>'
+        for index, (
+            title,
+            summary,
+            anchor,
+            action,
+            stage,
+            symbol,
+            status,
+            status_icon,
+            state,
+        ) in enumerate(steps, 1)
+    )
+    return (
+        f'<ol class="db-journey" aria-label="Investigation objectives">{numbered}</ol>'
+        '<nav class="db-native db-continuation" aria-label="Continue the review">'
+        '<a href="#tree">Open the evidence workspace</a>'
+        '<a href="#input-output">Review the proposed findings</a></nav>'
+    )
+
+
+def notepad_parent_context(archive):
+    receipt = (
+        archive.parent.parent / "maltego-enrichment/live-vetric-notepad-parent/1-maltego_run.json"
+    )
+    if not receipt.is_file():
+        return ""
+    result = verified_maltego_result(
+        receipt, "ci_3Ea4-YAxI1G0xD1TQpR6g93YCi", "1985974699856118267"
+    )
+    parent_id = "1985934103040954468"
+    span = SourceSpan(88, 129, "323982aa148012f4851afc97de65e99388656bc46e1b784d01da7100e56269d5")
+    matches = [
+        item
+        for item in result["entities"]
+        if item["type"] == "maltego.Twit" and item["id"] == parent_id
+    ]
+    cue = span.extract(matches[0].get("content", "")) if len(matches) == 1 else None
+    if cue is None:
+        raise ValueError("The Vetric result lacks the exact referenced post and quotation.")
+    return (
+        '<div class="db-trace-item"><strong>Quoted post recovered through Maltego</strong>'
+        "<p>Vetric returned the same parent ID recorded by the collector. The Fox News post quotes "
+        "Mamdani’s victory speech about immigrants in New York.</p>"
+        f"<blockquote>{esc(cue)}</blockquote>"
+        "<p>The parent text supplies the context for the quote. It provides no evidence for the alleged network.</p>"
+        f'<p><a href="https://x.com/FoxNews/status/{parent_id}">Read the quoted Fox News post</a> · '
+        f"{esc(result['credits']['consumed'])} estimated Maltego credits</p></div>"
+    )
+
+
+def render_dashboard(archive, bundle, anchors, labels, *, unified=False):
     path = archive.with_name("dashboard-data.json")
     if not path.is_file():
         return ""
@@ -524,6 +678,12 @@ def render_dashboard(archive, bundle, anchors, labels):
     def excerpt(ref):
         record_id = ref["record_id"]
         text = records[record_id]["text"]
+        span = ref.get("span")
+        if isinstance(span, SourceSpan):
+            quote = span.extract(text)
+            if quote is None:
+                raise ValueError("Dashboard excerpt does not match the saved case record.")
+            return f"{record_link(record_id)}<blockquote>{esc(quote)}</blockquote>"
         start, end, quote = ref["start"], ref["end"], ref["quote"]
         if (
             type(start) is not int
@@ -534,13 +694,54 @@ def render_dashboard(archive, bundle, anchors, labels):
             raise ValueError("Dashboard excerpt does not match the saved case record.")
         return f"{record_link(record_id)}<blockquote>{esc(quote)}</blockquote>"
 
-    trace_file = (
-        "trace-explorer.html" if archive.with_name("trace-explorer.html").is_file() else None
-    )
+    trace_file = "" if unified else None
+    if not unified and archive.with_name("trace-explorer.html").is_file():
+        trace_file = "trace-explorer.html"
     timeline = render_timeline(payload, record_link)
     supplement = maltego_supplement(archive, trace_file) + public_supplement(archive, payload)
     trace = render_trace(payload, record_link, excerpt, supplement, trace_file)
+    scenario_cards = render_scenarios(payload, excerpt, trace_file)
+    sentiment_review = render_sentiment(payload, records, excerpt)
+    platform_leads = render_platform_leads(
+        archive, payload, parent_html=notepad_parent_context(archive)
+    )
+    platform_link = (
+        '<p><a href="#notepad-platform-leads">Follow the shared notepad leads on X</a></p>'
+        if platform_leads
+        else ""
+    )
+    scenarios = (
+        '<section class="db-scenarios" id="review-scenarios" aria-labelledby="review-scenarios-title">'
+        '<div><h3 id="review-scenarios-title">Investigation scenarios</h3>'
+        '<p class="muted">Check a claim, compare how posts describe their targets, or inspect how the sample affects an apparent shift in sentiment.</p></div>'
+        f'<div class="db-trace-grid">{scenario_cards}</div>{sentiment_review}</section>'
+        if scenario_cards
+        else ""
+    )
     count = len(records)
+    overview = (
+        '<section id="case-dashboard" class="case-dashboard" aria-labelledby="case-dashboard-title">'
+        '<div class="section-heading"><div><span class="eyebrow">Investigation overview</span>'
+        '<h2 id="case-dashboard-title">Mamdani case dashboard</h2>'
+        f"<p>Follow the evidence around Election Day, then compare the proposed findings with the {count} saved case records.</p>"
+        "</div></div>"
+    )
+    if unified:
+        return (
+            f"{overview}{evidence_journey(payload, bool(sentiment_review))}{platform_link}"
+            f"{scenarios}{platform_leads}"
+            '<details class="db-support"><summary>Scope, review status and next actions</summary>'
+            f"{workflow(count, payload['scope'], '#tree')}</details>"
+            '<details class="db-support"><summary>Collector timeline and coverage details</summary>'
+            f"{timeline}</details>"
+            '<details class="db-support"><summary>Maltego source checks, language examples and coordination evidence</summary>'
+            f"{trace}</details>"
+            '<div class="db-native db-continuation">'
+            '<a href="#use-flow">Read the step-by-step walkthrough</a>'
+            '<a href="http://127.0.0.1:8053/">Open Traced to record a review decision</a>'
+            "</div></section>"
+        )
+
     sentiment = payload["sentiment"]
     bot = payload["coordination_and_automation"]
     lanes = "".join(
@@ -549,8 +750,8 @@ def render_dashboard(archive, bundle, anchors, labels):
                 "Misinformation",
                 "Draft claim check",
                 "Compare the ballot allegation with the certified result and counting rule. The repeated listing is visible in the saved sources. Duplicate counting remains unsubstantiated.",
-                "#trace-claim",
-                "Open claim and exact sources",
+                "#misinformation-scenario" if scenario_cards else "#trace-claim",
+                "Open the misinformation scenario",
             ),
             lane(
                 "Bots and coordination",
@@ -560,11 +761,13 @@ def render_dashboard(archive, bundle, anchors, labels):
                 "Open trace and input gaps",
             ),
             lane(
-                "Public sentiment",
-                "Unmeasured" if sentiment["status"] == "unavailable" else "Saved annotations",
-                f"{sentiment['classified_records']} of {sentiment['denominator']} selected X posts have a saved sentiment annotation. Review attributed language and its context.",
-                "#trace-sentiment",
-                "Open saved language examples",
+                "Sentiment around Election Day",
+                "Manual demo coding" if sentiment_review else "Unmeasured",
+                "Compare the stance expressed in selected posts and see how the pattern changes by selection method."
+                if sentiment_review
+                else f"{sentiment['classified_records']} of {sentiment['denominator']} selected X posts have a saved sentiment annotation.",
+                "#sentiment-shift" if sentiment_review else "#trace-sentiment",
+                "Compare before and after" if sentiment_review else "Open saved language examples",
             ),
         )
     )
@@ -579,13 +782,8 @@ def render_dashboard(archive, bundle, anchors, labels):
         else ""
     )
     return (
-        '<section id="case-dashboard" class="case-dashboard" aria-labelledby="case-dashboard-title">'
-        '<div class="section-heading"><div><span class="eyebrow">Investigation overview</span>'
-        '<h2 id="case-dashboard-title">Mamdani case dashboard</h2>'
-        f"<p>Follow the workflow, compare saved activity around Election Day, and trace the draft observations back to {count} case records.</p>"
-        "</div></div>"
-        f"{workflow(count, payload['scope'], trace_workspace)}{explorer}"
-        f'<div class="db-lanes">{lanes}</div>{timeline}{trace}'
+        f"{overview}{workflow(count, payload['scope'], trace_workspace)}{explorer}"
+        f'<div class="db-lanes">{lanes}</div>{scenarios}{platform_leads}{timeline}{trace}'
         '<div class="db-native"><a class="primary" href="http://127.0.0.1:8053/">Open Traced to review ↗</a>'
         '<a href="#use-flow">Read the step-by-step walkthrough</a></div></section>'
     )

@@ -17,8 +17,10 @@ from urllib.parse import urlsplit
 from zoneinfo import ZoneInfo
 
 import plotly.graph_objects as go
+from investigation_icons import ICON_CSS, icon, signal_chip
 from plotly.offline import get_plotlyjs
 from plotly.subplots import make_subplots
+from topic_clusters import TOPIC_CSS, render_topics
 
 BRAND = Path(__file__).resolve().parents[2] / "brand" / "traced"
 NY = ZoneInfo("America/New_York")
@@ -118,7 +120,7 @@ def chart(figure, chart_id):
     )
 
 
-def focus_plot(nodes, edges, anchors, focus_ids):
+def focus_plot(nodes, edges, anchors, focus_ids, *, same_page=False):
     """Display immediate neighbors with the directions supplied by the evidence."""
     fig = go.Figure()
     views = []
@@ -209,7 +211,8 @@ def focus_plot(nodes, edges, anchors, focus_ids):
             if node["kind"] == "capture":
                 lines = ["Saved", "capture"]
             label = "<br>".join(esc(line) for line in lines)
-            labels.append(f'<a href="#{anchors[node_id]}">{label}</a>')
+            target = ' target="_self"' if same_page else ""
+            labels.append(f'<a href="#{anchors[node_id]}"{target}>{label}</a>')
             detail = [esc(edge["label"]) for edge in neighbors.get(node_id, ())]
             if node.get("native_id"):
                 detail.append(esc(node["native_id"]))
@@ -611,7 +614,7 @@ def timeline_plot(data, nodes, root, related):
     return figure
 
 
-def record_index(nodes, edges, archive, focuses):
+def record_index(nodes, edges, archive, focuses, *, preview_prefix):
     links = defaultdict(list)
     for edge in edges:
         links[edge["source"]].append(edge)
@@ -651,7 +654,7 @@ def record_index(nodes, edges, archive, focuses):
         rows = "".join(map(relationship, links[node_id]))
         native_anchor = native_anchors.get(node.get("record_id"))
         jump = (
-            f'<a href="preview.html#{native_anchor}">Inspect saved record in dashboard ↗</a>'
+            f'<a href="{preview_prefix}#{native_anchor}">Inspect native source record</a>'
             if native_anchor
             else ""
         )
@@ -828,7 +831,7 @@ def workspace_navigation(focuses):
     )
 
 
-def trace_views(focuses, nodes, edges, clusters, dashboard, index_link, anchors):
+def trace_views(focuses, nodes, edges, clusters, dashboard, index_link, anchors, *, same_page):
     panels, timelines = [], []
     for key, root in focuses.items():
         memberships, related = trace_context(root, edges, clusters)
@@ -839,6 +842,7 @@ def trace_views(focuses, nodes, edges, clusters, dashboard, index_link, anchors)
                 edges,
                 {item: f"{anchor}-{key}" for item, anchor in anchors.items()},
                 (nodes[root]["native_id"],),
+                same_page=same_page,
             ),
             f"trace-focus-{key}",
         )
@@ -864,7 +868,7 @@ def trace_views(focuses, nodes, edges, clusters, dashboard, index_link, anchors)
         )
         panels.append(
             f'<article class="context-panel focus-grid" data-focus="{key}">'
-            '<div class="focus-graph"><span class="eyebrow">Relationship tree</span>'
+            f'<div class="focus-graph"><span class="eyebrow">{icon("graph")} Relationship tree</span>'
             f"<h3>{esc(node_label(nodes[root]))}</h3>"
             f'<div class="plot" role="region" aria-label="Selected post relationships">{focused}</div>'
             '<p class="muted">Arrows follow the saved link. A plain line shows conversation membership.</p>'
@@ -884,7 +888,7 @@ def trace_views(focuses, nodes, edges, clusters, dashboard, index_link, anchors)
         timeline = chart(timeline_plot(dashboard, nodes, root, related), f"trace-timeline-{key}")
         timelines.append(
             f'<div class="context-panel" data-focus="{key}"><p class="trace-key">'
-            f'<span aria-hidden="true"></span> Highlighted: {esc(node_label(nodes[root]))} and linked records</p>'
+            f"{icon('target')} Highlighted on the timeline · {esc(node_label(nodes[root]))} and linked records</p>"
             f'<div class="plot" role="region" aria-label="Publication and archive timeline">{timeline}</div>'
             f"<details><summary>Exact dated records ({len(date_rows)})</summary>"
             f'<ul class="dated-records">{dates}</ul></details></div>'
@@ -896,6 +900,25 @@ STYLE = """
 *{box-sizing:border-box}html{scroll-padding-top:84px}body{margin:0;background:#f4f3ee;color:#142229;font:16px/1.55 Manrope,sans-serif;overflow-wrap:anywhere}a{color:#276b63;text-underline-offset:3px}a:focus-visible,summary:focus-visible{outline:3px solid #142229;outline-offset:4px}header{position:sticky;top:0;z-index:3;background:#fff;border-bottom:1px solid #d9e0de}.bar{max-width:1180px;margin:auto;padding:12px 24px;display:flex;gap:18px;align-items:center;flex-wrap:wrap}.bar img{width:106px;height:32px;object-fit:contain}.bar nav{display:flex;gap:16px;flex-wrap:wrap;font-size:14px}main{max-width:1180px;margin:auto;padding:30px 24px 62px}h1,h2,h3,p{margin:0}h1{font-size:clamp(29px,4.3vw,48px);line-height:1.1;letter-spacing:-1.4px}h2{font-size:25px;line-height:1.2}h3{font-size:16px}.eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:1.3px;color:#52636c;font-weight:700}.lead{margin:12px 0 20px;max-width:75ch}.jump{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}.jump a{border:1px solid #b7c7c3;border-radius:5px;background:#fff;padding:7px 12px;font-size:14px}.section{margin-top:26px;padding:21px;border:1px solid #d9e0de;border-radius:8px;background:white;min-width:0}.section>p{max-width:88ch;margin:8px 0;font-size:14px}.plot{min-width:0}.muted,summary span{color:#52636c}.counts{display:flex;gap:13px;flex-wrap:wrap;font-size:13px;color:#52636c}.notice{margin-top:17px;padding:11px 14px;border-left:4px solid #f36643;background:#f8e8da}.record{border-top:1px solid #d9e0de;padding:9px 0;font-size:14px}.record summary{font-weight:700;color:#276b63;cursor:pointer}.record summary span{font-weight:400;margin-left:6px}.record p{margin:4px 0}.record blockquote{margin:8px 0;padding-left:12px;border-left:3px solid #276b63;white-space:pre-wrap}.record ul{margin:6px 0;padding-left:20px}.record li{margin:4px 0}.groups{display:grid;grid-template-columns:1fr 1fr;gap:8px 14px;padding:0;list-style:none}.groups li{padding:8px 0;border-top:1px solid #d9e0de}.groups a{font-size:13px;margin-right:8px}footer{font-size:13px;color:#52636c;margin-top:20px}@media(max-width:660px){.bar{gap:6px;padding:9px 14px}.bar nav{gap:12px;font-size:12px}main{padding:22px 13px 45px}.section{padding:13px}.groups{grid-template-columns:1fr}.lead{font-size:15px}}
 """
 
+EMBEDDED_STYLE = """
+.trace-workspace{margin-top:38px}
+.trace-workspace .section{margin-top:14px;padding:20px;border:1px solid var(--traced-border-subtle);border-radius:8px;background:var(--traced-surface);min-width:0}
+.trace-workspace .section>p{margin:7px 0;font-size:14px;max-width:84ch}
+.trace-workspace .plot{min-width:0}
+.trace-workspace .jump{display:flex;gap:6px 14px;flex-wrap:wrap;margin:12px 0;font-size:13px}
+.trace-workspace .record{border-top:1px solid var(--traced-border-subtle);margin-top:0;padding:9px 0;font-size:14px}
+.trace-workspace .record summary{margin-bottom:0}
+.trace-workspace .record summary span{color:var(--traced-foreground-secondary);font-weight:400;margin-left:6px}
+.trace-workspace .record p{margin:4px 0}
+.trace-workspace .record blockquote{margin:8px 0;padding-left:12px;border-left:3px solid var(--traced-color-moss);white-space:pre-wrap}
+.trace-workspace .record ul{margin:6px 0;padding-left:20px}
+.trace-workspace .groups{display:grid;grid-template-columns:1fr;gap:8px 14px;padding:0;list-style:none}
+.trace-workspace .groups li{padding:8px 0;border-top:1px solid var(--traced-border-subtle)}
+.trace-workspace .groups a{font-size:13px;margin-right:8px}
+.trace-footnote{margin:10px 0 0;color:var(--traced-foreground-secondary);font-size:13px}
+@media(max-width:660px){.trace-workspace .section{padding:13px}}
+"""
+
 WORKSPACE_STYLE = """
 .workspace-nav{display:none}
 h4{margin:0 0 6px;font-size:14px}.workspace{padding:22px}.workspace-head{display:flex;align-items:start;justify-content:space-between;gap:16px}.workspace-head p{margin:6px 0;max-width:58ch;font-size:14px;color:#52636c}.focus-anchor{display:block;height:0;scroll-margin-top:10px}.focus-options{display:flex;flex-wrap:wrap;gap:8px;margin:15px 0 18px}.focus-options a{background:#fff;color:#276b63;border:1px solid #82958f;border-radius:5px;padding:7px 11px;font-size:13px;font-weight:700}.context-stack{position:relative;min-width:0}.context-panel{position:absolute;inset:0 0 auto;visibility:hidden;pointer-events:none;min-width:0}.focus-grid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:16px;align-items:start}.focus-graph,.reader{padding:15px;border:1px solid #d9e0de;border-radius:7px;min-width:0}.focus-graph>h3,.reader>h3{font-size:20px;line-height:1.2;margin:5px 0 7px}.focus-graph>p{font-size:12px}.reader{background:#f4f3ee}.reader-meta,.reader-id,.reader-links{font-size:12px;color:#52636c}.reader-id{margin:3px 0 11px;font-variant-numeric:tabular-nums}.reader blockquote{border-left:3px solid #276b63;margin:6px 0 9px;padding-left:11px;white-space:pre-wrap;font-size:14px}.reader-links{display:flex;flex-wrap:wrap;gap:4px 11px;margin:6px 0}.reader details,.focus-groups{border-top:1px solid #d9e0de;margin-top:12px;padding-top:9px}.focus-group{padding:5px 0}.focus-group p{font-size:13px;margin:5px 0}.group-members{display:flex;flex-wrap:wrap;gap:5px 10px}.reader summary,.focus-group summary,.dated-records time,.relationships li span{font-size:12px;color:#52636c}.reader ul,.dated-records{margin:8px 0 0;padding-left:18px;font-size:13px}.dated-records time,.relationships li span{display:block}.reader li,.dated-records li{margin-top:5px}.overview-grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:14px;align-items:start}.overview-grid .section{margin-top:14px}.trace-key{font-size:12px;color:#52636c;margin:8px 0 2px}.trace-key span{display:inline-block;background:#f36643;width:8px;height:8px;border-radius:50%;margin-right:4px}.group-section .groups{grid-template-columns:1fr}.workspace-library .all-branches{margin:12px 0 8px}.record:has(:target){outline:2px solid #276b63;outline-offset:3px}.status-row{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}.status-row span{background:#f4f3ee;color:#52636c;padding:4px 8px;border-radius:4px;font-size:12px}
@@ -904,7 +927,7 @@ h4{margin:0 0 6px;font-size:14px}.workspace{padding:22px}.workspace-head{display
 """
 
 
-def render(graph_file, dashboard_file, archive, out):
+def render_workspace(graph_file, dashboard_file, archive, *, same_page=False):
     graph = json.loads(graph_file.read_bytes())
     dashboard = json.loads(dashboard_file.read_bytes())
     nodes = {node["id"]: node for node in graph["nodes"]}
@@ -936,7 +959,10 @@ def render(graph_file, dashboard_file, archive, out):
     }
     if not focuses:
         raise ValueError("No saved trace presets resolve to evidence.")
-    index, index_link, anchors = record_index(nodes, edges, archive, focuses)
+    preview_prefix = "" if same_page else "preview.html"
+    index, index_link, anchors = record_index(
+        nodes, edges, archive, focuses, preview_prefix=preview_prefix
+    )
     index_shortcuts = "".join(
         index_link(node_id)
         for node_id, node in nodes.items()
@@ -948,44 +974,67 @@ def render(graph_file, dashboard_file, archive, out):
         f"<p>{' '.join(index_link(node_id) for node_id in group['member_ids'])}</p></details></li>"
         for group in clusters
     )
-    logo = base64.b64encode((BRAND / "logos/traced-primary.svg").read_bytes()).decode()
-    font = base64.b64encode((BRAND / "fonts/Manrope-Variable.ttf").read_bytes()).decode()
     tree = chart(tree_plot(nodes, edges), "trace-tree-plot")
     cluster = chart(cluster_plot(nodes, clusters), "trace-cluster-plot")
     controls = focus_controls(focuses, nodes)
     navigation = workspace_navigation(focuses)
     targets = focus_targets(focuses, "focus")
     focus_panels, timelines = trace_views(
-        focuses, nodes, edges, clusters, dashboard, index_link, anchors
+        focuses,
+        nodes,
+        edges,
+        clusters,
+        dashboard,
+        index_link,
+        anchors,
+        same_page=same_page,
     )
     active_css = selection_css(focuses)
+    topic_cards = render_topics(
+        nodes,
+        edges,
+        index_link,
+        local_date,
+        datetime.fromisoformat(dashboard["scope"]["event_at"]),
+    )
+    topic_section = (
+        f'<section class="section" id="clusters" aria-labelledby="topic-title">'
+        f'{focus_targets(focuses, "clusters")}<h2 id="topic-title">{icon("stack")} Topic clusters</h2>'
+        "<p>Open a topic to see the saved posts and what each post does. Indented posts have a recorded link to the post above.</p>"
+        f'{topic_cards}<p class="muted">These are selected examples. The role labels describe the saved wording. Motive and coordination remain unverified.</p>'
+        f'<p class="topic-jump"><a href="#evidence-groups">Explore the evidence group map {icon("arrow")}</a></p></section>'
+        if topic_cards
+        else ""
+    )
+    evidence_group_id = "evidence-groups" if topic_cards else "clusters"
+    group_targets = "" if topic_cards else focus_targets(focuses, "clusters")
     unknown = sum(
         node["kind"] == "post" and not node.get("published_at") for node in nodes.values()
     )
-    content = f"""<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data: blob:; font-src data:; base-uri 'none'; form-action 'none'">
-<title>Mamdani evidence workspace · Traced</title><style>@font-face{{font-family:Manrope;src:url(data:font/ttf;base64,{font})}}{STYLE}{WORKSPACE_STYLE}{active_css}</style>
-<script>{get_plotlyjs()}</script></head>
-<body><header><div class="bar"><a href="preview.html#case-dashboard" aria-label="Back to the case dashboard"><img src="data:image/svg+xml;base64,{logo}" alt="Traced"></a>
-<nav aria-label="Case workspace">{navigation}<a href="preview.html#case-dashboard">Case overview</a></nav></div></header>
-<main><span class="eyebrow">Mamdani · November 4, 2025 NYC mayoral election</span><h1>Investigate the evidence</h1>
-<p class="lead">Choose a saved trace. Follow its links, read the source wording, and see where the linked records fall around Election Day.</p>
-<div class="counts"><span>{len(nodes)} trace items</span><span>{len(edges)} typed links</span><span>{len(clusters)} evidence groups</span></div>
+    index_content = f'<div class="jump">{index_shortcuts}</div>{index}'
+    if same_page:
+        index_content = (
+            f'<details class="index-records"><summary>Browse {len(nodes)} trace records</summary>'
+            f"{index_content}</details>"
+        )
+    workspace = f"""<div class="trace-workspace">
 <section class="section workspace" id="tree" aria-labelledby="tree-title">{targets}
-<div class="workspace-head"><div><h2 id="tree-title">Evidence workspace</h2>
+<div class="workspace-head"><div><h2 id="tree-title">{icon("graph")} Evidence workspace</h2>
 <p>Pick a trace to update the tree, related clusters, timeline highlights, and source inspector together.</p></div>
-<a href="preview.html#case-dashboard">Case dashboard ↗</a></div>
+<a href="{preview_prefix}#case-dashboard">Case dashboard</a></div>
 <nav class="focus-options" aria-label="Choose a saved trace">{controls}</nav>
 <div class="context-stack">{focus_panels}</div>
-<div class="status-row"><span>Bot activity · unmeasured</span><span>Public sentiment · unmeasured</span></div>
+<div class="status-row">{signal_chip("Bot activity · unmeasured", "question")}{signal_chip("Public sentiment · unresolved", "split")}
+<a href="{preview_prefix}#review-scenarios">Review the investigation scenarios {icon("arrow")}</a></div>
 </section>
+{topic_section}
 <div class="overview-grid">
 <section class="section" id="timeline" aria-labelledby="timeline-title">{focus_targets(focuses, "timeline")}<h2 id="timeline-title">Election timeline</h2>
-<p>Choose a window or drag to zoom. Bars count posts in the saved collector snapshot by New York publication day. Dots show publication times; diamonds show archive capture times.</p>
+<p>Choose a window or drag to zoom. Bars count saved posts per New York publication day. Dots show publication times and diamonds show archive capture times.
+<a href="{preview_prefix}#sentiment-shift">Compare the sentiment sample {icon("arrow")}</a></p>
 <div class="context-stack">{timelines}</div>
 <p class="muted">Shading marks known coverage gaps. Posts without a precise publication time stay in the index ({unknown}).</p></section>
-<section class="section group-section" id="clusters" aria-labelledby="cluster-title">{focus_targets(focuses, "clusters")}<h2 id="cluster-title">All evidence clusters</h2>
+<section class="section group-section" id="{evidence_group_id}" aria-labelledby="cluster-title">{group_targets}<h2 id="cluster-title">Evidence group map</h2>
 <p>Drill into a tile to see its members. A record can appear in more than one group.</p>
 <div class="plot" role="region" aria-label="Interactive evidence cluster map">{cluster}</div>
 <details><summary>Evidence groups and their exact members</summary><ul class="groups">{groups}</ul></details></section>
@@ -994,15 +1043,37 @@ def render(graph_file, dashboard_file, archive, out):
 <p>Open any record for its source, saved wording where available, and the basis for its links.</p>
 <details class="all-branches"><summary>Browse all evidence branches</summary><p>Select a branch or block to drill down.</p>
 <div class="plot" role="region" aria-label="Interactive case tree">{tree}</div></details>
-<div class="jump">{index_shortcuts}</div>{index}</section>
-<footer>Bound to the saved collector case and separately captured Maltego results. Evidence groups show recorded relationships.</footer>
-</main></body></html>"""
+{index_content}</section>
+<p class="trace-footnote">Bound to the saved collector case and separately captured Maltego results. Evidence groups show recorded relationships.</p>
+</div>"""
+    counts = f'<div class="counts"><span>{len(nodes)} trace items</span><span>{len(edges)} typed links</span><span>{len(clusters)} evidence groups</span></div>'
+    styles = (
+        (EMBEDDED_STYLE if same_page else STYLE + ICON_CSS)
+        + WORKSPACE_STYLE
+        + TOPIC_CSS
+        + active_css
+    )
+    return workspace, styles, navigation, counts
+
+
+def render(graph_file, dashboard_file, archive, out):
+    workspace, styles, navigation, counts = render_workspace(graph_file, dashboard_file, archive)
+    logo = base64.b64encode((BRAND / "logos/traced-primary.svg").read_bytes()).decode()
+    font = base64.b64encode((BRAND / "fonts/Manrope-Variable.ttf").read_bytes()).decode()
+    content = f"""<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data: blob:; font-src data:; base-uri 'none'; form-action 'none'">
+<title>Mamdani evidence workspace · Traced</title><style>@font-face{{font-family:Manrope;src:url(data:font/ttf;base64,{font})}}{styles}</style>
+<script>{get_plotlyjs()}</script></head>
+<body><header><div class="bar"><a href="preview.html#case-dashboard" aria-label="Back to the case dashboard"><img src="data:image/svg+xml;base64,{logo}" alt="Traced"></a>
+<nav aria-label="Case workspace">{navigation}<a href="preview.html#case-dashboard">Case overview</a></nav></div></header>
+<main><span class="eyebrow">Mamdani · November 4, 2025 NYC mayoral election</span><h1>Investigate the evidence</h1>
+<p class="lead">Choose a saved trace. Follow its links, read the source wording, and see where the linked records fall around Election Day.</p>
+{counts}{workspace}</main></body></html>"""
     temporary = out.with_suffix(".html.tmp")
     temporary.write_text(content, encoding="utf-8")
     temporary.replace(out)
-    print(
-        f"Trace explorer: {len(nodes)} items, {len(edges)} links, {len(clusters)} evidence groups"
-    )
+    print(f"Trace explorer written to {out}")
 
 
 if __name__ == "__main__":

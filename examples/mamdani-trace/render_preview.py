@@ -14,6 +14,8 @@ from urllib.parse import urlsplit
 
 from dashboard_preview import CSS as DASHBOARD_CSS
 from dashboard_preview import render_dashboard
+from investigation_icons import icon as case_icon
+from investigation_icons import signal_chip
 
 BRAND = Path(__file__).resolve().parents[2] / "brand" / "traced"
 
@@ -164,7 +166,25 @@ CSS = """
 """
 
 
-def render(archive: Path, output: Path):
+MISSION_CSS = """
+.mission-hero{gap:11px;padding:25px 28px;border:1px solid #2d4a50;border-left:4px solid var(--traced-color-trace);border-radius:8px;background:linear-gradient(110deg,#142229,#203c42);color:#fff}
+.mission-hero .eyebrow{display:flex;gap:8px;align-items:center;color:#cce5df}
+.mission-hero .lead{color:#edf3f1}
+.mission-status,.mission-nav{display:flex;align-items:center;flex-wrap:wrap;gap:7px 10px}
+.mission-status{margin-top:4px}
+.mission-nav a{display:inline-flex;align-items:center;gap:5px;color:#eff8f5;font-size:13px;font-weight:700;padding:5px 9px;border:1px solid #839c9b;border-radius:4px}
+.mission-nav a:hover{background:#37565a}
+.mission-nav a:focus-visible{outline-color:#fff}
+.mission-nav a:first-child{background:#f6bda8;color:#142229;border-color:#f6bda8}
+.mission-coverage{display:block;padding:11px 16px;margin:12px 0 22px}
+.mission-coverage summary{color:var(--traced-foreground);font-size:13px}
+.mission-coverage p{margin-top:5px}
+.mission-coverage .case-icon{margin-right:4px}
+@media(max-width:620px){.mission-hero{padding:18px 15px}.mission-nav a{min-height:36px}}
+"""
+
+
+def render(archive: Path, output: Path, *, trace_alias: bool = False):
     with zipfile.ZipFile(archive) as package:
         if package.getinfo("bundle.json").file_size > 16_000_000:
             raise ValueError("Bundle is too large for this bounded static preview.")
@@ -180,21 +200,47 @@ def render(archive: Path, output: Path):
     by_record = {r["id"]: r for r in records}
     anchors = {r["id"]: f"record-{i}" for i, r in enumerate(records, 1)}
     labels = {r["id"]: f"R{i}" for i, r in enumerate(records, 1)}
-    dashboard = render_dashboard(archive, bundle, anchors, labels)
+    graph = archive.with_name("trace-graph.json")
+    dashboard_data = archive.with_name("dashboard-data.json")
+    unified = graph.is_file() and dashboard_data.is_file()
+    workspace = trace_css = trace_script = ""
+    if unified:
+        from trace_explorer import get_plotlyjs, render_workspace
+
+        workspace, trace_css, workspace_nav, _ = render_workspace(
+            graph, dashboard_data, archive, same_page=True
+        )
+        trace_script = f"<script>{get_plotlyjs()}</script>"
+    elif trace_alias:
+        raise ValueError(
+            "A verified trace graph and dashboard data are required for the trace alias."
+        )
+    dashboard = render_dashboard(archive, bundle, anchors, labels, unified=unified)
     dashboard_nav = (
         '<a href="#case-dashboard">Dashboard</a><a href="#case-timeline">Timeline</a>'
         if dashboard
         else ""
     )
     trace_nav = (
-        '<a href="trace-explorer.html">Evidence workspace</a>'
-        if dashboard and archive.with_name("trace-explorer.html").is_file()
-        else ""
+        workspace_nav
+        if unified
+        else (
+            '<a href="trace-explorer.html">Interactive trace</a>'
+            if dashboard and archive.with_name("trace-explorer.html").is_file()
+            else ""
+        )
     )
     flow = overview_flow(archive, raw, by_record, anchors)
     flow_nav = '<a href="#use-flow">Walkthrough</a>' if flow else ""
     patterns = pattern_review(archive, raw, by_record, anchors, labels)
     pattern_nav = '<a href="#patterns">Patterns</a>' if patterns else ""
+    case_nav = (
+        '<a href="#case-dashboard">Overview</a><a href="#review-scenarios">Scenarios</a>'
+        f'{trace_nav}<a href="#saved-material">Sources</a>'
+        if unified
+        else f'{dashboard_nav}{trace_nav}{flow_nav}<a href="#scope">Scope</a>'
+        f'<a href="#saved-material">Saved material</a><a href="#input-output">Draft review</a>{pattern_nav}'
+    )
     fragments = {f["id"]: f for f in bundle["fragments"]}
     findings = {f["snapshot_id"]: f for f in bundle["findings"]}
     draft_runs = [r["id"] for r in bundle["runs"] if r["method"] == "traced_investigator"]
@@ -441,11 +487,126 @@ def render(archive: Path, output: Path):
         tokens = tokens.replace(f"./fonts/{font}", data_uri(BRAND / "fonts" / font, "font/ttf"))
     logo = data_uri(BRAND / "logos/traced-primary.svg", "image/svg+xml")
     icon = data_uri(BRAND / "logos/traced-favicon.svg", "image/svg+xml")
-    result = f'''<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data:; style-src 'unsafe-inline'; font-src data:; base-uri 'none'; form-action 'none'"><title>{H(case["title"])} · Traced</title><link rel="icon" href="{icon}"><style>{tokens}\n{CSS}{DASHBOARD_CSS if dashboard else ""}</style></head><body><header><div class="bar"><a href="#overview" aria-label="Traced case overview"><img class="logo" src="{logo}" alt="Traced"></a><nav class="nav" aria-label="Case sections">{dashboard_nav}{trace_nav}{flow_nav}<a href="#scope">Scope</a><a href="#saved-material">Saved material</a><a href="#input-output">Draft review</a>{pattern_nav}</nav><a class="primary" href="#input-output">Check input vs output ↗</a></div></header><main id="overview"><section class="hero"><div class="eyebrow">Evidence Trail · First case demo</div><h1>{H(case["title"])}</h1><p class="lead">{H(case["question"])}</p><div class="chips">{badge("Unreviewed draft", "review")}{badge(f"{len(records)} saved records")}{badge(f"{len(claims)} cited draft claims")}{badge("No human decision recorded")}</div></section><aside class="notice"><strong>{H(banner)}</strong><p>{H(status)}</p><p>{H(counts)} This selected sample cannot establish volume, trends, prevalence, or complete historical coverage.</p></aside>{dashboard}{flow}<section id="scope"><div class="windows">{"".join(window_cards)}</div><details><summary>Scope and gaps before review</summary><ul>{limits}</ul><p class="small muted">Publication timestamps stay unknown when only a source date was saved. Context documents are not presented as X posts. Account attribution does not establish truth.</p></details><details><summary>Questions still for a reviewer</summary><ul>{questions}</ul></details></section><section class="section" id="saved-material"><div class="section-heading"><div><span class="eyebrow">Read the inputs</span><h2>Saved posts and their source trail</h2><p>{H(material_description)}</p></div></div>{post_cards}</section><section class="section" id="context"><div class="section-heading"><div><h2>Context documents</h2><p>Published reporting and official statements. These provide context and attributed wording; they are not direct captures from X.</p></div></div><div class="record-grid">{"".join(map(record_card, context))}</div></section><section class="section" id="input-output"><div class="section-heading"><div><span class="eyebrow">Follow each claim back</span><h2>Check input vs output</h2><p>Compare exact saved quotations with the proposed wording. Follow each input link to its source card. This static preview runs no model, collection or review decision.</p></div></div>{"".join(claim_panel(c, i) for i, c in enumerate(claims, 1)) or '<p class="empty">No substantive draft claim is saved.</p>'}</section>{patterns}<details class="audit"><summary>Native package and traceability</summary>{pairs([("Case ID", case["id"]), ("Bundle SHA256", hashlib.sha256(raw).hexdigest()), ("Draft run", draft_runs[-1] if draft_runs else None)])}<p id="package-trace"><a href="{H(archive.name)}" download>Download native case package</a> · Import it into Traced to inspect the native evidence and planning history.</p></details><footer><span>Generated from the native case package</span><span>Static Python-generated preview · no JavaScript or remote assets</span></footer></main></body></html>'''
+    policy = "default-src 'none'; img-src data:; style-src 'unsafe-inline'; font-src data:; base-uri 'none'; form-action 'none'"
+    if unified:
+        policy = policy.replace("img-src data:", "script-src 'unsafe-inline'; img-src data: blob:")
+    heading = "What changed around Election Day?" if unified else H(case["title"])
+    eyebrow = (
+        f"{case_icon('flag')} Case 01 · Mamdani · November 4, 2025"
+        if unified
+        else "Evidence Trail · First case demo"
+    )
+    overview_question = (
+        "Follow the ballot claim to the official records, compare who the posts target, "
+        "and see how the sample changes the story about sentiment."
+        if unified
+        else H(case["question"])
+    )
+    input_output = f"""
+<section class="section" id="input-output">
+  <div class="section-heading"><div>
+    <span class="eyebrow">Review the draft against its sources</span>
+    <h2>Check input vs output</h2>
+    <p>Compare exact saved quotations with the proposed wording. Follow each input link to its source card.</p>
+  </div></div>
+  {"".join(claim_panel(c, i) for i, c in enumerate(claims, 1)) or '<p class="empty">No substantive draft claim is saved.</p>'}
+</section>"""
+    source_library = f"""
+<section id="scope">
+  <div class="windows">{"".join(window_cards)}</div>
+  <details><summary>Scope and gaps before review</summary><ul>{limits}</ul>
+    <p class="small muted">Publication timestamps stay unknown when only a source date was saved.</p></details>
+  <details><summary>Questions still for a reviewer</summary><ul>{questions}</ul></details>
+</section>
+<section class="section" id="saved-material">
+  <div class="section-heading"><div><span class="eyebrow">Read the inputs</span>
+  <h2>Saved posts and their source trail</h2><p>{H(material_description)}</p></div></div>
+  {post_cards}
+</section>
+<section class="section" id="context">
+  <div class="section-heading"><div><h2>Context documents</h2>
+  <p>Published reporting and official statements provide context and attributed wording.</p></div></div>
+  <div class="record-grid">{"".join(map(record_card, context))}</div>
+</section>"""
+    if unified:
+        content = f"""
+{dashboard}{workspace}{input_output}
+<details class="card section"><summary>Source library, scope, and walkthrough</summary>
+{source_library}{flow}{patterns}
+</details>"""
+    else:
+        content = f"{dashboard}{flow}{source_library}{input_output}{patterns}"
+
+    if unified:
+        briefing_actions = (
+            f'<nav class="mission-nav" aria-label="Case shortcuts">'
+            f'<a href="#case-dashboard">{case_icon("flag")} Objectives</a>'
+            f'<a href="#tree">{case_icon("graph")} Evidence map</a>'
+            f'<a href="#clusters">{case_icon("stack")} Topic clusters</a>'
+            f'<a href="#input-output">{case_icon("document")} Review draft</a></nav>'
+        )
+        briefing_status = (
+            '<div class="mission-status" aria-label="Case status">'
+            f"{signal_chip('Human review pending', 'clock', 'review')}"
+            f"{signal_chip(f'{len(records)} saved records', 'stack', 'context')}"
+            f"{signal_chip(f'{len(claims)} cited draft claims', 'document', 'context')}"
+            "</div>"
+        )
+        coverage_note = (
+            f'<details class="notice mission-coverage"><summary>{case_icon("question")} '
+            f"{H(banner)} · historical coverage incomplete</summary>"
+            f"<p>{H(status)}</p><p>{H(counts)}</p></details>"
+        )
+    else:
+        briefing_actions = ""
+        briefing_status = (
+            f'<div class="chips">{badge("Unreviewed draft", "review")}'
+            f"{badge(f'{len(records)} saved records')}{badge(f'{len(claims)} cited draft claims')}"
+            f"{badge('No human decision recorded')}</div>"
+        )
+        coverage_note = (
+            f'<aside class="notice"><strong>{H(banner)}</strong><p>{H(status)}</p>'
+            f"<p>{H(counts)} The selected sample has incomplete historical coverage.</p></aside>"
+        )
+
+    result = f"""
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="{policy}">
+<title>{H(case["title"])} · Traced</title>
+<link rel="icon" href="{icon}">
+<style>{tokens}
+{CSS}{DASHBOARD_CSS if dashboard else ""}{MISSION_CSS if unified else ""}{trace_css}</style>
+{trace_script}</head>
+<body><header><div class="bar">
+<a href="#overview" aria-label="Traced case overview"><img class="logo" src="{logo}" alt="Traced"></a>
+<nav class="nav" aria-label="Case sections">{case_nav}</nav>
+<a class="primary" href="#input-output">Check input vs output</a></div></header>
+<main id="overview">
+<section class="hero{" mission-hero" if unified else ""}">
+<div class="eyebrow">{eyebrow}</div><h1>{heading}</h1>
+<p class="lead">{overview_question}</p>
+{briefing_status}{briefing_actions}
+</section>
+{coverage_note}
+{content}
+<details class="audit"><summary>Native package and traceability</summary>
+{pairs([("Case ID", case["id"]), ("Bundle SHA256", hashlib.sha256(raw).hexdigest()), ("Draft run", draft_runs[-1] if draft_runs else None)])}
+<p id="package-trace"><a href="{H(archive.name)}" download>Download native case package</a>
+ · Import it into Traced to inspect the native evidence and planning history.</p></details>
+<footer><span>Generated from the native case package</span><span>Local case preview · no live analysis</span></footer>
+</main></body></html>""".lstrip()
     output.parent.mkdir(parents=True, exist_ok=True)
-    temporary = output.with_suffix(".html.tmp")
-    temporary.write_text(result, encoding="utf-8")
-    temporary.replace(output)
+    outputs = [output]
+    if trace_alias:
+        alias = output.with_name("trace-explorer.html")
+        if alias != output:
+            outputs.append(alias)
+    for path in outputs:
+        temporary = path.with_suffix(".html.tmp")
+        temporary.write_text(result, encoding="utf-8")
+        temporary.replace(path)
     print(
         json.dumps(
             {
@@ -464,5 +625,14 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("archive", type=Path)
     parser.add_argument("--out", type=Path)
+    parser.add_argument(
+        "--trace-alias",
+        action="store_true",
+        help="Keep the legacy trace-explorer.html URL as a copy of the combined page.",
+    )
     args = parser.parse_args()
-    render(args.archive, args.out or args.archive.with_name("preview.html"))
+    render(
+        args.archive,
+        args.out or args.archive.with_name("preview.html"),
+        trace_alias=args.trace_alias,
+    )
