@@ -1,4 +1,4 @@
-"""On-demand archive lookup and Aleph access controls for Live sources."""
+"""On-demand archive lookup plus Aleph and Maltego Data MCP access controls for Live sources."""
 
 from __future__ import annotations
 
@@ -7,9 +7,29 @@ from datetime import date
 from dash import Dash, Input, Output, ctx, dcc, html
 
 from ...collection.aleph import aleph_configuration, check_aleph_connection
+from ...collection.maltego.oauth import sign_in_status
+from ...collection.maltego.service import MaltegoDataSource
+from ...collection.maltego.settings import MaltegoSettingsError, maltego_settings
 from ...collection.models import CollectionFailure
 from ...collection.wayback import lookup_wayback
 from ..presentation import badge
+
+_MALTEGO_COMMANDS = (
+    ("Sign in once with your own account", "./traced maltego login"),
+    (
+        "Find capabilities for a question",
+        './traced maltego search "who operates this domain" '
+        "--type maltego.Domain --value example.org",
+    ),
+    (
+        "Run one and freeze its result",
+        "./traced maltego run ci_… --type maltego.Domain --value example.org",
+    ),
+    (
+        "Create a case from saved records",
+        './traced maltego case <record IDs> --title "…" --question "…"',
+    ),
+)
 
 _INPUT_STYLE = {
     "width": "100%",
@@ -99,6 +119,42 @@ def external_source_tools():
                                 className="rv-button rv-button--outline",
                             ),
                             html.Div(id="live-aleph-result", role="status"),
+                        ],
+                        style=_PANEL_STYLE,
+                    ),
+                ],
+                className="rv-details",
+            ),
+            html.Details(
+                [
+                    html.Summary("Maltego Data MCP"),
+                    html.Div(
+                        [
+                            html.P(
+                                "Maltego lookups run from a terminal on this computer with your "
+                                "own Maltego sign-in. Each result is saved as a hashed record that "
+                                "can become a case. Runs spend shared team credits; some take "
+                                "minutes.",
+                                className="rv-small rv-muted",
+                            ),
+                            html.Div(id="live-maltego-config", role="status"),
+                            html.Button(
+                                "Check Maltego connection",
+                                id="live-maltego-check",
+                                n_clicks=0,
+                                className="rv-button rv-button--outline",
+                            ),
+                            html.Div(id="live-maltego-result", role="status"),
+                            html.Dl(
+                                [
+                                    part
+                                    for label, command in _MALTEGO_COMMANDS
+                                    for part in (
+                                        html.Dt(label, className="rv-small"),
+                                        html.Dd(html.Code(command), className="rv-mono rv-small"),
+                                    )
+                                ]
+                            ),
                         ],
                         style=_PANEL_STYLE,
                     ),
@@ -215,3 +271,42 @@ def register_external_source_callbacks(app: Dash) -> None:
         except Exception:
             return setup, _notice("Aleph access could not be checked. Try again.", error=True)
         return setup, _notice(result.message, error=result.status != "connected")
+
+    @app.callback(
+        Output("live-maltego-config", "children"),
+        Output("live-maltego-result", "children"),
+        Input("live-maltego-check", "n_clicks"),
+        running=[(Output("live-maltego-check", "disabled"), True, False)],
+    )
+    def maltego_result(clicks):
+        try:
+            settings = maltego_settings()
+            status = sign_in_status(settings)
+        except MaltegoSettingsError as exc:
+            return _notice(str(exc), error=True), ""
+        except Exception:
+            return _notice("Maltego setup could not be read. Try again.", error=True), ""
+        setup = [
+            # Plain text, not a link: opening the endpoint in a browser starts a slow reload.
+            html.P(["Endpoint ", html.Span(settings.server_url, className="rv-mono")]),
+            badge(
+                "Signed in" if status.ready else "Sign-in required",
+                "neutral" if status.ready else "amber",
+            ),
+            html.P(status.message, className="rv-small"),
+        ]
+        if not clicks or not status.ready:
+            return setup, ""
+        try:
+            check = MaltegoDataSource(settings).check()
+        except CollectionFailure as exc:
+            return setup, _notice(str(exc), error=True)
+        except Exception:
+            return setup, _notice(
+                "The Maltego connection could not be checked. Try again.", error=True
+            )
+        server = " ".join(part for part in (check.server.name, check.server.version) if part)
+        return setup, _notice(
+            f"Connected to {server or 'the Data MCP'} · {len(check.tools)} tools available. "
+            "Connection checks spend no credits."
+        )

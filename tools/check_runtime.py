@@ -176,6 +176,9 @@ class RuntimeCheck:
         self.caller.mkdir()
         (self.caller / ".env").write_text("EVIDENCE_DATA_DIR=wrong-caller-store\n")
         self.environment = isolated_environment(dict(os.environ))
+        # The Live sources panel reads sign-in state on mount. Keep that read
+        # inside the disposable runtime workspace, away from a developer's token.
+        self.environment["TRACED_MALTEGO_TOKEN_FILE"] = str(self.temporary / "maltego-token.json")
         self.commands: list[dict] = []
         self.cleanup: list[dict] = []
 

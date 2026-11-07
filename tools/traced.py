@@ -84,12 +84,14 @@ def main(argv: list[str] | None = None, *, root: Path | None = None) -> None:
         epilog=(
             "start (default): integrated desk and combined worker; "
             "config: show paths without opening a database; "
-            "review: forward to the existing review CLI. Use '<command> --help' for details."
+            "review: forward to the existing review CLI; "
+            "maltego: sign in to the Maltego Data MCP and run explicit lookups. "
+            "Use '<command> --help' for details."
         ),
     )
     parser.add_argument("--data-dir", help="Explicit store, relative to the EDTH root or absolute")
     parser.add_argument(
-        "command", choices=("start", "config", "review"), nargs="?", default="start"
+        "command", choices=("start", "config", "review", "maltego"), nargs="?", default="start"
     )
     parser.add_argument("arguments", nargs=argparse.REMAINDER)
     args = parser.parse_args(argv)
@@ -116,6 +118,10 @@ def main(argv: list[str] | None = None, *, root: Path | None = None) -> None:
     if args.command == "review":
         _run_review(root, args.arguments)
         return
+    if args.command == "maltego":
+        from evidence_explorer.collection.maltego.cli import main as maltego_main
+
+        raise SystemExit(maltego_main(args.arguments, data_dir=Path(configuration["data_dir"])))
     assert start_args is not None
     host = start_args.host or os.getenv("EVIDENCE_HOST", "127.0.0.1")
     try:
