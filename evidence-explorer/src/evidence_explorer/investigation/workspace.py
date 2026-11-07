@@ -21,6 +21,7 @@ from ..review.contracts import EvidenceBundle
 from ..review.integrations.snapshots import workspace_snapshot
 from ..review.integrations.workspace import WorkspaceRepository, WorkspaceService
 from ..review.navigation import navigation_context
+from ..review.verifier import CheckError, OpenRouterVerifier, openrouter_configuration
 from ..review.workflow import assessment_context
 from .bundle import INVESTIGATION_METHOD, InvestigationDraft, build_saved_investigation_bundle
 from .checker import LABELS, FrozenRecordUnavailable, check_bundle
@@ -34,6 +35,7 @@ MAX_CHECK_TEXT_BYTES = 1024 * 1024
 MAX_FROZEN_BYTES = 2 * 1024 * 1024
 MAX_FROZEN_TOTAL_BYTES = 8 * 1024 * 1024
 MAX_CHECK_TRAVERSALS = 20_000
+MAX_OPENROUTER_REQUESTS = 4
 CHECK_LIMITS = {"records": 100, "findings": 300, "fragments": 1000, "links": 1000, "runs": 50}
 _FOLDER_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,199}\Z")
 _UNAVAILABLE = "This saved investigation is unavailable or exceeds the supported import limits."
@@ -341,26 +343,64 @@ class _BoundedRecordStore(RecordStore):
 
 
 def check_case(
-    service: WorkspaceService, state: Mapping, *, expected_context: dict | None = None
+    service: WorkspaceService,
+    state: Mapping,
+    *,
+    expected_context: dict | None = None,
+    use_openrouter: bool = False,
 ) -> dict:
-    """Explicitly check saved evidence, without models, network, jobs, or decisions."""
+    """Check saved evidence and optionally challenge the selected run through OpenRouter."""
     bundle, context = _capture(service, state)
     if expected_context is not None and context != expected_context:
         raise ValueError(_CHANGED)
     _require_baseline(context)
     _bounded_check(bundle)
-    report = check_bundle(
-        bundle,
-        store=_BoundedRecordStore(_root(service)),
-        reasoner=Reasoner(
-            None, not_run_reason="This action runs mechanical and deterministic checks only."
-        ),
-    ).to_json()
     selected = {
         finding["snapshot_id"]
         for finding in bundle["findings"]
         if finding["run_id"] == context["run_id"]
     }
+    if use_openrouter:
+        configuration = openrouter_configuration()
+        if not configuration["ready"]:
+            raise CheckError(configuration["message"])
+        reasoner = Reasoner(
+            OpenRouterVerifier.from_env(timeout=15), request_limit=MAX_OPENROUTER_REQUESTS
+        )
+    else:
+        reasoner = Reasoner(
+            None, not_run_reason="This action runs mechanical and deterministic checks only."
+        )
+    report = check_bundle(
+        bundle,
+        store=_BoundedRecordStore(_root(service)),
+        reasoner=reasoner,
+        model_finding_ids=selected,
+    ).to_json()
+    if use_openrouter:
+        model = report["summary"]["model_checks"]
+        model.update(
+            provider="openrouter",
+            actual_model=reasoner.describe()["actual_model"],
+            skipped=reasoner.skipped,
+            discarded_objections=reasoner.discarded,
+            request_limit=MAX_OPENROUTER_REQUESTS,
+        )
+        if not (reasoner.calls or reasoner.cached):
+            model.update(
+                status="not_run",
+                reason="The selected analysis run had no eligible model checks.",
+            )
+        elif reasoner.errors == reasoner.calls and not reasoner.cached:
+            model.update(status="failed", reason="OpenRouter did not return a usable check.")
+        elif reasoner.errors or reasoner.skipped or reasoner.discarded:
+            model.update(
+                status="partial",
+                reason=(
+                    "The model check was incomplete. See the request counts and finding notes "
+                    "for provider errors, request limits, and discarded quotations."
+                ),
+            )
     report["findings"] = [item for item in report["findings"] if item["id"] in selected]
     report["conclusions"] = [item for item in report["conclusions"] if item["id"] in selected]
     report["links"] = [item for item in report["links"] if item["target"].get("id") in selected]

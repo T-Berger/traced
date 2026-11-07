@@ -42,13 +42,20 @@ The investigation question and confirmed source scope stay in the saved plan.
    and decisions retain their exact run and finding identities. Download the
    reasoning report separately when its detailed checks are useful to a reviewer.
 
-The interactive checker makes no network or model calls. Its report is held in
-memory and can be downloaded; changing the evidence or assessment requires a
-fresh check. Excluded evidence, unsupported media/text selectors, and cases above
-the interactive size/work limits make this check unavailable. Existing evidence
-inspection, specialist methods and review decisions remain accessible. Optional
-model assistance is still explicit through **Request an evidence check** or the
-CLI; a machine result never becomes a human decision.
+**Check saved reasoning** runs offline. To add a model challenge, set
+`OPENROUTER_API_KEY` and `EVIDENCE_REVIEW_MODEL` in the server environment or the
+root `.env` and start the viewer with that configuration. The model must support
+structured JSON output. **Check with OpenRouter** sends statements from
+the selected analysis run and relevant excerpts from the saved case. Each
+interactive run makes up to four requests. Provider errors and incomplete checks
+stay visible alongside the mechanical and rule-based results. Use the CLI for a
+longer model check or model drafting.
+
+Reports stay in memory and can be downloaded. Changing the evidence or assessment
+requires a fresh check. Exclusions, unsupported media or selectors, and cases
+above the interactive limits make the reasoning check unavailable. Model
+objections are proposals and must cite exact supplied text. Record the human
+decision using the existing review controls.
 
 This supports the cited-claim and election-briefing use cases: move from a bounded
 saved sample to a substantive, checkable claim before a reviewer decides what to
@@ -72,7 +79,7 @@ complete election archive; live alerts and submissions remain separate actions.
 | Original CLI verification | 38 offline tests (fixture records built by the real `build_record`, fake verifier, fake Data MCP source, mocked OpenRouter) and the then-current 84 tool tests passed. A checked bundle imported into a scratch review workspace |
 | Viewer verification | Focused integration, import/binding, stale-state, note-preservation and UI checks; shared browser gate; all six distributions built and fresh-install checks passed. A fictional browser exercise verified saved-draft import, exact evidence navigation, manual drafting, planted contradiction, report download and case export/reopen at desktop and 390 px in light/dark themes. No source or model calls were made |
 | Verified live | Maltego on `maltego.com`: free search, describe, and three validate-only checks; two paid runs (historical WHOIS, IBM Watson WHOIS entities), 6 credits. Mechanical and deterministic checks of a hand-written draft over the three frozen records, and the planted assumption caught. See [Live run](#live-run-who-is-behind-maltegocom) |
-| Not run | The investigator's model draft and the model-based reasoning checks: OpenRouter is not configured (`OPENROUTER_API_KEY` and `EVIDENCE_REVIEW_MODEL` not set). Reports say so explicitly; [re-run commands](#re-run-with-the-model-once-openrouter-is-configured) are below |
+| Original live-run limit | The live example used a manual draft and offline checks. It did not use OpenRouter. The [model re-run commands](#re-run-with-the-model-once-openrouter-is-configured) use the same saved records |
 | Human review | None. Labels are machine checks for a reviewer, not review decisions |
 
 ## Quick start
@@ -329,9 +336,9 @@ launcher loads it as `./traced` does) or export them. Then, from the EDTH root:
 The engine lives in `evidence_explorer/investigation/`; `tools/investigation/`
 keeps compatible imports and the CLI. The viewer mounts intake on Cases and
 reasoning checks in the existing Review slot, with shared record navigation,
-review decisions and exports. It adds no schema, worker registration or model
-transport. Each manual draft appends a new immutable run; earlier evidence and
-reviews remain attached to their original snapshots. Browser reports remain
+review decisions and exports. The OpenRouter action uses the shared review
+verifier with a bounded request count. Each manual draft appends an immutable
+run. Earlier evidence and reviews stay with their original snapshots. Browser reports remain
 bound to the exact case, run and assessment that was checked.
 
 Saved investigation folders stay under the explicitly selected workspace's

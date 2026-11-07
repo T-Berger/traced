@@ -78,6 +78,7 @@ class Reasoner:
         *,
         cache_path: Path | None = None,
         not_run_reason: str | None = None,
+        request_limit: int | None = None,
     ):
         self.verifier = verifier
         self.not_run_reason = (
@@ -92,6 +93,9 @@ class Reasoner:
         self.calls = 0
         self.cached = 0
         self.errors = 0
+        self.request_limit = request_limit
+        self.skipped = 0
+        self.discarded = 0
 
     @property
     def model(self) -> str | None:
@@ -152,6 +156,15 @@ class Reasoner:
             raw = self.cache[key]
             self.cached += 1
         else:
+            if self.request_limit is not None:
+                if self.errors or self.calls >= self.request_limit:
+                    self.skipped += 1
+                    reason = (
+                        "remaining requests paused after a provider error"
+                        if self.errors
+                        else "interactive OpenRouter request limit reached"
+                    )
+                    return Verdict("off", error=reason)
             try:
                 self.calls += 1
                 raw = self.verifier.check(statement, passages)
@@ -205,4 +218,5 @@ class Reasoner:
                 verdict.discarded.append(f"{item.finding_type}: {problem}")
                 continue
             verdict.objections.append(Objection(item.finding_type, item.explanation, tuple(spans)))
+        self.discarded += len(verdict.discarded)
         return verdict

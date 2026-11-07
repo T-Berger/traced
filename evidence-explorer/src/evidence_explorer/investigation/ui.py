@@ -8,12 +8,13 @@ import uuid
 from collections import OrderedDict
 from threading import Lock
 
-from dash import Dash, Input, Output, State, dcc, html
+from dash import Dash, Input, Output, State, ctx, dcc, html
 from dash.exceptions import PreventUpdate
 
 from ..review.integrations.snapshots import workspace_snapshot
 from ..review.navigation import NextAction, navigation_context
 from ..review.presentation import badge, empty
+from ..review.verifier import CheckError, openrouter_configuration
 from .workspace import check_case, check_context
 
 LABELS = {
@@ -27,6 +28,18 @@ CONCLUSIONS = {
     "holds": ("No flagged dependencies", "neutral"),
     "weak": ("Needs closer review", "amber"),
     "undermined": ("Unsupported or conflicting dependency", "red"),
+}
+MODEL_LABELS = {
+    "supported": ("Model raised no objection", "neutral"),
+    "contradicted": ("Model-proposed conflict", "amber"),
+    "unsupported": ("Model-proposed concern", "amber"),
+    "assumption_not_backed": ("Model questions this assumption", "amber"),
+}
+MODEL_STATUS = {
+    "ran": ("Model check completed", "blue"),
+    "partial": ("Model check incomplete", "amber"),
+    "failed": ("Model check failed", "red"),
+    "not_run": ("Model check not run", "neutral"),
 }
 
 
@@ -66,12 +79,19 @@ def check_panel():
                 "recording your decision.",
                 className="rv-small rv-muted",
             ),
-            html.Div(
+            html.Fieldset(
                 [
                     html.Button(
                         "Check saved reasoning",
                         id="investigation-check-run",
                         n_clicks=0,
+                        className="rv-button rv-button--outline",
+                    ),
+                    html.Button(
+                        "Check with OpenRouter",
+                        id="investigation-check-openrouter",
+                        n_clicks=0,
+                        disabled=True,
                         className="rv-button rv-button--outline",
                     ),
                     html.Button(
@@ -82,12 +102,19 @@ def check_panel():
                         className="rv-text-button",
                     ),
                 ],
+                id="investigation-check-actions",
                 className="rv-toolbar",
+                style={"border": "none", "padding": 0, "margin": 0, "minWidth": 0},
             ),
             html.P(
-                "Uses saved evidence only. No collection, model call, or review decision.",
+                "Check saved reasoning runs offline. Check with OpenRouter sends statements "
+                "from the selected analysis run and relevant saved excerpts to OpenRouter "
+                "and its model provider. Excerpts may include nearby related text from the "
+                "complete saved case. Up to 4 requests per action. Results are proposals "
+                "for human review.",
                 className="rv-small rv-muted",
             ),
+            html.Div(id="investigation-openrouter-status", role="status"),
             html.Div(id="investigation-check-message", role="status"),
             dcc.Loading(
                 html.Div(id="investigation-check-result", **{"aria-live": "polite"}),
@@ -102,9 +129,49 @@ def check_panel():
     )
 
 
-def _label(value):
-    text, tone = LABELS.get(value, ("Not established", "amber"))
+def _label(value, basis=None):
+    labels = MODEL_LABELS if basis == "model" else LABELS
+    text, tone = labels.get(value, ("Not established", "amber"))
     return badge(text, tone)
+
+
+def _model_provenance(model):
+    children = []
+    if model.get("provider") or model.get("model"):
+        children.extend(
+            [
+                html.P(
+                    f"Provider: {model.get('provider') or 'Not recorded'} · "
+                    f"Requested model: {model.get('model') or 'Not recorded'} · "
+                    f"Returned model: {model.get('actual_model') or 'Not reported'}",
+                    className="rv-small rv-mono",
+                ),
+                html.P(
+                    f"Requests: {model.get('calls', 0)} · "
+                    f"Cached checks: {model.get('cached', 0)} · "
+                    f"Errors: {model.get('errors', 0)} · "
+                    f"Skipped checks: {model.get('skipped', 0)} · "
+                    f"Discarded objections: {model.get('discarded_objections', 0)}",
+                    className="rv-small",
+                ),
+                html.P(
+                    "Model observations are proposals for review. A lack of objections "
+                    "does not establish support or approve a conclusion.",
+                    className="rv-small rv-muted",
+                ),
+            ]
+        )
+    if model.get("reason"):
+        children.append(
+            html.P(
+                model["reason"],
+                className="rv-notice"
+                if model.get("status") in {"partial", "failed"}
+                else "rv-small rv-muted",
+                role="status",
+            )
+        )
+    return html.Div(children, id="investigation-model-result")
 
 
 def _finding_action(finding, context, location):
@@ -188,15 +255,17 @@ def render_report(report: dict, state: dict, view: dict):
     )
     summary = report["summary"]
     model = summary.get("model_checks", {})
+    links_by_id = {link["id"]: link for link in report["links"]}
     content = [
         html.Div(
             [
                 badge("Saved evidence checked", "blue"),
-                badge("Model check not run" if model.get("status") != "ran" else "Model-assisted"),
+                badge(*MODEL_STATUS.get(model.get("status"), MODEL_STATUS["not_run"])),
                 badge("Human decision still required", "amber"),
             ],
             className="rv-badges",
         ),
+        _model_provenance(model),
         html.P(
             f"{summary['records_failed']} record integrity problem(s) · "
             f"{summary['broken_fragments']} broken quotation(s). "
@@ -225,7 +294,7 @@ def render_report(report: dict, state: dict, view: dict):
         selected_status = (
             badge(*CONCLUSIONS[selected_conclusion["status"]])
             if selected_conclusion
-            else _label(selected["verdict"])
+            else _label(selected["verdict"], selected.get("basis"))
         )
         content.append(
             html.Section(
@@ -234,6 +303,19 @@ def render_report(report: dict, state: dict, view: dict):
                     selected_status,
                     *[html.P(reason) for reason in dict.fromkeys(concerns)],
                     *[html.P(caveat, className="rv-small") for caveat in selected["caveats"]],
+                    html.Details(
+                        [
+                            html.Summary("Model notes for this finding"),
+                            html.Ul([html.Li(note) for note in selected["model_notes"][:40]]),
+                            html.P("Further notes are included in the downloaded report.")
+                            if len(selected["model_notes"]) > 40
+                            else None,
+                        ],
+                        className="rv-details",
+                        open=True,
+                    )
+                    if selected.get("model_notes")
+                    else None,
                 ],
                 className="investigation-selected",
             )
@@ -256,7 +338,12 @@ def render_report(report: dict, state: dict, view: dict):
                         *[
                             html.Div(
                                 [
-                                    _label(flag["label"]),
+                                    _label(
+                                        flag["label"],
+                                        links_by_id.get(flag["id"], {}).get("basis")
+                                        if flag.get("item") == "link"
+                                        else findings.get(flag["id"], {}).get("basis"),
+                                    ),
                                     html.P(flag["reason"]),
                                     html.P(
                                         "Reasoning path: " + " → ".join(flag["via"]),
@@ -321,7 +408,7 @@ def render_report(report: dict, state: dict, view: dict):
                     *[
                         html.Div(
                             [
-                                _label(link["label"]),
+                                _label(link["label"], link.get("basis")),
                                 html.P(
                                     findings.get(link["source"].get("id"), {}).get("statement")
                                     or link["relation"]
@@ -366,10 +453,6 @@ def render_report(report: dict, state: dict, view: dict):
                     "Mechanical and rule-based checks ran on the complete saved case; "
                     "conclusions shown belong to the selected analysis run."
                 ),
-                html.P(
-                    model.get("reason")
-                    or "Optional model checks are separate from this saved reasoning check."
-                ),
                 *[html.P(note, className="rv-small") for note in report.get("notes", [])],
                 html.P(
                     f"Checker version {report['checker']['version']} · {report['checked_at']}",
@@ -390,19 +473,52 @@ def register_check_callbacks(app: Dash, service):
     cache = ReportCache()
 
     @app.callback(
+        Output("investigation-openrouter-status", "children"),
+        Output("investigation-check-openrouter", "disabled"),
+        Input("rv-session", "data"),
+    )
+    def model_configuration(state):
+        configuration = openrouter_configuration()
+        ready = configuration["ready"]
+        return html.Div(
+            [
+                badge(
+                    "OpenRouter configured" if ready else "OpenRouter not configured",
+                    "blue" if ready else "amber",
+                ),
+                html.P(
+                    configuration.get("model") or "No model configured",
+                    className="rv-small rv-mono",
+                ),
+                html.P(
+                    "Configuration is present; availability is checked when you run the analysis."
+                    if ready
+                    else configuration["message"]
+                    + " Restart the app after changing its configuration.",
+                    className="rv-small rv-muted",
+                ),
+            ]
+        ), not ready or not bool((state or {}).get("case_id"))
+
+    @app.callback(
         Output("investigation-check-token", "data"),
         Output("investigation-check-message", "children"),
         Input("investigation-check-run", "n_clicks"),
+        Input("investigation-check-openrouter", "n_clicks"),
         State("rv-session", "data"),
         prevent_initial_call=True,
-        running=[(Output("investigation-check-run", "disabled"), True, False)],
+        running=[(Output("investigation-check-actions", "disabled"), True, False)],
     )
-    def run_check(clicks, state):
-        if not clicks:
+    def run_check(clicks, openrouter_clicks, state):
+        use_openrouter = ctx.triggered_id == "investigation-check-openrouter"
+        if ctx.triggered_id not in {
+            "investigation-check-run",
+            "investigation-check-openrouter",
+        } or not (openrouter_clicks if use_openrouter else clicks):
             raise PreventUpdate
         try:
-            return cache.put(check_case(service, state or {})), ""
-        except (ValueError, OSError, sqlite3.Error) as exc:
+            return cache.put(check_case(service, state or {}, use_openrouter=use_openrouter)), ""
+        except (CheckError, ValueError, OSError, sqlite3.Error) as exc:
             return None, html.P(str(exc), className="rv-notice", role="status")
 
     def current(token, state, owner=service):

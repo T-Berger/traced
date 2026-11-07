@@ -220,10 +220,12 @@ class _Checker:
         store: RecordStore | None,
         reasoner: Reasoner | None,
         now: str | None,
+        model_finding_ids: set[str] | None,
     ):
         self.data = data
         self.store = store
         self.reasoner = reasoner or Reasoner(None)
+        self.model_finding_ids = model_finding_ids
         self.now = now or _now()
         self.notes: list[str] = []
         self.records: dict[str, dict] = {}
@@ -237,6 +239,11 @@ class _Checker:
         self.extra_links: list[LinkCheck] = []
         self.extra_fragments: dict[tuple[str, int, int], dict] = {}
         self.lines: dict[str, tuple[Line, ...]] = {}
+
+    def _model_enabled(self, finding: FindingCheck) -> bool:
+        return self.reasoner.verifier is not None and (
+            self.model_finding_ids is None or finding.id in self.model_finding_ids
+        )
 
     # -- structure -------------------------------------------------------
     def _items(self, name: str, required: Sequence[str]) -> list[dict]:
@@ -876,7 +883,7 @@ class _Checker:
                             else "the cited lines do not name every property the statement uses: "
                             + ", ".join(uncovered_words(statement, lines)),
                         )
-            if self.reasoner.verifier is None or not mechanical_ok or not spans:
+            if not self._model_enabled(finding) or not mechanical_ok or not spans:
                 continue
             if any(problem["label"] in {"unsupported", "contradicted"} for problem in problems):
                 continue  # deterministic failures stand; skip the model call
@@ -965,7 +972,9 @@ class _Checker:
                 )
         for objection in verdict.of("alternative_explanation"):
             finding.caveats.append(f"model: {objection.explanation}")
-        if not verdict.of("contradiction", "unsupported_inference", "insufficient_evidence"):
+        if not verdict.discarded and not verdict.of(
+            "contradiction", "unsupported_inference", "insufficient_evidence"
+        ):
             for link in links:
                 check = self.link_checks[link["id"]]
                 if check.label == "unchecked":
@@ -1032,7 +1041,7 @@ class _Checker:
                 if not reasons:
                     reasons.append("no record line states it")
             candidates = self.related_lines(statement, exclude=set(), limit=6, minimum=2)
-            if self.reasoner.verifier is not None and candidates and verdict != "contradicted":
+            if self._model_enabled(finding) and candidates and verdict != "contradicted":
                 windows = [self.line_window(record_id, line) for record_id, line in candidates]
                 model = self.reasoner.challenge(finding.statement, windows)
                 finding.model_notes.extend(
@@ -1054,7 +1063,7 @@ class _Checker:
                                 finding.backing = []
                                 reasons = []
                             reasons.extend(f"model: {item.explanation}" for item in doubts)
-                        elif verdict != "supported":
+                        elif not model.discarded and verdict != "supported":
                             reasons.append(
                                 "the verifier raised no objection, but no record line states it"
                             )
@@ -1190,7 +1199,7 @@ class _Checker:
                     )
                 elif not problems:
                     check.note("inference", "open", open_reason)
-            if problems or self.reasoner.verifier is None or not spans:
+            if problems or not self._model_enabled(finding) or not spans:
                 continue
             windows = self._cited_windows(spans)
             for assumption_id in assumptions:
@@ -1222,7 +1231,7 @@ class _Checker:
                         f"model ({objection.kind.replace('_', ' ')}): {objection.explanation}",
                         "model",
                     )
-                if not doubts and check.label == "unchecked":
+                if not doubts and not verdict.discarded and check.label == "unchecked":
                     check.label, check.basis = "supported", "model"
                     check.note(
                         "model_check", "pass", "the verifier raised no objection to this inference"
@@ -1526,6 +1535,7 @@ def check_bundle(
     store: RecordStore | None = None,
     reasoner: Reasoner | None = None,
     now: str | None = None,
+    model_finding_ids: set[str] | None = None,
 ) -> CheckReport:
     """Check one bundle (as JSON data) and return a labelled report."""
-    return _Checker(data, store, reasoner, now).run()
+    return _Checker(data, store, reasoner, now, model_finding_ids).run()

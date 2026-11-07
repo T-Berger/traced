@@ -253,7 +253,12 @@ class OpenRouterVerifier:
     provider = "openrouter"
 
     def __init__(
-        self, api_key: str, model: str, *, transport: httpx.BaseTransport | None = None
+        self,
+        api_key: str,
+        model: str,
+        *,
+        transport: httpx.BaseTransport | None = None,
+        timeout: float = 60,
     ) -> None:
         if not api_key or not model:
             raise CheckError(
@@ -265,14 +270,16 @@ class OpenRouterVerifier:
         self.requested_model = model
         self.actual_model: str | None = None
         self.transport = transport
+        self.timeout = timeout
 
     @classmethod
-    def from_env(cls, model: str | None = None) -> OpenRouterVerifier:
+    def from_env(cls, model: str | None = None, *, timeout: float = 60) -> OpenRouterVerifier:
         return cls(
             api_key=os.environ.get("OPENROUTER_API_KEY", "").strip(),
             model=model
             if model is not None
             else os.environ.get("EVIDENCE_REVIEW_MODEL", "").strip(),
+            timeout=timeout,
         )
 
     def check(self, statement: str, passages: list[Passage]) -> dict[str, Any]:
@@ -293,7 +300,7 @@ class OpenRouterVerifier:
         }
         try:
             with httpx.Client(
-                timeout=httpx.Timeout(60, connect=5), transport=self.transport
+                timeout=httpx.Timeout(self.timeout, connect=5), transport=self.transport
             ) as client:
                 with client.stream(
                     "POST",
