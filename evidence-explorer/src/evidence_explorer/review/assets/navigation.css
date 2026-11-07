@@ -1,0 +1,21 @@
+/* Available navigation stays distinct from workflow completion and decisions. */
+.review-app .rv-next-action {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  margin: 16px 0;
+  padding: 14px 16px;
+  background: var(--rv-subtle);
+  border: 1px solid var(--rv-border);
+  border-radius: var(--traced-radius-card);
+}
+.review-app .rv-next-action-copy { flex: 1 1 320px; min-width: 0; }
+.review-app .rv-next-action-copy p { max-width: 72ch; margin-top: 3px; }
+.review-app .rv-next-action .rv-button { flex: 0 1 auto; }
+@media (max-width: 600px) {
+  .review-app .rv-next-action { padding: 12px; gap: 12px; }
+  .review-app .rv-next-action-copy { flex-basis: 100%; }
+  .review-app .rv-next-action .rv-button { width: 100%; }
+}

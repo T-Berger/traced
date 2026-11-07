@@ -1,0 +1,195 @@
+name: Traced CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+  workflow_call:
+    outputs:
+      distribution-artifact-id:
+        description: Immutable artifact containing the checked distributions.
+        value: ${{ jobs.distributions.outputs.artifact-id }}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  UV_NO_PROGRESS: "1"
+  PYTHONUNBUFFERED: "1"
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  quality:
+    name: Ruff, identity, and workspace lock
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Check out the event commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Install the declared uv version
+        uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          version-file: pyproject.toml
+      - name: Install the declared Python version
+        run: uv python install
+      - name: Check release tag against every package version
+        if: github.ref_type == 'tag'
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          uv run --no-project python - <<'PY'
+          import os
+          import tomllib
+          from pathlib import Path
+
+          tag = os.environ["RELEASE_TAG"]
+          members = ("evidence-explorer", "swarm-detector", "operation-silent-storm")
+          for member in members:
+              project = tomllib.loads((Path(member) / "pyproject.toml").read_text())["project"]
+              expected = f"v{project['version']}"
+              if tag != expected:
+                  raise SystemExit(f"{project['name']}: tag {tag!r} must match {expected!r}")
+          PY
+      - name: Check the workspace lock
+        run: make locks
+      - name: Install locked development dependencies
+        run: make setup
+      - name: Check lint and formatting
+        run: make lint
+      - name: Check shared identity assets
+        run: make identity-check
+      - name: Test packaging verification tools
+        run: make test-tools
+
+  tests:
+    name: Tests / ${{ matrix.package }}
+    needs: quality
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - package: evidence-explorer
+            target: test-explorer
+          - package: swarm-detector
+            target: test-swarm
+          - package: silent-storm
+            target: test-silent-storm
+    steps:
+      - name: Check out the event commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Install the declared uv version
+        uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          version-file: pyproject.toml
+      - name: Install the declared Python version
+        run: uv python install
+      - name: Install locked development dependencies
+        run: make setup
+      - name: Install Node for client-side callback regression tests
+        if: matrix.package == 'evidence-explorer'
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .node-version
+          package-manager-cache: false
+      - name: Run the package suite
+        env:
+          MAKE_TARGET: ${{ matrix.target }}
+        run: make "$MAKE_TARGET"
+
+  runtime:
+    name: Root launcher runtime integration
+    needs: [quality, tests]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Check out the event commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Install the declared uv version
+        uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          version-file: pyproject.toml
+      - name: Install the declared Python version
+        run: uv python install
+      - name: Install locked development dependencies
+        run: make setup
+      - name: Check the root launcher with isolated runtime storage
+        run: make runtime-check
+      - name: Install locked browser tooling and Chromium
+        run: make browser-setup BROWSER_INSTALL_FLAGS=--with-deps
+      - name: Check visible navigation during delayed assessment responses
+        run: make browser-check
+      - name: Retain runtime reports and browser diagnostics
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: runtime-checks-${{ github.sha }}
+          path: |
+            dist/runtime-check.json
+            dist/browser-check.json
+            dist/browser-check-artifacts/
+          if-no-files-found: warn
+          retention-days: 14
+
+  distributions:
+    name: Build and install distributions
+    needs: [quality, tests, runtime]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    outputs:
+      artifact-id: ${{ steps.upload.outputs.artifact-id }}
+    steps:
+      - name: Check out the event commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Install the declared uv version
+        uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          version-file: pyproject.toml
+      - name: Install the declared Python version
+        run: uv python install
+      - name: Install locked development dependencies
+        run: make setup
+      - name: Build all three wheels and source distributions
+        run: make build
+      - name: Check packages and install them in a disposable environment
+        run: make package-check
+      - name: Record the checked commit and distribution hashes
+        run: |
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          printf '%s\n' "$GITHUB_SHA" > dist/BUILD_COMMIT
+          cd dist
+          sha256sum -- *.whl *.tar.gz > SHA256SUMS
+      - name: Retain the checked distributions
+        id: upload
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: python-distributions-${{ github.sha }}
+          path: |
+            dist/*.whl
+            dist/*.tar.gz
+            dist/SHA256SUMS
+            dist/BUILD_COMMIT
+          if-no-files-found: error
+          retention-days: 14
+

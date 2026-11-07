@@ -1,0 +1,78 @@
+/* Standalone Explorer bridge; canonical tokens and artwork are generated. */
+body:has(.traced-explorer) { background: var(--traced-background); font-family: var(--traced-font-sans); }
+.traced-explorer {
+  color-scheme: light;
+  --paper: var(--traced-background); --panel: var(--traced-surface);
+  --ink: var(--traced-foreground); --muted: var(--traced-foreground-secondary);
+  --line: var(--traced-border-subtle); --green: var(--traced-link);
+  --sage: var(--traced-selection-background); --sidebar: var(--traced-surface-inverse);
+  background: var(--traced-background); color: var(--traced-foreground);
+  font-family: var(--traced-font-sans); font-size: var(--traced-font-size-body);
+  line-height: var(--traced-line-height-body);
+}
+.traced-explorer :where(h1,h2,h3,h4,button,input,textarea,select) { font-family: var(--traced-font-sans); }
+.traced-explorer :where(code,pre,.model-reference) { font-family: var(--traced-font-mono); }
+.traced-explorer a:not(.nav-link) { color: var(--traced-link); text-decoration: underline; }
+.traced-explorer :where(button,a,input,textarea,select,summary,[role="combobox"]):focus-visible { outline: 3px solid var(--traced-focus-ring); outline-offset: 3px; }
+.traced-explorer .sidebar { background: var(--traced-surface-inverse); color: var(--traced-foreground-inverse); --traced-focus-ring: var(--traced-focus-ring-on-dark); }
+.traced-explorer .traced-brand { flex-direction: column; align-items: flex-start; gap: 6px; margin-bottom: 28px; }
+.traced-explorer .traced-specialist { color: var(--traced-foreground-inverse); font-size: 14px; line-height: 1.5; font-weight: 500; }
+.traced-explorer .sidebar :where(.sidebar-eyebrow,.sidebar-note,.status-line,.sidebar-footer) { color: var(--traced-foreground-inverse); font-size: 12px; letter-spacing: .15px; }
+.traced-explorer .nav-link { color: var(--traced-foreground-inverse); font-size: 14px; }
+.traced-explorer .nav-link span { color: var(--traced-link-on-dark); }
+.traced-explorer .nav-link:hover,.traced-explorer .nav-link--active { background: var(--traced-action-secondary-hover-background); color: var(--traced-foreground-inverse); }
+.traced-explorer .nav-link--active { box-shadow: inset 2px 0 var(--traced-color-trace); }
+.traced-explorer .sidebar-analysis,.traced-explorer .sidebar-footer { border-color: var(--traced-border-strong); }
+.traced-explorer .sidebar .Select-control,.traced-explorer .sidebar .dash-dropdown { background: var(--traced-surface-inverse); border-color: var(--traced-link-on-dark); color: var(--traced-foreground-inverse); font-size: 14px; }
+.traced-explorer .sidebar .Select-value-label,.traced-explorer .sidebar .dash-dropdown-value { color: var(--traced-foreground-inverse) !important; }
+.traced-explorer .sidebar .dash-dropdown-trigger-icon { color: var(--traced-foreground-inverse); fill: var(--traced-foreground-inverse); }
+.traced-explorer .status-dot { background: var(--traced-status-review-border); }
+.traced-explorer .status-dot--green { background: var(--traced-link-on-dark); box-shadow: none; }
+.traced-explorer .topbar { background: var(--traced-surface); border-color: var(--traced-border-subtle); }
+.traced-explorer :where(.eyebrow,.breadcrumb-current,.breadcrumb-divider,.page-description,.collection-tag div span,.stat__label,.stat__note,.small,.article-byline,.claim-details,.model-reference,.saved-feed-times dt,.saved-feed-times dd,.saved-feed-result,.saved-feed-analysis-status,.saved-feed-connection,.provenance-panel dt,.provenance-panel dd) { color: var(--traced-foreground-secondary); }
+.traced-explorer :where(.eyebrow,.breadcrumb-current,.page-description,.collection-tag strong,.collection-tag div span,.stat__label,.stat__note,.small,.article-byline,.claim-details,.model-reference,.saved-feed-times,.saved-feed-connection,.saved-feed-fields label,.provenance-panel dl) { font-size: 13px; }
+.traced-explorer .collection-icon { color: var(--traced-link); border-color: var(--traced-border-subtle); }
+.traced-explorer :where(.panel,.result-card,.stat) { background: var(--traced-surface); border-color: var(--traced-border-subtle); border-radius: var(--traced-radius-card); }
+.traced-explorer .result-card:hover { border-color: var(--traced-border-strong); }
+.traced-explorer .article-title { font-family: var(--traced-font-sans); font-weight: 500; }
+.traced-explorer :where(.result-card__publisher,.article-byline strong,.result-card__rank) { color: var(--traced-foreground-secondary); font-size: 13px; }
+.traced-explorer :where(.result-card__passage,.saved-article-text p,.claim-card blockquote) { color: var(--traced-foreground); font-family: var(--traced-font-sans); font-size: 16px; line-height: 1.8; }
+.traced-explorer .claim-card { background: var(--traced-surface); border-color: var(--traced-border-subtle); border-radius: var(--traced-radius-card); }
+.traced-explorer .claim-card h4 { color: var(--traced-foreground); font-size: 15px; }
+.traced-explorer .claim-card blockquote { border-color: var(--traced-color-moss); font-style: normal; }
+.traced-explorer :where(.source-link,.text-button,.article-disclosure summary,.provenance-panel summary,.saved-feed-form > summary) { color: var(--traced-link); font-size: 14px; }
+.traced-explorer .text-button { text-decoration: underline; text-underline-offset: 3px; }
+.traced-explorer .text-button:hover { color: var(--traced-foreground); }
+.traced-explorer input:not([type="checkbox"]):not([type="radio"]),.traced-explorer textarea { background: var(--traced-surface); color: var(--traced-foreground); border-color: var(--traced-border-strong); font-size: 16px; min-width: 0; }
+.traced-explorer :where(input,textarea)::placeholder { color: var(--traced-foreground-secondary); opacity: 1; }
+.traced-explorer :where(.Select-control,.Select-menu-outer,.dash-dropdown,.dash-dropdown-content) { background: var(--traced-surface); color: var(--traced-foreground); border-color: var(--traced-border-strong); font-family: var(--traced-font-sans); font-size: 14px; }
+.traced-explorer .Select-value-label,.traced-explorer .dash-dropdown-value { color: var(--traced-foreground) !important; }
+.traced-explorer .dash-dropdown-option:hover { background: var(--traced-selection-background); }
+.traced-explorer .button { min-height: var(--traced-layout-control-height); height: auto; padding-block: 10px; border-radius: var(--traced-radius-small); font-size: 14px; }
+.traced-explorer .button--primary,.traced-explorer .button--sidebar { background: var(--traced-action-primary-background); color: var(--traced-action-primary-foreground); border-color: var(--traced-action-primary-background); }
+.traced-explorer .button--primary:hover:not(:disabled),.traced-explorer .button--sidebar:hover:not(:disabled) { background: var(--traced-action-primary-hover-background); color: var(--traced-action-primary-foreground); }
+.traced-explorer .button--primary:active:not(:disabled),.traced-explorer .button--sidebar:active:not(:disabled) { background: var(--traced-action-primary-active-background); }
+.traced-explorer .button:disabled { background: var(--traced-disabled-background); color: var(--traced-disabled-foreground); border-color: var(--traced-border-strong); opacity: 1; }
+.traced-explorer .saved-feed-form { background: var(--traced-surface); border-color: var(--traced-border-subtle); }
+.traced-explorer .saved-feed-button { background: var(--traced-surface); color: var(--traced-link); border-color: var(--traced-border-strong); font-size: 14px; }
+.traced-explorer .saved-feed-button:hover { background: var(--traced-selection-background); }
+.traced-explorer .notice { background: var(--traced-status-info-background); color: var(--traced-status-info-foreground); font-size: 14px; }
+.traced-explorer .notice--success { background: var(--traced-status-success-background); color: var(--traced-status-success-foreground); }
+.traced-explorer .notice--error { background: var(--traced-status-error-background); color: var(--traced-status-error-foreground); }
+.traced-explorer .notice--warning,.traced-explorer .job-import-errors { background: var(--traced-status-review-background); color: var(--traced-status-review-foreground); }
+.traced-explorer .pill { color: var(--traced-foreground-secondary); background: var(--traced-surface-subtle); font-size: 12px; }
+.traced-explorer .pill--green { color: var(--traced-status-success-foreground); background: var(--traced-status-success-background); }
+.traced-explorer .pill--sample,.traced-explorer .pill--warning { color: var(--traced-status-review-foreground); background: var(--traced-status-review-background); }
+.traced-explorer .sample-banner { background: var(--traced-status-review-background); border-color: var(--traced-status-review-border); color: var(--traced-status-review-foreground); }
+.traced-explorer :where(.sample-banner strong,.sample-banner div span,.sample-banner__icon) { color: var(--traced-status-review-foreground); font-size: 13px; }
+.traced-explorer .count-badge { color: var(--traced-foreground-secondary); background: var(--traced-surface-subtle); font-size: 12px; }
+.traced-explorer .legend-publisher { color: var(--traced-foreground); }
+.traced-explorer .legend-article { color: var(--traced-link); }
+.traced-explorer .legend-claim { color: var(--traced-foreground-secondary); }
+.traced-explorer .js-plotly-plot :where(text,.main-svg) { font-family: var(--traced-font-sans) !important; }
+.traced-explorer .page-footer { color: var(--traced-foreground-secondary); font-size: 13px; }
+.traced-explorer .skip-link { top: 0; left: 12px; transform: translateY(-120%); background: var(--traced-surface); color: var(--traced-link); }
+.traced-explorer .skip-link:focus { top: 12px; transform: none; }
+body:has(.traced-explorer) .dash-dropdown-content { background: var(--traced-surface); color: var(--traced-foreground); border-color: var(--traced-border-strong); font-family: var(--traced-font-sans); font-size: 14px; }
+@media (max-width: 700px) { .traced-explorer .traced-brand { margin-bottom: 0; } .traced-explorer .sidebar-analysis { align-items: end; } }
+@media print { .traced-explorer .sidebar { background: var(--traced-surface); color: var(--traced-foreground); } .traced-explorer .traced-specialist { color: var(--traced-foreground); } }

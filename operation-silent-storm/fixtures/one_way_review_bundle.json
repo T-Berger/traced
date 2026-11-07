@@ -1,0 +1,870 @@
+{
+  "schema_version": "1.0",
+  "case": {
+    "id": "silent-storm:synthetic-handoff-release:case",
+    "title": "Synthetic one way specialist review handoff",
+    "question": "Can saved specialist context cross the shared contract without becoming a shared decision?",
+    "synthetic": true,
+    "coverage": {
+      "frame_surrogates": 1,
+      "image_artifacts": 0,
+      "clips": 1,
+      "source_videos": 1,
+      "specialist_review_revisions": 5,
+      "shared_reviews": 0,
+      "bounded_subset": true,
+      "full_release_processed": false
+    },
+    "limitations": [
+      "Entirely synthetic contract fixture; no combat imagery or real review decisions.",
+      "The SVG is saved as text. No image artifact or original JPG is included or validated.",
+      "Exercise week means first posted, not capture time. Capture order remains unknown.",
+      "Original URLs, publication dates, locations, event identity, and depicted side remain unknown.",
+      "Specialist statuses are provenance only; no shared use, qualify, or withhold decision is supplied.",
+      "Selected specialist history is bounded and does not represent the complete source workspace."
+    ]
+  },
+  "records": [
+    {
+      "id": "silent-storm:synthetic-handoff-release:frame:synthetic-frame-a",
+      "kind": "synthetic_frame_text_surrogate",
+      "source_label": "Harmless SVG surrogate saved as text; original JPG is not supplied",
+      "text": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"64\" height=\"48\"><rect width=\"64\" height=\"48\" fill=\"#ddd\"/><text x=\"5\" y=\"28\">SAMPLE</text></svg>",
+      "content_hash": "c97b68fd285c2c61d9efe0efbd298f98c9793337285852ea583de218a1fa100f",
+      "source_url": null,
+      "artifact_ref": null,
+      "acquired_at": "2026-11-07T00:00:00+01:00",
+      "published_at": null,
+      "metadata": {
+        "synthetic": true,
+        "release_id": "synthetic-handoff-release",
+        "frame_id": "synthetic-frame-a",
+        "clip_id": "synthetic-clip-a",
+        "clip_key": "c7679f16f2f98b2aa2c0d8b1c61f8cd658bd38122ff60662550ad5649d62cb88",
+        "video_id": "synthetic-video-a",
+        "specialist_evidence_id": "synthetic-handoff-release:synthetic-frame-a",
+        "original_relative_path": "frames/synthetic-card-a.jpg",
+        "source_file": "metadata/frames.csv",
+        "source_row": 2,
+        "first_posted_exercise_week": 7,
+        "posting_channel_affiliation": null,
+        "capture_time": null,
+        "event_time": null,
+        "location": null,
+        "depicted_side": null,
+        "original_publication_context": "unavailable",
+        "capture_order": "unknown",
+        "raw_metadata": {
+          "frame_id": "synthetic-frame-a",
+          "file": "synthetic-card-a.jpg",
+          "clip_id": "synthetic-clip-a",
+          "video_id": "synthetic-video-a",
+          "week": "Week 7",
+          "side": "",
+          "image_type": "Photo",
+          "from_perspective": "",
+          "to_perspective": "",
+          "camera": "RGB",
+          "width_px": "64",
+          "height_px": "48"
+        },
+        "original_media_available": false,
+        "original_media_sha256": null,
+        "fixture_surrogate_only": true
+      }
+    },
+    {
+      "id": "silent-storm:synthetic-handoff-release:frame:synthetic-frame-a:metadata",
+      "kind": "supplied_frame_metadata",
+      "source_label": "Synthetic supplied CSV row",
+      "text": "{\"provenance\":{\"release_id\":\"synthetic-handoff-release\",\"source_file\":\"metadata/frames.csv\",\"source_row\":2},\"raw_supplied_row\":{\"camera\":\"RGB\",\"clip_id\":\"synthetic-clip-a\",\"file\":\"synthetic-card-a.jpg\",\"frame_id\":\"synthetic-frame-a\",\"from_perspective\":\"\",\"height_px\":\"48\",\"image_type\":\"Photo\",\"side\":\"\",\"to_perspective\":\"\",\"video_id\":\"synthetic-video-a\",\"week\":\"Week 7\",\"width_px\":\"64\"}}",
+      "content_hash": "f299c8ee91101103c7318c6f7f2abc793488a7d7fc8d5b43a16c556f6087d21a",
+      "source_url": null,
+      "artifact_ref": null,
+      "acquired_at": "2026-11-07T00:00:00+01:00",
+      "published_at": null,
+      "metadata": {
+        "synthetic": true,
+        "fixture_only": true,
+        "describes_record_id": "silent-storm:synthetic-handoff-release:frame:synthetic-frame-a"
+      }
+    },
+    {
+      "id": "silent-storm:synthetic-handoff-release:clip-key:c7679f16f2f98b2aa2c0d8b1c61f8cd658bd38122ff60662550ad5649d62cb88",
+      "kind": "supplied_clip",
+      "source_label": "Synthetic supplied clip membership",
+      "text": "{\"capture_order\":\"unknown\",\"clip_id\":\"synthetic-clip-a\",\"clip_key\":\"c7679f16f2f98b2aa2c0d8b1c61f8cd658bd38122ff60662550ad5649d62cb88\",\"display_order\":\"frame_id ascending\",\"video_id\":\"synthetic-video-a\"}",
+      "content_hash": "d343711fd26f69176e906d33a629856c418439c3426302acf998c2da1c952a96",
+      "source_url": null,
+      "artifact_ref": null,
+      "acquired_at": "2026-11-07T00:00:00+01:00",
+      "published_at": null,
+      "metadata": {
+        "synthetic": true,
+        "release_id": "synthetic-handoff-release"
+      }
+    },
+    {
+      "id": "silent-storm:synthetic-handoff-release:video:synthetic-video-a",
+      "kind": "supplied_source_video",
+      "source_label": "Synthetic source-video identifier only",
+      "text": "{\"capture_time\":null,\"location\":null,\"original_source_url\":null,\"original_video_payload\":null,\"video_id\":\"synthetic-video-a\"}",
+      "content_hash": "0771183ca85af9ca4e01c31c1da63bbb1275a76602b00af67e1d9b78ddd08c2c",
+      "source_url": null,
+      "artifact_ref": null,
+      "acquired_at": "2026-11-07T00:00:00+01:00",
+      "published_at": null,
+      "metadata": {
+        "synthetic": true,
+        "release_id": "synthetic-handoff-release"
+      }
+    },
+    {
+      "id": "silent-storm:synthetic-handoff-release:specialist-review:synthetic-baseline-note:r1",
+      "kind": "specialist_review_revision",
+      "source_label": "Synthetic specialist review history",
+      "text": "{\"change_reason\":\"Synthetic draft for contract testing.\",\"change_type\":\"created\",\"created_at\":\"2026-11-07T00:01:00+01:00\",\"evidence_ids\":[\"synthetic-handoff-release:synthetic-frame-a\"],\"interpretation\":\"\",\"observation\":\"The saved synthetic frame surrogate contains the label SAMPLE.\",\"origin_review_id\":null,\"origin_revision\":null,\"rationale\":\"Inspect the saved SVG text.\",\"release_id\":\"synthetic-handoff-release\",\"review_id\":\"synthetic-baseline-note\",\"reviewer\":\"Fixture Reviewer A\",\"revision\":1,\"scenario_id\":\"synthetic-baseline\",\"status\":\"draft\",\"synthetic\":true,\"title\":\"Synthetic specialist note\",\"uncertainty\":\"No event, location, capture date, or original public source is established.\"}",
+      "content_hash": "05fdbd3b8af8d4865f4bbf8edccc62b5dc20d9780ffdb10256e3ff7bc7830bda",
+      "source_url": null,
+      "artifact_ref": null,
+      "acquired_at": "2026-11-07T00:00:00+01:00",
+      "published_at": null,
+      "metadata": {
+        "synthetic": true,
+        "specialist_origin": {
+          "producer": "silent-storm",
+          "review_id": "synthetic-baseline-note",
+          "scenario_id": "synthetic-baseline",
+          "revision": 1,
+          "status": "draft",
+          "reviewer": "Fixture Reviewer A",
+          "created_at": "2026-11-07T00:01:00+01:00",
+          "change_type": "created",
+          "change_reason": "Synthetic draft for contract testing.",
+          "observation": "The saved synthetic frame surrogate contains the label SAMPLE.",
+          "rationale": "Inspect the saved SVG text.",
+          "origin_review_id": null,
+          "origin_revision": null,
+          "release_id": "synthetic-handoff-release",
+          "title": "Synthetic specialist note",
+          "interpretation": "",
+          "uncertainty": "No event, location, capture date, or original public source is established.",
+          "evidence_ids": [
+            "synthetic-handoff-release:synthetic-frame-a"
+          ],
+          "synthetic": true
+        },
+        "shared_disposition": null
+      }
+    },
+    {
+      "id": "silent-storm:synthetic-handoff-release:specialist-review:synthetic-baseline-note:r2",
+      "kind": "specialist_review_revision",
+      "source_label": "Synthetic specialist review history",
+      "text": "{\"change_reason\":\"Synthetic specialist review completed.\",\"change_type\":\"edited\",\"created_at\":\"2026-11-07T00:02:00+01:00\",\"evidence_ids\":[\"synthetic-handoff-release:synthetic-frame-a\"],\"interpretation\":\"\",\"observation\":\"The saved synthetic frame surrogate contains the label SAMPLE.\",\"origin_review_id\":null,\"origin_revision\":null,\"rationale\":\"The saved surrogate text contains SAMPLE.\",\"release_id\":\"synthetic-handoff-release\",\"review_id\":\"synthetic-baseline-note\",\"reviewer\":\"Fixture Reviewer A\",\"revision\":2,\"scenario_id\":\"synthetic-baseline\",\"status\":\"reviewed\",\"synthetic\":true,\"title\":\"Synthetic specialist note\",\"uncertainty\":\"No event, location, capture date, or original public source is established.\"}",
+      "content_hash": "2345417beae7ae3d0f2e4f213538229db6f75eb6eb768dbccf67ceb85059b6fe",
+      "source_url": null,
+      "artifact_ref": null,
+      "acquired_at": "2026-11-07T00:00:00+01:00",
+      "published_at": null,
+      "metadata": {
+        "synthetic": true,
+        "specialist_origin": {
+          "producer": "silent-storm",
+          "review_id": "synthetic-baseline-note",
+          "scenario_id": "synthetic-baseline",
+          "revision": 2,
+          "status": "reviewed",
+          "reviewer": "Fixture Reviewer A",
+          "created_at": "2026-11-07T00:02:00+01:00",
+          "change_type": "edited",
+          "change_reason": "Synthetic specialist review completed.",
+          "observation": "The saved synthetic frame surrogate contains the label SAMPLE.",
+          "rationale": "The saved surrogate text contains SAMPLE.",
+          "origin_review_id": null,
+          "origin_revision": null,
+          "release_id": "synthetic-handoff-release",
+          "title": "Synthetic specialist note",
+          "interpretation": "",
+          "uncertainty": "No event, location, capture date, or original public source is established.",
+          "evidence_ids": [
+            "synthetic-handoff-release:synthetic-frame-a"
+          ],
+          "synthetic": true
+        },
+        "shared_disposition": null
+      }
+    },
+    {
+      "id": "silent-storm:synthetic-handoff-release:specialist-review:synthetic-rejected-note:r1",
+      "kind": "specialist_review_revision",
+      "source_label": "Synthetic specialist review history",
+      "text": "{\"change_reason\":\"A synthetic card does not establish an event.\",\"change_type\":\"created\",\"created_at\":\"2026-11-07T00:03:00+01:00\",\"evidence_ids\":[\"synthetic-handoff-release:synthetic-frame-a\"],\"interpretation\":\"\",\"observation\":\"The synthetic card establishes that an event occurred.\",\"origin_review_id\":null,\"origin_revision\":null,\"rationale\":\"This proposed statement exceeds the fixture evidence.\",\"release_id\":\"synthetic-handoff-release\",\"review_id\":\"synthetic-rejected-note\",\"reviewer\":\"Fixture Reviewer A\",\"revision\":1,\"scenario_id\":\"synthetic-baseline\",\"status\":\"rejected\",\"synthetic\":true,\"title\":\"Synthetic specialist note\",\"uncertainty\":\"No event, location, capture date, or original public source is established.\"}",
+      "content_hash": "cfda561b1f34d9896ae4c98f383e66b14e37e1cd3aebf5adef0d2f2faa2cf7c6",
+      "source_url": null,
+      "artifact_ref": null,
+      "acquired_at": "2026-11-07T00:00:00+01:00",
+      "published_at": null,
+      "metadata": {
+        "synthetic": true,
+        "specialist_origin": {
+          "producer": "silent-storm",
+          "review_id": "synthetic-rejected-note",
+          "scenario_id": "synthetic-baseline",
+          "revision": 1,
+          "status": "rejected",
+          "reviewer": "Fixture Reviewer A",
+          "created_at": "2026-11-07T00:03:00+01:00",
+          "change_type": "created",
+          "change_reason": "A synthetic card does not establish an event.",
+          "observation": "The synthetic card establishes that an event occurred.",
+          "rationale": "This proposed statement exceeds the fixture evidence.",
+          "origin_review_id": null,
+          "origin_revision": null,
+          "release_id": "synthetic-handoff-release",
+          "title": "Synthetic specialist note",
+          "interpretation": "",
+          "uncertainty": "No event, location, capture date, or original public source is established.",
+          "evidence_ids": [
+            "synthetic-handoff-release:synthetic-frame-a"
+          ],
+          "synthetic": true
+        },
+        "shared_disposition": null
+      }
+    },
+    {
+      "id": "silent-storm:synthetic-handoff-release:specialist-review:synthetic-fork-note:r1",
+      "kind": "specialist_review_revision",
+      "source_label": "Synthetic specialist review history",
+      "text": "{\"change_reason\":\"Forked synthetic baseline at version 3.\",\"change_type\":\"fork\",\"created_at\":\"2026-11-07T00:04:00+01:00\",\"evidence_ids\":[\"synthetic-handoff-release:synthetic-frame-a\"],\"interpretation\":\"\",\"observation\":\"The saved synthetic frame surrogate contains the label SAMPLE.\",\"origin_review_id\":\"synthetic-baseline-note\",\"origin_revision\":2,\"rationale\":\"The saved surrogate text contains SAMPLE.\",\"release_id\":\"synthetic-handoff-release\",\"review_id\":\"synthetic-fork-note\",\"reviewer\":\"Fixture Reviewer B\",\"revision\":1,\"scenario_id\":\"synthetic-fork\",\"status\":\"reviewed\",\"synthetic\":true,\"title\":\"Synthetic specialist note\",\"uncertainty\":\"No event, location, capture date, or original public source is established.\"}",
+      "content_hash": "84c0602efb49a8bc159219ea7cd780be95c6da2105047e1d8df57613c25bd4c6",
+      "source_url": null,
+      "artifact_ref": null,
+      "acquired_at": "2026-11-07T00:00:00+01:00",
+      "published_at": null,
+      "metadata": {
+        "synthetic": true,
+        "specialist_origin": {
+          "producer": "silent-storm",
+          "review_id": "synthetic-fork-note",
+          "scenario_id": "synthetic-fork",
+          "revision": 1,
+          "status": "reviewed",
+          "reviewer": "Fixture Reviewer B",
+          "created_at": "2026-11-07T00:04:00+01:00",
+          "change_type": "fork",
+          "change_reason": "Forked synthetic baseline at version 3.",
+          "observation": "The saved synthetic frame surrogate contains the label SAMPLE.",
+          "rationale": "The saved surrogate text contains SAMPLE.",
+          "origin_review_id": "synthetic-baseline-note",
+          "origin_revision": 2,
+          "release_id": "synthetic-handoff-release",
+          "title": "Synthetic specialist note",
+          "interpretation": "",
+          "uncertainty": "No event, location, capture date, or original public source is established.",
+          "evidence_ids": [
+            "synthetic-handoff-release:synthetic-frame-a"
+          ],
+          "synthetic": true
+        },
+        "shared_disposition": null
+      }
+    },
+    {
+      "id": "silent-storm:synthetic-handoff-release:specialist-review:synthetic-fork-note:r2",
+      "kind": "specialist_review_revision",
+      "source_label": "Synthetic specialist review history",
+      "text": "{\"change_reason\":\"Synthetic source exclusion exercise.\",\"change_type\":\"source_excluded\",\"created_at\":\"2026-11-07T00:05:00+01:00\",\"evidence_ids\":[\"synthetic-handoff-release:synthetic-frame-a\"],\"interpretation\":\"\",\"observation\":\"The saved synthetic frame surrogate contains the label SAMPLE.\",\"origin_review_id\":\"synthetic-baseline-note\",\"origin_revision\":2,\"rationale\":\"The saved surrogate text contains SAMPLE.\",\"release_id\":\"synthetic-handoff-release\",\"review_id\":\"synthetic-fork-note\",\"reviewer\":\"Fixture Reviewer B\",\"revision\":2,\"scenario_id\":\"synthetic-fork\",\"status\":\"needs_review\",\"synthetic\":true,\"title\":\"Synthetic specialist note\",\"uncertainty\":\"No event, location, capture date, or original public source is established.\"}",
+      "content_hash": "1e542b78533c67ed5b6773eb5a9facb31c3a11284df607318c67a5bfb8b1dfe1",
+      "source_url": null,
+      "artifact_ref": null,
+      "acquired_at": "2026-11-07T00:00:00+01:00",
+      "published_at": null,
+      "metadata": {
+        "synthetic": true,
+        "specialist_origin": {
+          "producer": "silent-storm",
+          "review_id": "synthetic-fork-note",
+          "scenario_id": "synthetic-fork",
+          "revision": 2,
+          "status": "needs_review",
+          "reviewer": "Fixture Reviewer B",
+          "created_at": "2026-11-07T00:05:00+01:00",
+          "change_type": "source_excluded",
+          "change_reason": "Synthetic source exclusion exercise.",
+          "observation": "The saved synthetic frame surrogate contains the label SAMPLE.",
+          "rationale": "The saved surrogate text contains SAMPLE.",
+          "origin_review_id": "synthetic-baseline-note",
+          "origin_revision": 2,
+          "release_id": "synthetic-handoff-release",
+          "title": "Synthetic specialist note",
+          "interpretation": "",
+          "uncertainty": "No event, location, capture date, or original public source is established.",
+          "evidence_ids": [
+            "synthetic-handoff-release:synthetic-frame-a"
+          ],
+          "synthetic": true
+        },
+        "shared_disposition": null
+      }
+    },
+    {
+      "id": "silent-storm:synthetic-handoff-release:exclusion:1",
+      "kind": "specialist_source_exclusion_event",
+      "source_label": "Synthetic saved source exclusion",
+      "text": "{\"affected_review_ids\":[\"synthetic-fork-note\"],\"affected_revision\":2,\"created_at\":\"2026-11-07T00:05:00+01:00\",\"event_id\":\"synthetic-exclusion-event-1\",\"excluded\":true,\"origin_event_id\":null,\"reason\":\"Synthetic source exclusion exercise.\",\"release_id\":\"synthetic-handoff-release\",\"reviewer\":\"Fixture Reviewer B\",\"scenario_id\":\"synthetic-fork\",\"scenario_version\":2,\"synthetic\":true,\"video_id\":\"synthetic-video-a\"}",
+      "content_hash": "282d8fb4aa54b3ad0849c5a49a7037e2ecf76cde501023e9651a5836ff56660d",
+      "source_url": null,
+      "artifact_ref": null,
+      "acquired_at": "2026-11-07T00:00:00+01:00",
+      "published_at": null,
+      "metadata": {
+        "synthetic": true,
+        "specialist_origin": {
+          "event_id": "synthetic-exclusion-event-1",
+          "release_id": "synthetic-handoff-release",
+          "scenario_id": "synthetic-fork",
+          "scenario_version": 2,
+          "video_id": "synthetic-video-a",
+          "excluded": true,
+          "reviewer": "Fixture Reviewer B",
+          "reason": "Synthetic source exclusion exercise.",
+          "created_at": "2026-11-07T00:05:00+01:00",
+          "origin_event_id": null,
+          "affected_review_ids": [
+            "synthetic-fork-note"
+          ],
+          "affected_revision": 2,
+          "synthetic": true
+        }
+      }
+    },
+    {
+      "id": "silent-storm:synthetic-handoff-release:scenario-lineage",
+      "kind": "specialist_scenario_lineage",
+      "source_label": "Synthetic baseline and fork lineage",
+      "text": "{\"baseline\":{\"is_baseline\":true,\"scenario_id\":\"synthetic-baseline\",\"version\":3},\"fork\":{\"is_baseline\":false,\"scenario_id\":\"synthetic-fork\",\"source_scenario_id\":\"synthetic-baseline\",\"source_scenario_version\":3,\"version\":2},\"release_id\":\"synthetic-handoff-release\",\"selection\":{\"complete_scenario_history\":false,\"included_review_ids\":[\"synthetic-baseline-note\",\"synthetic-rejected-note\",\"synthetic-fork-note\"],\"omitted_context\":\"The fork copy of the separate rejected note is outside this selected subset.\"}}",
+      "content_hash": "96f131699cdccc94c3bd10007a2b2813a3b02782dbb7864e248ab01e13bc4a4c",
+      "source_url": null,
+      "artifact_ref": null,
+      "acquired_at": "2026-11-07T00:00:00+01:00",
+      "published_at": null,
+      "metadata": {
+        "synthetic": true,
+        "specialist_origin": {
+          "release_id": "synthetic-handoff-release",
+          "baseline": {
+            "scenario_id": "synthetic-baseline",
+            "version": 3,
+            "is_baseline": true
+          },
+          "fork": {
+            "scenario_id": "synthetic-fork",
+            "version": 2,
+            "is_baseline": false,
+            "source_scenario_id": "synthetic-baseline",
+            "source_scenario_version": 3
+          },
+          "selection": {
+            "included_review_ids": [
+              "synthetic-baseline-note",
+              "synthetic-rejected-note",
+              "synthetic-fork-note"
+            ],
+            "complete_scenario_history": false,
+            "omitted_context": "The fork copy of the separate rejected note is outside this selected subset."
+          }
+        }
+      }
+    }
+  ],
+  "fragments": [
+    {
+      "id": "silent-storm:synthetic-handoff-release:frame:synthetic-frame-a:saved-content",
+      "record_id": "silent-storm:synthetic-handoff-release:frame:synthetic-frame-a",
+      "selector": {
+        "kind": "text",
+        "start": 0,
+        "end": 143
+      },
+      "quote": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"64\" height=\"48\"><rect width=\"64\" height=\"48\" fill=\"#ddd\"/><text x=\"5\" y=\"28\">SAMPLE</text></svg>"
+    },
+    {
+      "id": "silent-storm:synthetic-handoff-release:frame:synthetic-frame-a:metadata:saved-content",
+      "record_id": "silent-storm:synthetic-handoff-release:frame:synthetic-frame-a:metadata",
+      "selector": {
+        "kind": "text",
+        "start": 0,
+        "end": 387
+      },
+      "quote": "{\"provenance\":{\"release_id\":\"synthetic-handoff-release\",\"source_file\":\"metadata/frames.csv\",\"source_row\":2},\"raw_supplied_row\":{\"camera\":\"RGB\",\"clip_id\":\"synthetic-clip-a\",\"file\":\"synthetic-card-a.jpg\",\"frame_id\":\"synthetic-frame-a\",\"from_perspective\":\"\",\"height_px\":\"48\",\"image_type\":\"Photo\",\"side\":\"\",\"to_perspective\":\"\",\"video_id\":\"synthetic-video-a\",\"week\":\"Week 7\",\"width_px\":\"64\"}}"
+    },
+    {
+      "id": "silent-storm:synthetic-handoff-release:clip-key:c7679f16f2f98b2aa2c0d8b1c61f8cd658bd38122ff60662550ad5649d62cb88:saved-content",
+      "record_id": "silent-storm:synthetic-handoff-release:clip-key:c7679f16f2f98b2aa2c0d8b1c61f8cd658bd38122ff60662550ad5649d62cb88",
+      "selector": {
+        "kind": "text",
+        "start": 0,
+        "end": 202
+      },
+      "quote": "{\"capture_order\":\"unknown\",\"clip_id\":\"synthetic-clip-a\",\"clip_key\":\"c7679f16f2f98b2aa2c0d8b1c61f8cd658bd38122ff60662550ad5649d62cb88\",\"display_order\":\"frame_id ascending\",\"video_id\":\"synthetic-video-a\"}"
+    },
+    {
+      "id": "silent-storm:synthetic-handoff-release:video:synthetic-video-a:saved-content",
+      "record_id": "silent-storm:synthetic-handoff-release:video:synthetic-video-a",
+      "selector": {
+        "kind": "text",
+        "start": 0,
+        "end": 125
+      },
+      "quote": "{\"capture_time\":null,\"location\":null,\"original_source_url\":null,\"original_video_payload\":null,\"video_id\":\"synthetic-video-a\"}"
+    },
+    {
+      "id": "silent-storm:synthetic-handoff-release:specialist-review:synthetic-baseline-note:r1:saved-content",
+      "record_id": "silent-storm:synthetic-handoff-release:specialist-review:synthetic-baseline-note:r1",
+      "selector": {
+        "kind": "text",
+        "start": 0,
+        "end": 694
+      },
+      "quote": "{\"change_reason\":\"Synthetic draft for contract testing.\",\"change_type\":\"created\",\"created_at\":\"2026-11-07T00:01:00+01:00\",\"evidence_ids\":[\"synthetic-handoff-release:synthetic-frame-a\"],\"interpretation\":\"\",\"observation\":\"The saved synthetic frame surrogate contains the label SAMPLE.\",\"origin_review_id\":null,\"origin_revision\":null,\"rationale\":\"Inspect the saved SVG text.\",\"release_id\":\"synthetic-handoff-release\",\"review_id\":\"synthetic-baseline-note\",\"reviewer\":\"Fixture Reviewer A\",\"revision\":1,\"scenario_id\":\"synthetic-baseline\",\"status\":\"draft\",\"synthetic\":true,\"title\":\"Synthetic specialist note\",\"uncertainty\":\"No event, location, capture date, or original public source is established.\"}"
+    },
+    {
+      "id": "silent-storm:synthetic-handoff-release:specialist-review:synthetic-baseline-note:r2:saved-content",
+      "record_id": "silent-storm:synthetic-handoff-release:specialist-review:synthetic-baseline-note:r2",
+      "selector": {
+        "kind": "text",
+        "start": 0,
+        "end": 711
+      },
+      "quote": "{\"change_reason\":\"Synthetic specialist review completed.\",\"change_type\":\"edited\",\"created_at\":\"2026-11-07T00:02:00+01:00\",\"evidence_ids\":[\"synthetic-handoff-release:synthetic-frame-a\"],\"interpretation\":\"\",\"observation\":\"The saved synthetic frame surrogate contains the label SAMPLE.\",\"origin_review_id\":null,\"origin_revision\":null,\"rationale\":\"The saved surrogate text contains SAMPLE.\",\"release_id\":\"synthetic-handoff-release\",\"review_id\":\"synthetic-baseline-note\",\"reviewer\":\"Fixture Reviewer A\",\"revision\":2,\"scenario_id\":\"synthetic-baseline\",\"status\":\"reviewed\",\"synthetic\":true,\"title\":\"Synthetic specialist note\",\"uncertainty\":\"No event, location, capture date, or original public source is established.\"}"
+    },
+    {
+      "id": "silent-storm:synthetic-handoff-release:specialist-review:synthetic-rejected-note:r1:saved-content",
+      "record_id": "silent-storm:synthetic-handoff-release:specialist-review:synthetic-rejected-note:r1",
+      "selector": {
+        "kind": "text",
+        "start": 0,
+        "end": 723
+      },
+      "quote": "{\"change_reason\":\"A synthetic card does not establish an event.\",\"change_type\":\"created\",\"created_at\":\"2026-11-07T00:03:00+01:00\",\"evidence_ids\":[\"synthetic-handoff-release:synthetic-frame-a\"],\"interpretation\":\"\",\"observation\":\"The synthetic card establishes that an event occurred.\",\"origin_review_id\":null,\"origin_revision\":null,\"rationale\":\"This proposed statement exceeds the fixture evidence.\",\"release_id\":\"synthetic-handoff-release\",\"review_id\":\"synthetic-rejected-note\",\"reviewer\":\"Fixture Reviewer A\",\"revision\":1,\"scenario_id\":\"synthetic-baseline\",\"status\":\"rejected\",\"synthetic\":true,\"title\":\"Synthetic specialist note\",\"uncertainty\":\"No event, location, capture date, or original public source is established.\"}"
+    },
+    {
+      "id": "silent-storm:synthetic-handoff-release:specialist-review:synthetic-fork-note:r1:saved-content",
+      "record_id": "silent-storm:synthetic-handoff-release:specialist-review:synthetic-fork-note:r1",
+      "selector": {
+        "kind": "text",
+        "start": 0,
+        "end": 720
+      },
+      "quote": "{\"change_reason\":\"Forked synthetic baseline at version 3.\",\"change_type\":\"fork\",\"created_at\":\"2026-11-07T00:04:00+01:00\",\"evidence_ids\":[\"synthetic-handoff-release:synthetic-frame-a\"],\"interpretation\":\"\",\"observation\":\"The saved synthetic frame surrogate contains the label SAMPLE.\",\"origin_review_id\":\"synthetic-baseline-note\",\"origin_revision\":2,\"rationale\":\"The saved surrogate text contains SAMPLE.\",\"release_id\":\"synthetic-handoff-release\",\"review_id\":\"synthetic-fork-note\",\"reviewer\":\"Fixture Reviewer B\",\"revision\":1,\"scenario_id\":\"synthetic-fork\",\"status\":\"reviewed\",\"synthetic\":true,\"title\":\"Synthetic specialist note\",\"uncertainty\":\"No event, location, capture date, or original public source is established.\"}"
+    },
+    {
+      "id": "silent-storm:synthetic-handoff-release:specialist-review:synthetic-fork-note:r2:saved-content",
+      "record_id": "silent-storm:synthetic-handoff-release:specialist-review:synthetic-fork-note:r2",
+      "selector": {
+        "kind": "text",
+        "start": 0,
+        "end": 732
+      },
+      "quote": "{\"change_reason\":\"Synthetic source exclusion exercise.\",\"change_type\":\"source_excluded\",\"created_at\":\"2026-11-07T00:05:00+01:00\",\"evidence_ids\":[\"synthetic-handoff-release:synthetic-frame-a\"],\"interpretation\":\"\",\"observation\":\"The saved synthetic frame surrogate contains the label SAMPLE.\",\"origin_review_id\":\"synthetic-baseline-note\",\"origin_revision\":2,\"rationale\":\"The saved surrogate text contains SAMPLE.\",\"release_id\":\"synthetic-handoff-release\",\"review_id\":\"synthetic-fork-note\",\"reviewer\":\"Fixture Reviewer B\",\"revision\":2,\"scenario_id\":\"synthetic-fork\",\"status\":\"needs_review\",\"synthetic\":true,\"title\":\"Synthetic specialist note\",\"uncertainty\":\"No event, location, capture date, or original public source is established.\"}"
+    },
+    {
+      "id": "silent-storm:synthetic-handoff-release:exclusion:1:saved-content",
+      "record_id": "silent-storm:synthetic-handoff-release:exclusion:1",
+      "selector": {
+        "kind": "text",
+        "start": 0,
+        "end": 411
+      },
+      "quote": "{\"affected_review_ids\":[\"synthetic-fork-note\"],\"affected_revision\":2,\"created_at\":\"2026-11-07T00:05:00+01:00\",\"event_id\":\"synthetic-exclusion-event-1\",\"excluded\":true,\"origin_event_id\":null,\"reason\":\"Synthetic source exclusion exercise.\",\"release_id\":\"synthetic-handoff-release\",\"reviewer\":\"Fixture Reviewer B\",\"scenario_id\":\"synthetic-fork\",\"scenario_version\":2,\"synthetic\":true,\"video_id\":\"synthetic-video-a\"}"
+    },
+    {
+      "id": "silent-storm:synthetic-handoff-release:scenario-lineage:saved-content",
+      "record_id": "silent-storm:synthetic-handoff-release:scenario-lineage",
+      "selector": {
+        "kind": "text",
+        "start": 0,
+        "end": 506
+      },
+      "quote": "{\"baseline\":{\"is_baseline\":true,\"scenario_id\":\"synthetic-baseline\",\"version\":3},\"fork\":{\"is_baseline\":false,\"scenario_id\":\"synthetic-fork\",\"source_scenario_id\":\"synthetic-baseline\",\"source_scenario_version\":3,\"version\":2},\"release_id\":\"synthetic-handoff-release\",\"selection\":{\"complete_scenario_history\":false,\"included_review_ids\":[\"synthetic-baseline-note\",\"synthetic-rejected-note\",\"synthetic-fork-note\"],\"omitted_context\":\"The fork copy of the separate rejected note is outside this selected subset.\"}}"
+    }
+  ],
+  "runs": [
+    {
+      "id": "silent-storm:synthetic-handoff-release:run:baseline-v3",
+      "input_fingerprint": "20f290ee4d61c412bee653bf2eff6c316fbaa4bbc1b7ed87532866eca4aaea38",
+      "input_manifest": [
+        "silent-storm:synthetic-handoff-release:frame:synthetic-frame-a",
+        "silent-storm:synthetic-handoff-release:frame:synthetic-frame-a:metadata",
+        "silent-storm:synthetic-handoff-release:clip-key:c7679f16f2f98b2aa2c0d8b1c61f8cd658bd38122ff60662550ad5649d62cb88",
+        "silent-storm:synthetic-handoff-release:video:synthetic-video-a",
+        "silent-storm:synthetic-handoff-release:specialist-review:synthetic-baseline-note:r1",
+        "silent-storm:synthetic-handoff-release:specialist-review:synthetic-baseline-note:r2",
+        "silent-storm:synthetic-handoff-release:specialist-review:synthetic-rejected-note:r1"
+      ],
+      "method": "synthetic-specialist-review-handoff",
+      "method_version": "fixture-1",
+      "created_at": "2026-11-07T00:03:00+01:00",
+      "full_inputs_available": false,
+      "recomputation_capability": "dependency_review_only",
+      "status": "completed",
+      "configuration": {
+        "release_id": "synthetic-handoff-release",
+        "specialist_scenario_id": "synthetic-baseline",
+        "specialist_scenario_version": 3
+      },
+      "coverage": {
+        "bounded_subset": true,
+        "frame_surrogates": 1,
+        "image_artifacts": 0,
+        "full_release_processed": false,
+        "complete_scenario_history": false
+      }
+    },
+    {
+      "id": "silent-storm:synthetic-handoff-release:run:fork-v2",
+      "input_fingerprint": "4fcf17e99175ce06f2ccbd7986fef9e99d42283fc6ac53f721592c3a62d4b570",
+      "input_manifest": [
+        "silent-storm:synthetic-handoff-release:frame:synthetic-frame-a",
+        "silent-storm:synthetic-handoff-release:frame:synthetic-frame-a:metadata",
+        "silent-storm:synthetic-handoff-release:clip-key:c7679f16f2f98b2aa2c0d8b1c61f8cd658bd38122ff60662550ad5649d62cb88",
+        "silent-storm:synthetic-handoff-release:video:synthetic-video-a",
+        "silent-storm:synthetic-handoff-release:specialist-review:synthetic-baseline-note:r1",
+        "silent-storm:synthetic-handoff-release:specialist-review:synthetic-baseline-note:r2",
+        "silent-storm:synthetic-handoff-release:specialist-review:synthetic-rejected-note:r1",
+        "silent-storm:synthetic-handoff-release:specialist-review:synthetic-fork-note:r1",
+        "silent-storm:synthetic-handoff-release:specialist-review:synthetic-fork-note:r2",
+        "silent-storm:synthetic-handoff-release:exclusion:1",
+        "silent-storm:synthetic-handoff-release:scenario-lineage"
+      ],
+      "method": "synthetic-specialist-review-handoff",
+      "method_version": "fixture-1",
+      "created_at": "2026-11-07T00:05:00+01:00",
+      "full_inputs_available": false,
+      "recomputation_capability": "dependency_review_only",
+      "status": "completed",
+      "configuration": {
+        "release_id": "synthetic-handoff-release",
+        "specialist_scenario_id": "synthetic-fork",
+        "specialist_scenario_version": 2
+      },
+      "coverage": {
+        "bounded_subset": true,
+        "frame_surrogates": 1,
+        "image_artifacts": 0,
+        "full_release_processed": false,
+        "complete_scenario_history": false
+      }
+    }
+  ],
+  "findings": [
+    {
+      "snapshot_id": "silent-storm:synthetic-handoff-release:finding:synthetic-baseline-note:r2",
+      "lineage_id": "silent-storm:synthetic-handoff-release:finding:synthetic-baseline-note",
+      "version": 2,
+      "run_id": "silent-storm:synthetic-handoff-release:run:baseline-v3",
+      "kind": "observation",
+      "statement": "The saved synthetic frame surrogate contains the label SAMPLE.",
+      "details": {
+        "specialist_review_status": "reviewed",
+        "specialist_origin": {
+          "producer": "silent-storm",
+          "review_id": "synthetic-baseline-note",
+          "scenario_id": "synthetic-baseline",
+          "revision": 2,
+          "status": "reviewed",
+          "reviewer": "Fixture Reviewer A",
+          "created_at": "2026-11-07T00:02:00+01:00",
+          "change_type": "edited",
+          "change_reason": "Synthetic specialist review completed.",
+          "observation": "The saved synthetic frame surrogate contains the label SAMPLE.",
+          "rationale": "The saved surrogate text contains SAMPLE.",
+          "origin_review_id": null,
+          "origin_revision": null,
+          "release_id": "synthetic-handoff-release",
+          "title": "Synthetic specialist note",
+          "interpretation": "",
+          "uncertainty": "No event, location, capture date, or original public source is established.",
+          "evidence_ids": [
+            "synthetic-handoff-release:synthetic-frame-a"
+          ],
+          "synthetic": true
+        },
+        "specialist_review_record_ids": [
+          "silent-storm:synthetic-handoff-release:specialist-review:synthetic-baseline-note:r1",
+          "silent-storm:synthetic-handoff-release:specialist-review:synthetic-baseline-note:r2"
+        ],
+        "shared_disposition": null,
+        "synthetic": true
+      }
+    },
+    {
+      "snapshot_id": "silent-storm:synthetic-handoff-release:finding:synthetic-rejected-note:r1",
+      "lineage_id": "silent-storm:synthetic-handoff-release:finding:synthetic-rejected-note",
+      "version": 1,
+      "run_id": "silent-storm:synthetic-handoff-release:run:baseline-v3",
+      "kind": "assumption",
+      "statement": "The synthetic card establishes that an event occurred.",
+      "details": {
+        "specialist_review_status": "rejected",
+        "specialist_origin": {
+          "producer": "silent-storm",
+          "review_id": "synthetic-rejected-note",
+          "scenario_id": "synthetic-baseline",
+          "revision": 1,
+          "status": "rejected",
+          "reviewer": "Fixture Reviewer A",
+          "created_at": "2026-11-07T00:03:00+01:00",
+          "change_type": "created",
+          "change_reason": "A synthetic card does not establish an event.",
+          "observation": "The synthetic card establishes that an event occurred.",
+          "rationale": "This proposed statement exceeds the fixture evidence.",
+          "origin_review_id": null,
+          "origin_revision": null,
+          "release_id": "synthetic-handoff-release",
+          "title": "Synthetic specialist note",
+          "interpretation": "",
+          "uncertainty": "No event, location, capture date, or original public source is established.",
+          "evidence_ids": [
+            "synthetic-handoff-release:synthetic-frame-a"
+          ],
+          "synthetic": true
+        },
+        "specialist_review_record_ids": [
+          "silent-storm:synthetic-handoff-release:specialist-review:synthetic-rejected-note:r1"
+        ],
+        "shared_disposition": null,
+        "synthetic": true
+      }
+    },
+    {
+      "snapshot_id": "silent-storm:synthetic-handoff-release:finding:synthetic-fork-note:r2",
+      "lineage_id": "silent-storm:synthetic-handoff-release:finding:synthetic-fork-note",
+      "version": 2,
+      "run_id": "silent-storm:synthetic-handoff-release:run:fork-v2",
+      "kind": "observation",
+      "statement": "The saved synthetic frame surrogate contains the label SAMPLE.",
+      "details": {
+        "specialist_review_status": "needs_review",
+        "specialist_origin": {
+          "producer": "silent-storm",
+          "review_id": "synthetic-fork-note",
+          "scenario_id": "synthetic-fork",
+          "revision": 2,
+          "status": "needs_review",
+          "reviewer": "Fixture Reviewer B",
+          "created_at": "2026-11-07T00:05:00+01:00",
+          "change_type": "source_excluded",
+          "change_reason": "Synthetic source exclusion exercise.",
+          "observation": "The saved synthetic frame surrogate contains the label SAMPLE.",
+          "rationale": "The saved surrogate text contains SAMPLE.",
+          "origin_review_id": "synthetic-baseline-note",
+          "origin_revision": 2,
+          "release_id": "synthetic-handoff-release",
+          "title": "Synthetic specialist note",
+          "interpretation": "",
+          "uncertainty": "No event, location, capture date, or original public source is established.",
+          "evidence_ids": [
+            "synthetic-handoff-release:synthetic-frame-a"
+          ],
+          "synthetic": true
+        },
+        "specialist_review_record_ids": [
+          "silent-storm:synthetic-handoff-release:specialist-review:synthetic-fork-note:r1",
+          "silent-storm:synthetic-handoff-release:specialist-review:synthetic-fork-note:r2"
+        ],
+        "shared_disposition": null,
+        "synthetic": true
+      }
+    }
+  ],
+  "links": [
+    {
+      "id": "silent-storm:synthetic-handoff-release:link:1",
+      "source": {
+        "type": "record",
+        "id": "silent-storm:synthetic-handoff-release:frame:synthetic-frame-a"
+      },
+      "target": {
+        "type": "record",
+        "id": "silent-storm:synthetic-handoff-release:clip-key:c7679f16f2f98b2aa2c0d8b1c61f8cd658bd38122ff60662550ad5649d62cb88"
+      },
+      "relation": "part_of",
+      "basis": "Only supplied clip membership is represented; no frame ordering is inferred.",
+      "fragment_ids": [
+        "silent-storm:synthetic-handoff-release:frame:synthetic-frame-a:metadata:saved-content"
+      ]
+    },
+    {
+      "id": "silent-storm:synthetic-handoff-release:link:2",
+      "source": {
+        "type": "record",
+        "id": "silent-storm:synthetic-handoff-release:clip-key:c7679f16f2f98b2aa2c0d8b1c61f8cd658bd38122ff60662550ad5649d62cb88"
+      },
+      "target": {
+        "type": "record",
+        "id": "silent-storm:synthetic-handoff-release:video:synthetic-video-a"
+      },
+      "relation": "part_of",
+      "basis": "Supplied source-video membership; the original video and public URL are absent.",
+      "fragment_ids": []
+    },
+    {
+      "id": "silent-storm:synthetic-handoff-release:link:3",
+      "source": {
+        "type": "record",
+        "id": "silent-storm:synthetic-handoff-release:specialist-review:synthetic-baseline-note:r2"
+      },
+      "target": {
+        "type": "finding",
+        "id": "silent-storm:synthetic-handoff-release:finding:synthetic-baseline-note:r2"
+      },
+      "relation": "part_of",
+      "basis": "Saved specialist review origin, not an Evidence Trail disposition or independent proof.",
+      "fragment_ids": []
+    },
+    {
+      "id": "silent-storm:synthetic-handoff-release:link:4",
+      "source": {
+        "type": "fragment",
+        "id": "silent-storm:synthetic-handoff-release:frame:synthetic-frame-a:saved-content"
+      },
+      "target": {
+        "type": "finding",
+        "id": "silent-storm:synthetic-handoff-release:finding:synthetic-baseline-note:r2"
+      },
+      "relation": "supports",
+      "basis": "The exact saved surrogate text contains SAMPLE; it is not original media.",
+      "fragment_ids": [
+        "silent-storm:synthetic-handoff-release:frame:synthetic-frame-a:saved-content"
+      ]
+    },
+    {
+      "id": "silent-storm:synthetic-handoff-release:link:5",
+      "source": {
+        "type": "record",
+        "id": "silent-storm:synthetic-handoff-release:video:synthetic-video-a"
+      },
+      "target": {
+        "type": "finding",
+        "id": "silent-storm:synthetic-handoff-release:finding:synthetic-baseline-note:r2"
+      },
+      "relation": "depends_on",
+      "basis": "The specialist note depends on the declared supplied source-video membership.",
+      "fragment_ids": []
+    },
+    {
+      "id": "silent-storm:synthetic-handoff-release:link:6",
+      "source": {
+        "type": "record",
+        "id": "silent-storm:synthetic-handoff-release:specialist-review:synthetic-rejected-note:r1"
+      },
+      "target": {
+        "type": "finding",
+        "id": "silent-storm:synthetic-handoff-release:finding:synthetic-rejected-note:r1"
+      },
+      "relation": "part_of",
+      "basis": "Saved specialist review origin, not an Evidence Trail disposition or independent proof.",
+      "fragment_ids": []
+    },
+    {
+      "id": "silent-storm:synthetic-handoff-release:link:7",
+      "source": {
+        "type": "record",
+        "id": "silent-storm:synthetic-handoff-release:specialist-review:synthetic-fork-note:r2"
+      },
+      "target": {
+        "type": "finding",
+        "id": "silent-storm:synthetic-handoff-release:finding:synthetic-fork-note:r2"
+      },
+      "relation": "part_of",
+      "basis": "Saved specialist review origin, not an Evidence Trail disposition or independent proof.",
+      "fragment_ids": []
+    },
+    {
+      "id": "silent-storm:synthetic-handoff-release:link:8",
+      "source": {
+        "type": "fragment",
+        "id": "silent-storm:synthetic-handoff-release:frame:synthetic-frame-a:saved-content"
+      },
+      "target": {
+        "type": "finding",
+        "id": "silent-storm:synthetic-handoff-release:finding:synthetic-fork-note:r2"
+      },
+      "relation": "supports",
+      "basis": "The exact saved surrogate text contains SAMPLE; it is not original media.",
+      "fragment_ids": [
+        "silent-storm:synthetic-handoff-release:frame:synthetic-frame-a:saved-content"
+      ]
+    },
+    {
+      "id": "silent-storm:synthetic-handoff-release:link:9",
+      "source": {
+        "type": "record",
+        "id": "silent-storm:synthetic-handoff-release:video:synthetic-video-a"
+      },
+      "target": {
+        "type": "finding",
+        "id": "silent-storm:synthetic-handoff-release:finding:synthetic-fork-note:r2"
+      },
+      "relation": "depends_on",
+      "basis": "The specialist note depends on the declared supplied source-video membership.",
+      "fragment_ids": []
+    }
+  ],
+  "reviews": [],
+  "scenarios": [
+    {
+      "id": "silent-storm:synthetic-handoff-release:scenario:baseline",
+      "base_run_id": "silent-storm:synthetic-handoff-release:run:baseline-v3",
+      "excluded_record_ids": [],
+      "reason": "Synthetic specialist baseline snapshot.",
+      "status": "specialist_baseline_snapshot",
+      "result_run_id": null,
+      "is_baseline": true,
+      "specialist_origin": {
+        "producer": "silent-storm",
+        "release_id": "synthetic-handoff-release",
+        "scenario_id": "synthetic-baseline",
+        "version": 3,
+        "is_baseline": true
+      }
+    },
+    {
+      "id": "silent-storm:synthetic-handoff-release:scenario:fork",
+      "base_run_id": "silent-storm:synthetic-handoff-release:run:baseline-v3",
+      "excluded_record_ids": [
+        "silent-storm:synthetic-handoff-release:video:synthetic-video-a",
+        "silent-storm:synthetic-handoff-release:frame:synthetic-frame-a",
+        "silent-storm:synthetic-handoff-release:frame:synthetic-frame-a:metadata",
+        "silent-storm:synthetic-handoff-release:clip-key:c7679f16f2f98b2aa2c0d8b1c61f8cd658bd38122ff60662550ad5649d62cb88"
+      ],
+      "reason": "Synthetic source exclusion exercise.",
+      "status": "specialist_review_snapshot",
+      "result_run_id": "silent-storm:synthetic-handoff-release:run:fork-v2",
+      "is_baseline": false,
+      "specialist_origin": {
+        "producer": "silent-storm",
+        "release_id": "synthetic-handoff-release",
+        "scenario_id": "synthetic-fork",
+        "version": 2,
+        "is_baseline": false,
+        "source_scenario_id": "synthetic-baseline",
+        "source_scenario_version": 3,
+        "excluded_video_ids": [
+          "synthetic-video-a"
+        ],
+        "exclusion_event_record_id": "silent-storm:synthetic-handoff-release:exclusion:1"
+      }
+    }
+  ],
+  "handoff": {
+    "direction": "silent-storm-to-evidence-trail-only",
+    "fixture_version": 1,
+    "specialist_status_to_disposition_mapping": null,
+    "original_media_payloads_included": false,
+    "human_validation": "OPEN: qualified human sample review has not been performed."
+  }
+}

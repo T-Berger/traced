@@ -1,0 +1,127 @@
+TRACED / SELECTED CORPORATE IDENTITY
+Accepted by the user in the naming and branding chat. Published 7 November 2026.
+
+DECISION
+Product name: Traced.
+Selected logo: Branch Clock, option 03 in the time-tree exploration.
+Tagline: Every claim. A clear trail.
+Primary artwork: logos/traced-primary.svg.
+Dark-surface artwork: logos/traced-reversed.svg.
+Machine-readable source: brand-manifest.json.
+
+This directory is the canonical identity handoff. The earlier output folders
+are retained as design history. In particular, output/traced-brand-kit/guide/
+shows the earlier angular T-path logo; that logo and its application examples
+are superseded by Branch Clock. Its palette and typography informed this kit.
+Do not choose another exploration logo when implementing the shared identity.
+
+PRODUCT PROMISE
+Traced connects claims to exact sources, shows what an assessment depends on,
+and helps reviewers challenge evidence, record human decisions, and share a
+checkable evidence dossier. Its product direction brings this process earlier:
+helping teams review emerging information risks and prepare evidence-led
+prebunking responses as use cases, source coverage and alert methods are
+developed and validated.
+
+The shared process is define purpose and scope -> collect or import -> inspect
+baselines and signals -> check exact evidence, compare and challenge -> human
+review and reversible exclusions -> briefing and evidence dossier.
+
+This describes the product direction. Claims about available collection,
+monitoring, alerts, coverage and outcomes require current verification.
+The branches represent evidence lineage. The clock arc represents chronology.
+The coloured endpoint marks a point of focus; it is not a truth or confidence
+rating. Branch Clock is a logo name, not a new product feature or data model.
+
+WORKSHOP IDEAS AND PRESENTATION CLAIMS
+The product direction draws on the source-mapped workshop ideas in
+docs/source-notes/2026-11-06-workshop-ocr.md. The transcription preserves
+uncertain handwriting, proposals and unverified claims separately.
+
+Subscription pricing, proposed customer segments, and EMEA/NA/APAC applicability
+are business hypotheses. Proposed platforms and investigation horizons describe
+ideas to validate; they do not establish current coverage or an active monitor.
+The handwritten alert percentage requires a metric, baseline, window, coverage
+and review status before it can become an interpretable candidate rule.
+
+Workshop political, payment and bot-count claims remain unverified source notes.
+Use source-grounded demonstrations and label fictional examples explicitly.
+Presentation support should explain the review process and its evidence, with
+clear differences between implemented, locally checked and proposed behaviour.
+
+A dossier contains traceable saved records, citations, reviewed interpretations,
+qualifications and decision history. Platform-policy research needs its own
+source and retrieval date. Preparing a dossier, submitting a report and a
+platform's decision are separate steps. Product messaging must keep their
+readiness and outcomes distinct; it cannot promise a successful takedown.
+
+NAMING ACROSS THE PROJECT
+Use Traced in the main product heading, browser title, common app chrome, and
+new branded briefing/export covers as their owning chats adopt this identity.
+Keep specialist names as useful descriptors: Evidence Explorer, Evidence Trail,
+Swarm Detector, and Historical Review and Chronology retain their technical or
+specialist meanings. A specialist surface can say, for example, "Swarm Detector"
+with "Part of Traced" as a supporting label.
+
+This identity decision does not request renaming Python packages, directories,
+CLI commands, schemas, chats, repositories, branches, or existing pull requests.
+Preserve open PR numbers, history, and discussion. Do not change evidence origin
+labels, run IDs, case IDs, or timestamps to fit a brand convention.
+
+VISUAL SYSTEM
+Ink       #142229  Primary text, structure, dark surfaces.
+Paper     #F4F3EE  Main reading background.
+White     #FFFFFF  Elevated reading panels and cards.
+Vermilion #F36643  Brand endpoint and primary action fill.
+Slate     #52636C  Supporting text and essential control outlines.
+Line      #D9E0DE  Decorative dividers only.
+Moss      #276B63  Supporting data and links on light surfaces.
+
+Typography: Manrope for headings, interface and body; IBM Plex Mono for source
+identifiers, timestamps and compact metadata. Local fonts and OFL licences are
+included under fonts/. Use traced-tokens.css and traced-tokens.json rather than
+independently recreating theme values in each feature.
+
+Use Ink text on Vermilion actions (5.26:1 contrast). Slate/Paper and Moss/Paper
+both exceed 5.6:1. Do not use small white text on orange. Use a visible Ink focus
+ring on light backgrounds and a Paper ring on dark backgrounds. Keep errors,
+review-needed states, and completion distinct from the brand accent and label
+them in words. Never make green mean that a finding is automatically true.
+
+Keep the logo proportions fixed. Leave clear space of at least the diameter of
+the coloured endpoint around the visible artwork. Minimum lockup width: 120 px
+or 30 mm. Minimum standalone symbol: 24 px or 8 mm. Use the supplied favicon for
+smaller digital uses. Keep the logo away from busy evidence images and graphs.
+Use a disciplined grid, generous reading space, restrained 8 px card radii, and
+one clear primary action. Preserve the readable focused graphs already built.
+
+VOICE AND EVIDENCE LANGUAGE
+Write like a careful colleague: calm, direct, specific and open about limits.
+Keep Observation, Inference, Assumption, model proposal, specialist result and
+human review decision distinguishable. Preserve Use, Qualify and Withhold.
+Say "supported by", "requires review", and "unknown" where appropriate.
+Exact citations provide traceability; they do not alone establish truth,
+independence, intent, attribution or a historical event time.
+
+ADOPTION AND OWNERSHIP
+The branding chat owns this directory. The coordination chat owns the shared
+implementation plan. The UI/workflow chat leads visual adoption with the common
+review/layout owner and platform owner. Feature chats inherit the common theme
+and apply terminology in their own surfaces; they do not create parallel themes
+or take over shared files without coordinating ownership.
+
+Each owner keeps its current authorized feature work. Apply the identity at the
+next safe integration point. Respect an active shared verification freeze; do
+not interrupt live collection/model checks or start competing workers.
+
+A visual adoption handoff names the files changed, visible surfaces checked,
+screenshots or artifacts, accessibility checks, remaining gaps and next owner.
+Check headings, browser title, app header, favicon, empty/error/loading states,
+source inspection, existing graph readability, narrow layout, and print/export
+headers where that owner changes them. Preserve exact evidence, decisions,
+data-directory selection and export/reopen semantics.
+
+PUBLICATION LIMIT
+Publishing this identity and notifying chats is distinct from completing the
+visual rollout in every application. The branding chat reports deliveries;
+the implementation owners report what they have actually applied and checked.

@@ -1,0 +1,36 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "swarm-detector"
+version = "0.1.0"
+description = "A behaviour-first analyst workbench for reviewing Telegram coordination evidence."
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "dash>=3.2",
+  "dash-cytoscape>=1.0.2",
+  "gunicorn>=23.0",
+  "networkx>=3.4",
+  "plotly>=6.0",
+  "pydantic>=2.10,<3",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "ruff>=0.11"]
+
+[project.scripts]
+swarm-detector = "swarm_detector.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/swarm_detector"]
+
+[tool.hatch.build.targets.sdist]
+include = ["/src/swarm_detector", "/README.md", "/pyproject.toml"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+extend = "../pyproject.toml"

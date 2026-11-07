@@ -1,0 +1,233 @@
+/* Silent Storm's narrow bridge to the canonical Traced identity.
+ * Canonical values and local fonts are supplied by 00_traced_tokens.css.
+ * The dark reading surfaces below are derived from Ink, Paper, and Moss;
+ * they are application mappings, not a second canonical brand palette.
+ * Workflow status colors remain distinct from the Vermilion brand accent.
+ */
+.ss-workbench.traced-app {
+  --ss-font-family: var(--traced-font-sans);
+  --ss-font-size-base: var(--traced-font-size-body);
+  --ss-line-height: var(--traced-line-height-body);
+  --ss-radius: var(--traced-radius-card);
+
+  --ss-background: light-dark(var(--traced-background), var(--traced-color-ink));
+  --ss-surface: light-dark(var(--traced-surface),
+    color-mix(in srgb, var(--traced-color-ink) 92%, var(--traced-color-paper)));
+  --ss-foreground: light-dark(var(--traced-foreground), var(--traced-color-paper));
+  --ss-muted-foreground: light-dark(var(--traced-foreground-secondary),
+    color-mix(in srgb, var(--traced-color-paper) 80%, var(--traced-color-ink)));
+  --ss-line: light-dark(var(--traced-border-subtle),
+    color-mix(in srgb, var(--traced-color-ink) 65%, var(--traced-color-paper)));
+  --ss-input-border: light-dark(var(--traced-border-strong),
+    color-mix(in srgb, var(--traced-color-paper) 65%, var(--traced-color-ink)));
+
+  --ss-sidebar: var(--traced-color-ink);
+  --ss-sidebar-foreground: var(--traced-color-paper);
+  --ss-sidebar-muted: color-mix(in srgb, var(--traced-color-paper) 80%, var(--traced-color-ink));
+  --ss-sidebar-input-border: color-mix(in srgb,
+    var(--traced-color-paper) 65%, var(--traced-color-ink));
+  --ss-accent: light-dark(var(--traced-link), var(--traced-link-on-dark));
+  --ss-accent-foreground: light-dark(var(--traced-color-paper), var(--traced-color-ink));
+  --ss-accent-hover: light-dark(var(--traced-color-moss), var(--traced-link-on-dark));
+  --ss-selected: light-dark(var(--traced-selection-background),
+    color-mix(in srgb, var(--traced-color-ink) 72%, var(--traced-color-moss)));
+  --ss-selected-foreground: light-dark(var(--traced-selection-foreground),
+    var(--traced-color-paper));
+  --ss-focus: light-dark(var(--traced-color-ink), var(--traced-color-paper));
+
+  --ss-draft: var(--ss-muted-foreground);
+  --ss-draft-surface: light-dark(var(--traced-surface-subtle),
+    color-mix(in srgb, var(--traced-color-ink) 88%, var(--traced-color-paper)));
+  --ss-reviewed: light-dark(var(--traced-status-success-foreground),
+    var(--traced-status-success-background));
+  --ss-reviewed-surface: light-dark(var(--traced-status-success-background),
+    color-mix(in srgb, var(--traced-color-ink) 82%, var(--traced-status-success-foreground)));
+  --ss-needs-review: light-dark(var(--traced-status-review-foreground),
+    var(--traced-status-review-background));
+  --ss-needs-review-surface: light-dark(var(--traced-status-review-background),
+    color-mix(in srgb, var(--traced-color-ink) 82%, var(--traced-status-review-foreground)));
+  --ss-amber-mark: var(--ss-needs-review);
+  --ss-rejected: light-dark(var(--traced-status-error-foreground),
+    var(--traced-status-error-background));
+  --ss-rejected-surface: light-dark(var(--traced-status-error-background),
+    color-mix(in srgb, var(--traced-color-ink) 82%, var(--traced-status-error-foreground)));
+
+  font-family: var(--ss-font-family);
+  font-size: var(--ss-font-size-base);
+  line-height: var(--ss-line-height);
+}
+
+.ss-workbench.traced-app[data-theme="dark"] {
+  --traced-focus-ring: var(--traced-focus-ring-on-dark);
+}
+
+.ss-workbench.traced-app :where(code, pre, .ss-pagination-label) {
+  font-family: var(--traced-font-mono);
+}
+.ss-workbench.traced-app :where(a, .ss-definitions summary) {
+  color: var(--ss-accent);
+  text-underline-offset: 3px;
+}
+.ss-workbench.traced-app a { text-decoration: underline; }
+.ss-workbench.traced-app :where(button, a, input, textarea, select, summary,
+  [role="tab"], [role="combobox"]):focus-visible {
+  outline: 3px solid var(--ss-focus);
+  outline-offset: 3px;
+}
+
+.ss-workbench.traced-app .ss-brand { flex-direction: column; align-items: flex-start; gap: 12px; }
+.ss-workbench.traced-app .ss-brand .traced-lockup { flex-direction: row; }
+.ss-workbench.traced-app .ss-brand strong {
+  color: var(--ss-sidebar-foreground); font-size: 15px; letter-spacing: 0;
+}
+.ss-workbench.traced-app .ss-brand > div > span,
+.ss-workbench.traced-app .ss-brand-affiliation {
+  color: var(--ss-sidebar-muted); font-size: 13px; letter-spacing: 0;
+}
+.ss-workbench.traced-app .ss-specialist-name {
+  color: var(--ss-sidebar-foreground); font-size: 15px; line-height: 1.5;
+}
+.ss-workbench.traced-app :where(.ss-brand-note, .ss-sidebar-note, .ss-sidebar-principle) {
+  color: var(--ss-sidebar-muted); font-size: 13px;
+}
+.ss-workbench.traced-app .ss-sidebar label {
+  color: var(--ss-sidebar-foreground); font-size: 14px;
+}
+.ss-workbench.traced-app :where(.ss-release-control, .ss-sidebar-principle) {
+  border-color: color-mix(in srgb, var(--traced-color-ink) 65%, var(--traced-color-paper));
+}
+.ss-workbench.traced-app .ss-current-section,
+.ss-workbench.traced-app .ss-view-navigation label {
+  color: var(--ss-sidebar-foreground); border-color: var(--ss-sidebar-input-border);
+  background: var(--ss-sidebar); font-size: 14px;
+}
+.ss-workbench.traced-app .ss-view-navigation label:has(input:checked),
+.ss-workbench.traced-app .ss-current-section {
+  color: var(--traced-color-paper);
+  background: color-mix(in srgb, var(--traced-color-ink) 72%, var(--traced-color-moss));
+  border-color: var(--traced-link-on-dark);
+}
+.ss-workbench.traced-app .ss-view-navigation input { accent-color: var(--traced-link-on-dark); }
+.ss-workbench.traced-app .ss-sidebar :where(a, button, input, select, summary,
+  [role="combobox"]):focus-visible {
+  outline-color: var(--traced-color-paper);
+}
+.ss-workbench.traced-app .ss-search,
+.ss-workbench.traced-app .ss-sidebar-button {
+  color: var(--ss-sidebar-foreground); background: var(--ss-sidebar);
+  border-color: var(--ss-sidebar-input-border);
+}
+.ss-workbench.traced-app .ss-search::placeholder { color: var(--ss-sidebar-muted); }
+.ss-workbench.traced-app .ss-sidebar-button:hover:not(:disabled) {
+  color: var(--traced-color-paper); background: var(--traced-action-secondary-hover-background);
+  border-color: var(--traced-color-paper);
+}
+
+.ss-workbench.traced-app .ss-eyebrow {
+  color: var(--ss-accent); font-size: 13px; letter-spacing: .06em;
+}
+.ss-workbench.traced-app .ss-specialist-heading { margin-bottom: 12px; }
+.ss-workbench.traced-app .ss-page-header #ss-page-title { font-size: 24px; }
+.ss-workbench.traced-app .ss-workspace-badge {
+  color: var(--ss-muted-foreground); border-color: var(--ss-input-border); font-size: 12px;
+}
+.ss-workbench.traced-app :where(.ss-muted, .ss-card-meta, .ss-contact-caption,
+  .ss-release-caption, .ss-coverage-note, .ss-availability, .ss-pagination-label,
+  .ss-footer, .ss-review-panel label, .ss-history-card dt, .ss-form-feedback) {
+  font-size: 14px;
+}
+.ss-workbench.traced-app :where(.ss-metric-label, .ss-metric .ss-muted, .ss-order-label,
+  .ss-preview-placeholder, .ss-preview-image, .ss-data-table thead th,
+  .ss-provenance dt, .ss-review-badge) { font-size: 13px; }
+.ss-workbench.traced-app :where(.ss-provenance dd, .ss-reveal-bar p,
+  .ss-empty p, .ss-definitions, .ss-data-table, .ss-unit-control) { font-size: 14px; }
+.ss-workbench.traced-app :where(.ss-clip-card strong, .ss-frame-card code,
+  .ss-data-table code, .ss-provenance code) {
+  font-family: var(--traced-font-mono); font-size: 12px;
+}
+.ss-workbench.traced-app .ss-clip-card .ss-eyebrow { font-size: 12px; }
+.ss-workbench.traced-app :where(.ss-preview-image) {
+  color: var(--traced-color-paper); background: var(--traced-color-ink);
+}
+.ss-workbench.traced-app .ss-choice { border-color: var(--ss-input-border); }
+.ss-workbench.traced-app .ss-choice:has(input:checked) {
+  color: var(--ss-selected-foreground); background: var(--ss-selected);
+  border-color: var(--ss-accent);
+}
+.ss-workbench.traced-app .ss-choice:has(input:focus-visible) {
+  outline-color: var(--ss-focus);
+}
+
+.ss-workbench.traced-app .ss-button {
+  min-height: var(--traced-layout-control-height); border-radius: var(--traced-radius-card);
+  font-size: 14px; border-color: var(--ss-input-border);
+}
+.ss-workbench.traced-app .ss-primary {
+  color: var(--traced-action-primary-foreground);
+  background: var(--traced-action-primary-background);
+  border-color: var(--traced-color-ink);
+}
+.ss-workbench.traced-app .ss-primary:hover:not(:disabled) {
+  color: var(--traced-action-primary-foreground);
+  background: var(--traced-action-primary-hover-background);
+  border-color: var(--traced-color-ink);
+}
+.ss-workbench.traced-app .ss-primary:active:not(:disabled) {
+  background: var(--traced-action-primary-active-background);
+}
+.ss-workbench.traced-app :where(.ss-form-input, .ss-form-textarea, .ss-search) {
+  border-color: var(--ss-input-border); font-size: 16px;
+}
+.ss-workbench.traced-app .ss-sidebar .ss-search { border-color: var(--ss-sidebar-input-border); }
+.ss-workbench.traced-app :where(.ss-dropdown, .dash-dropdown-content,
+  .dash-dropdown-option) { font-family: var(--traced-font-sans); font-size: 14px; }
+.ss-workbench.traced-app .dash-dropdown {
+  color: var(--ss-foreground); background: var(--ss-surface);
+  border-color: var(--ss-input-border); min-height: 44px;
+}
+.ss-workbench.traced-app .ss-sidebar .dash-dropdown,
+.ss-workbench.traced-app .ss-sidebar .Select-control {
+  background: var(--ss-sidebar) !important;
+  color: var(--ss-sidebar-foreground) !important;
+  border-color: var(--ss-sidebar-input-border) !important;
+}
+.ss-workbench.traced-app .ss-sidebar .dash-dropdown :where(.dash-dropdown-value,
+  .dash-dropdown-value-item, .dash-dropdown-trigger-icon),
+.ss-workbench.traced-app .ss-sidebar :where(.Select-value-label, .Select-placeholder,
+  .Select-input input) { color: var(--ss-sidebar-foreground) !important; }
+.ss-workbench.traced-app :where(.dash-dropdown-content, .dash-dropdown-option,
+  .Select-menu-outer) { background: var(--ss-surface); color: var(--ss-foreground); }
+.ss-workbench.traced-app .dash-dropdown-option[aria-selected="true"] {
+  color: var(--ss-selected-foreground); background: var(--ss-selected);
+}
+
+.ss-workbench.traced-app :where(.ss-inline-error, .ss-error) {
+  color: var(--ss-rejected); background: var(--ss-rejected-surface);
+  border-color: light-dark(var(--traced-status-error-border), var(--ss-rejected));
+}
+.ss-workbench.traced-app .ss-inline-success {
+  color: var(--ss-reviewed); background: var(--ss-reviewed-surface);
+  border-radius: var(--ss-radius); padding: 12px;
+}
+
+@media (max-width: 600px) {
+  .ss-workbench.traced-app .ss-specialist-heading { font-size: 26px; }
+  .ss-workbench.traced-app .ss-clip-card .ss-card-meta { font-size: 12px; }
+  .ss-workbench.traced-app .ss-preview-placeholder { font-size: 12px; }
+}
+@media print {
+  .ss-workbench.traced-app .ss-sidebar {
+    color: var(--traced-color-ink); background: var(--traced-color-white);
+  }
+  .ss-workbench.traced-app .ss-brand :where(strong, span),
+  .ss-workbench.traced-app :where(.ss-brand-note, .ss-specialist-name) {
+    color: var(--traced-color-ink);
+  }
+}
+@media (forced-colors: active) {
+  .ss-workbench.traced-app :where(button, a, input, textarea, select, summary,
+    [role="tab"], [role="combobox"]):focus-visible,
+  .ss-workbench.traced-app .ss-choice:has(input:focus-visible) {
+    outline-color: Highlight;
+  }
+}

@@ -1,0 +1,64 @@
+/* Standalone Swarm bridge; retain all specialist geometry and evidence meanings. */
+body:has(.traced-swarm) { background: var(--traced-background); font-family: var(--traced-font-sans); }
+.traced-swarm {
+  color-scheme: light;
+  --ink: var(--traced-foreground); --muted: var(--traced-foreground-secondary);
+  --teal: var(--traced-link); --amber: var(--traced-status-review-foreground);
+  --line: var(--traced-border-subtle); --paper: var(--traced-background);
+  --side: var(--traced-surface-inverse); --font: var(--traced-font-sans);
+  color: var(--traced-foreground); background: var(--traced-background);
+  font-family: var(--traced-font-sans); font-size: var(--traced-font-size-body);
+  line-height: var(--traced-line-height-body);
+}
+.traced-swarm :where(h1,h2,h3,h4,button,input,textarea,select) { font-family: var(--traced-font-sans); }
+.traced-swarm :where(code,pre,.source-ref,.small-code) { font-family: var(--traced-font-mono); }
+.traced-swarm a { color: var(--traced-link); text-decoration: underline; }
+.traced-swarm :where(button,a,input,textarea,select,summary,[role="combobox"]):focus-visible { outline: 3px solid var(--traced-focus-ring); outline-offset: 3px; }
+.traced-swarm .sidebar { background: var(--traced-surface-inverse); color: var(--traced-foreground-inverse); --traced-focus-ring: var(--traced-focus-ring-on-dark); }
+.traced-swarm .traced-brand { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; padding: 0 5px; }
+.traced-swarm .traced-specialist { color: var(--traced-foreground-inverse); font-size: 14px; font-weight: 500; letter-spacing: 0; }
+.traced-swarm .sidebar :where(.brand-note,.sidebar-label,.dataset-name,.dataset-note,.sidebar-footer,.sidebar-footer p,.sidebar-run code) { color: var(--traced-foreground-inverse); }
+.traced-swarm .brand-note { font-size: 13px; }
+.traced-swarm .nav-step { color: var(--traced-foreground-inverse); }
+.traced-swarm .nav-step > span { color: var(--traced-link-on-dark); }
+.traced-swarm .nav-step:hover,.traced-swarm .nav-step.active { background: var(--traced-action-secondary-hover-background); border-color: var(--traced-border-strong); color: var(--traced-foreground-inverse); }
+.traced-swarm .nav-step.active { box-shadow: inset 3px 0 var(--traced-color-trace); }
+.traced-swarm .dataset-panel { background: var(--traced-action-secondary-hover-background); border-color: var(--traced-border-strong); border-radius: var(--traced-radius-card); }
+.traced-swarm .sidebar-run { border-color: var(--traced-border-strong); }
+.traced-swarm .dataset-badge { color: var(--traced-status-review-background); background: var(--traced-status-review-foreground); border-color: var(--traced-status-review-border); }
+.traced-swarm .live-dot { background: var(--traced-link-on-dark); }
+.traced-swarm :where(.panel,.queue-card,.compact-case-picker,.field-input,.field-textarea) { background: var(--traced-surface); border-radius: var(--traced-radius-card); }
+.traced-swarm :where(.panel,.queue-card,.compact-case-picker) { border-color: var(--traced-border-subtle); }
+.traced-swarm .queue-card:hover,.traced-swarm .queue-card.selected { border-color: var(--traced-border-strong); }
+.traced-swarm .queue-card.selected { background: var(--traced-selection-background); }
+.traced-swarm .queue-card.active { border-color: var(--traced-link); background: var(--traced-selection-background); }
+.traced-swarm :where(.category-tag,.neutral-tag,.queue-type) { color: var(--traced-foreground-secondary); background: var(--traced-surface-subtle); border-color: var(--traced-border-subtle); }
+.traced-swarm :where(.review-required,.sample-badge,.review-draft-status) { color: var(--traced-status-review-foreground); background: var(--traced-status-review-background); border-color: var(--traced-status-review-border); }
+.traced-swarm .readiness-status.ready,.traced-swarm .readiness-status.verified { color: var(--traced-status-success-foreground); background: var(--traced-status-success-background); }
+.traced-swarm .readiness-status.warning,.traced-swarm .readiness-status.limited,.traced-swarm .readiness-status.unknown,.traced-swarm .readiness-status.unavailable { color: var(--traced-status-review-foreground); background: var(--traced-status-review-background); }
+.traced-swarm .readiness-status.error,.traced-swarm .readiness-status.missing,.traced-swarm .readiness-status.invalid { color: var(--traced-status-error-foreground); background: var(--traced-status-error-background); }
+.traced-swarm .button { border-radius: var(--traced-radius-small); font-family: var(--traced-font-sans); }
+.traced-swarm .button.primary { background: var(--traced-action-primary-background); color: var(--traced-action-primary-foreground); border-color: var(--traced-action-primary-background); }
+.traced-swarm .button.primary:hover:not(:disabled) { background: var(--traced-action-primary-hover-background); color: var(--traced-action-primary-foreground); }
+.traced-swarm .button.primary:active:not(:disabled) { background: var(--traced-action-primary-active-background); }
+.traced-swarm .button.secondary { background: var(--traced-surface); color: var(--traced-foreground); border-color: var(--traced-border-strong); }
+.traced-swarm .button.secondary:hover:not(:disabled) { background: var(--traced-selection-background); border-color: var(--traced-border-strong); }
+.traced-swarm .button:disabled { background: var(--traced-disabled-background); color: var(--traced-disabled-foreground); border-color: var(--traced-border-strong); opacity: 1; }
+.traced-swarm .text-button { color: var(--traced-link); text-decoration: underline; text-underline-offset: 3px; font-size: 14px; }
+.traced-swarm :where(input,textarea,.field-input,.field-textarea,.Select-control,.Select-menu-outer,.dash-dropdown,.dash-dropdown-content) { border-color: var(--traced-border-strong); color: var(--traced-foreground); background: var(--traced-surface); font-family: var(--traced-font-sans); }
+.traced-swarm :where(input,textarea)::placeholder { color: var(--traced-foreground-secondary); opacity: 1; }
+.traced-swarm :where(label,.field-help,.section-note,.chart-note,.coverage-note,.text-muted,.source-role,.source-ref,.source-identifiers,.page-footer) { color: var(--traced-foreground-secondary); }
+.traced-swarm .coverage-note { color: var(--traced-status-review-foreground) !important; border-color: var(--traced-status-review-border); }
+.traced-swarm .error-banner { background: var(--traced-status-error-background); color: var(--traced-status-error-foreground); border-color: var(--traced-status-error-border); }
+.traced-swarm .existing-review { background: var(--traced-status-info-background); color: var(--traced-status-info-foreground); }
+.traced-swarm .save-status { color: var(--traced-status-success-foreground); }
+.traced-swarm .reply-context { background: var(--traced-surface-subtle); border-color: var(--traced-border-strong); }
+.traced-swarm .context-quote blockquote { border-color: var(--traced-color-moss); }
+.traced-swarm .brief-preview { background: var(--traced-surface); border-color: var(--traced-border-subtle); font-family: var(--traced-font-sans); }
+.traced-swarm .skip-link { background: var(--traced-surface); color: var(--traced-link); }
+.traced-swarm .skip-link { top: 0; left: 12px; transform: translateY(-120%); }
+.traced-swarm .skip-link:focus { top: 12px; transform: none; }
+.traced-swarm .js-plotly-plot :where(text,.main-svg) { font-family: var(--traced-font-sans) !important; }
+body:has(.traced-swarm) .dash-dropdown-content { background: var(--traced-surface); color: var(--traced-foreground); border-color: var(--traced-border-strong); font-family: var(--traced-font-sans); }
+@media (max-width: 650px) { .traced-swarm .traced-brand { padding: 0; } .traced-swarm .nav-step.active { box-shadow: inset 0 -2px var(--traced-color-trace); } }
+@media print { .traced-swarm .sidebar { background: var(--traced-surface); color: var(--traced-foreground); } .traced-swarm .traced-specialist { color: var(--traced-foreground); } }

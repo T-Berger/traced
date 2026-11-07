@@ -1,0 +1,28 @@
+# Root build context allowlist for the Explorer and Swarm production images.
+# Source datasets, working databases, exports, credentials and environments stay out.
+**
+!pyproject.toml
+!uv.lock
+!.python-version
+!README.md
+!evidence-explorer/
+!evidence-explorer/pyproject.toml
+!evidence-explorer/README.md
+!evidence-explorer/Dockerfile
+!evidence-explorer/src/
+!evidence-explorer/src/**
+!swarm-detector/
+!swarm-detector/pyproject.toml
+!swarm-detector/README.md
+!swarm-detector/Dockerfile
+!swarm-detector/src/
+!swarm-detector/src/**
+!swarm-detector/scripts/
+!swarm-detector/scripts/entrypoint.sh
+!swarm-detector/gunicorn.conf.py
+!operation-silent-storm/
+!operation-silent-storm/pyproject.toml
+**/__pycache__/
+**/*.py[cod]
+**/.env
+**/.env.*

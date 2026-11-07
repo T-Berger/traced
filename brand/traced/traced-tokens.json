@@ -1,0 +1,289 @@
+{
+  "brand": "Traced",
+  "version": "1.0.0",
+  "description": "Design tokens for the Traced evidence review identity. CSS variable names use the traced prefix. Sizes use CSS units.",
+  "color": {
+    "base": {
+      "ink": "#142229",
+      "paper": "#F4F3EE",
+      "white": "#FFFFFF",
+      "trace": "#F36643",
+      "slate": "#52636C",
+      "line": "#D9E0DE",
+      "moss": "#276B63"
+    },
+    "role": {
+      "background": "#F4F3EE",
+      "surface": "#FFFFFF",
+      "surfaceSubtle": "#ECEEE9",
+      "surfaceInverse": "#142229",
+      "foreground": "#142229",
+      "foregroundSecondary": "#52636C",
+      "foregroundInverse": "#F4F3EE",
+      "borderSubtle": "#D9E0DE",
+      "borderStrong": "#52636C",
+      "actionPrimaryBackground": "#F36643",
+      "actionPrimaryForeground": "#142229",
+      "actionPrimaryHoverBackground": "#EA5E3A",
+      "actionPrimaryActiveBackground": "#E85C3B",
+      "actionSecondaryBackground": "#142229",
+      "actionSecondaryForeground": "#F4F3EE",
+      "actionSecondaryHoverBackground": "#263842",
+      "link": "#276B63",
+      "linkOnDark": "#A7D7CD",
+      "selectionBackground": "#D9E9E4",
+      "selectionForeground": "#142229",
+      "focusRing": "#142229",
+      "focusRingOnDark": "#F4F3EE",
+      "focusAccent": "#F36643",
+      "disabledBackground": "#D9E0DE",
+      "disabledForeground": "#607078"
+    },
+    "semantic": {
+      "success": {
+        "foreground": "#245D49",
+        "background": "#E5F1EA",
+        "border": "#BDD6C7"
+      },
+      "review": {
+        "foreground": "#754B05",
+        "background": "#FFF0CF",
+        "border": "#E4C589"
+      },
+      "error": {
+        "foreground": "#8F2F33",
+        "background": "#FBE9E8",
+        "border": "#E8BBBD"
+      },
+      "info": {
+        "foreground": "#254F64",
+        "background": "#EAF1F6",
+        "border": "#C6D7E1"
+      }
+    }
+  },
+  "font": {
+    "family": {
+      "sans": "Manrope, ui-sans-serif, system-ui, sans-serif",
+      "mono": "\"IBM Plex Mono\", ui-monospace, monospace"
+    },
+    "files": {
+      "sans": "fonts/Manrope-Variable.ttf",
+      "mono": "fonts/IBMPlexMono-Regular.ttf"
+    },
+    "weight": {
+      "regular": 400,
+      "medium": 500,
+      "semibold": 600,
+      "bold": 700
+    },
+    "size": {
+      "caption": "12px",
+      "label": "14px",
+      "body": "16px",
+      "lead": "18px",
+      "titleSmall": "20px",
+      "title": "24px",
+      "heading": "32px",
+      "display": "48px",
+      "hero": "64px"
+    },
+    "lineHeight": {
+      "tight": 1.08,
+      "heading": 1.2,
+      "label": 1.4,
+      "body": 1.6
+    },
+    "style": {
+      "caption": {
+        "fontFamily": "mono",
+        "fontSize": "12px",
+        "fontWeight": 400,
+        "lineHeight": 1.5,
+        "letterSpacing": "0.02em"
+      },
+      "label": {
+        "fontFamily": "sans",
+        "fontSize": "14px",
+        "fontWeight": 600,
+        "lineHeight": 1.4,
+        "letterSpacing": "0"
+      },
+      "body": {
+        "fontFamily": "sans",
+        "fontSize": "16px",
+        "fontWeight": 400,
+        "lineHeight": 1.6,
+        "letterSpacing": "0"
+      },
+      "lead": {
+        "fontFamily": "sans",
+        "fontSize": "18px",
+        "fontWeight": 400,
+        "lineHeight": 1.5,
+        "letterSpacing": "-0.01em"
+      },
+      "heading": {
+        "fontFamily": "sans",
+        "fontSize": "32px",
+        "fontWeight": 600,
+        "lineHeight": 1.2,
+        "letterSpacing": "-0.025em"
+      },
+      "display": {
+        "fontFamily": "sans",
+        "fontSize": "48px",
+        "fontWeight": 700,
+        "lineHeight": 1.08,
+        "letterSpacing": "-0.04em"
+      }
+    }
+  },
+  "spacing": {
+    "0": "0px",
+    "1": "4px",
+    "2": "8px",
+    "3": "12px",
+    "4": "16px",
+    "5": "20px",
+    "6": "24px",
+    "8": "32px",
+    "10": "40px",
+    "12": "48px",
+    "16": "64px",
+    "20": "80px",
+    "24": "96px"
+  },
+  "radius": {
+    "none": "0px",
+    "small": "4px",
+    "card": "8px",
+    "large": "12px",
+    "round": "50%"
+  },
+  "border": {
+    "width": "1px",
+    "focusWidth": "2px",
+    "focusOffset": "3px"
+  },
+  "shadow": {
+    "card": "0 8px 28px rgba(20, 34, 41, 0.06)",
+    "overlay": "0 20px 64px rgba(20, 34, 41, 0.16)"
+  },
+  "motion": {
+    "fast": "120ms",
+    "standard": "180ms",
+    "slow": "240ms",
+    "easing": "cubic-bezier(0.2, 0, 0, 1)",
+    "reducedMotion": "0ms"
+  },
+  "layout": {
+    "contentMax": "1280px",
+    "readingMax": "68ch",
+    "controlHeight": "44px",
+    "sidebarWidth": "264px"
+  },
+  "accessibility": {
+    "method": "WCAG sRGB relative luminance contrast calculation",
+    "contrast": {
+      "ink on paper": {
+        "ratio": 14.65,
+        "normalTextAA": true,
+        "largeTextOrUIBoundaryAA": true
+      },
+      "ink on white": {
+        "ratio": 16.27,
+        "normalTextAA": true,
+        "largeTextOrUIBoundaryAA": true
+      },
+      "paper on ink": {
+        "ratio": 14.65,
+        "normalTextAA": true,
+        "largeTextOrUIBoundaryAA": true
+      },
+      "ink on trace": {
+        "ratio": 5.26,
+        "normalTextAA": true,
+        "largeTextOrUIBoundaryAA": true
+      },
+      "white on trace": {
+        "ratio": 3.09,
+        "normalTextAA": false,
+        "largeTextOrUIBoundaryAA": true
+      },
+      "trace on paper": {
+        "ratio": 2.78,
+        "normalTextAA": false,
+        "largeTextOrUIBoundaryAA": false
+      },
+      "trace on ink": {
+        "ratio": 5.26,
+        "normalTextAA": true,
+        "largeTextOrUIBoundaryAA": true
+      },
+      "slate on paper": {
+        "ratio": 5.63,
+        "normalTextAA": true,
+        "largeTextOrUIBoundaryAA": true
+      },
+      "slate on white": {
+        "ratio": 6.25,
+        "normalTextAA": true,
+        "largeTextOrUIBoundaryAA": true
+      },
+      "white on moss": {
+        "ratio": 6.23,
+        "normalTextAA": true,
+        "largeTextOrUIBoundaryAA": true
+      },
+      "moss on paper": {
+        "ratio": 5.61,
+        "normalTextAA": true,
+        "largeTextOrUIBoundaryAA": true
+      },
+      "line on paper": {
+        "ratio": 1.21,
+        "normalTextAA": false,
+        "largeTextOrUIBoundaryAA": false
+      },
+      "success status label": {
+        "ratio": 6.61,
+        "normalTextAA": true,
+        "largeTextOrUIBoundaryAA": true
+      },
+      "review status label": {
+        "ratio": 6.73,
+        "normalTextAA": true,
+        "largeTextOrUIBoundaryAA": true
+      },
+      "error status label": {
+        "ratio": 6.83,
+        "normalTextAA": true,
+        "largeTextOrUIBoundaryAA": true
+      },
+      "info status label": {
+        "ratio": 7.73,
+        "normalTextAA": true,
+        "largeTextOrUIBoundaryAA": true
+      },
+      "ink on trace hover": {
+        "ratio": 4.77,
+        "normalTextAA": true,
+        "largeTextOrUIBoundaryAA": true
+      },
+      "ink on trace active": {
+        "ratio": 4.67,
+        "normalTextAA": true,
+        "largeTextOrUIBoundaryAA": true
+      }
+    },
+    "rules": [
+      "Use Ink text on Trace action backgrounds. White text on Trace fails normal text AA.",
+      "Use Moss or Ink for links on light surfaces; underline links in body copy.",
+      "Use Ink focus rings on light surfaces and Paper focus rings on dark surfaces. Trace alone is not a sufficient focus boundary against Paper.",
+      "Line is a decorative divider color only; use Slate for essential input outlines and controls.",
+      "Semantic labels always combine text with color. Success means an action completed; it is not a truth verdict.",
+      "Do not reduce text opacity to create secondary text. Use the Slate token."
+    ]
+  }
+}

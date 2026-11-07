@@ -1,0 +1,82 @@
+/*
+ * Silent Storm workbench foundation. Scope application markup with .ss-workbench.
+ * Derived from the existing Swarm workbench palette; no global document styling.
+ * Status IDs and visible labels: draft / Draft, reviewed / Reviewed,
+ * rejected / Rejected, needs_review / Needs review. No additional review states.
+ * Reviewed and Rejected describe a review outcome, never force affiliation.
+ */
+.ss-workbench {
+  color-scheme: light dark;
+
+  --ss-font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --ss-font-size-base: 14px;
+  --ss-line-height: 1.55;
+
+  --ss-space-1: 4px;
+  --ss-space-2: 8px;
+  --ss-space-3: 12px;
+  --ss-space-4: 16px;
+  --ss-space-5: 24px;
+  --ss-space-6: 32px;
+  --ss-radius: 8px;
+
+  --ss-background: light-dark(#f4f7f8, #10212a);
+  --ss-surface: light-dark(#ffffff, #18333f);
+  --ss-foreground: light-dark(#18333f, #e4edf0);
+  --ss-muted-foreground: light-dark(#526a76, #a7bac3);
+  --ss-line: light-dark(#dce5e8, #334a55);
+  --ss-input-border: light-dark(#8499a3, #7893a0);
+
+  --ss-sidebar: light-dark(#122c38, #0c1a21);
+  --ss-sidebar-foreground: light-dark(#d5e2e6, #d5e2e6);
+  --ss-sidebar-muted: light-dark(#9db5c0, #9db5c0);
+
+  --ss-accent: light-dark(#087f82, #75d0cb);
+  --ss-accent-foreground: light-dark(#ffffff, #10212a);
+  --ss-accent-hover: light-dark(#066b6f, #9be1dc);
+  --ss-selected: light-dark(#e2f0ef, #173c40);
+  --ss-selected-foreground: light-dark(#075f62, #b9edeb);
+
+  /* Amber mark retains the source palette; use the darker text token for labels. */
+  --ss-amber-mark: light-dark(#b67a2a, #e0b16e);
+  --ss-needs-review: light-dark(#805312, #f0c58c);
+  --ss-needs-review-surface: light-dark(#faf1e3, #392b1a);
+  --ss-draft: light-dark(#526a76, #b5c7cf);
+  --ss-draft-surface: light-dark(#edf2f4, #243943);
+
+  /* Optional outcomes. Always pair the color with a visible status label. */
+  --ss-reviewed: light-dark(#176b52, #8dd8b7);
+  --ss-reviewed-surface: light-dark(#e8f4ef, #17382e);
+  --ss-rejected: light-dark(#9c3943, #ffb0b7);
+  --ss-rejected-surface: light-dark(#faecee, #42252c);
+
+  --ss-focus: light-dark(#805312, #f0c58c);
+  --ss-focus-width: 3px;
+  --ss-focus-offset: 3px;
+
+  font-family: var(--ss-font-family);
+  font-size: var(--ss-font-size-base);
+  line-height: var(--ss-line-height);
+  color: var(--ss-foreground);
+  background: var(--ss-background);
+}
+
+.ss-workbench[data-theme="light"] {
+  color-scheme: light;
+}
+
+.ss-workbench[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+.ss-workbench :where(button, a, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: var(--ss-focus-width) solid var(--ss-focus);
+  outline-offset: var(--ss-focus-offset);
+}
+
+/* Preserve the operating system's high-contrast focus indicator. */
+@media (forced-colors: active) {
+  .ss-workbench :where(button, a, input, select, textarea, summary, [tabindex]):focus-visible {
+    outline-color: Highlight;
+  }
+}

@@ -1,0 +1,12 @@
+.venv/
+.venv-trail/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+*.pyc
+.env
+/data/
+/artifacts/
+/dist/
+*.egg-info/
+.DS_Store

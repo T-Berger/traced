@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+traced_project_root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+export UV_PROJECT_ENVIRONMENT="$traced_project_root/.venv"
+exec uv --directory "$traced_project_root" run \
+  --locked --all-packages --all-extras --group dev \
+  python "$traced_project_root/tools/traced.py" "$@"

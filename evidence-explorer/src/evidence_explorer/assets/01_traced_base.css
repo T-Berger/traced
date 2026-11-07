@@ -1,0 +1,25 @@
+/* Shared interface rules. Edit here, then run tools/sync_traced_identity.py. */
+.traced-lockup { display: flex; align-items: center; width: 160px; padding: 5px 0; flex-shrink: 0; }
+.traced-logo { display: block; width: 160px; max-width: 100%; height: auto; }
+.traced-logo--dark { display: none; }
+.traced-lockup--inverse .traced-logo--light { display: none; }
+.traced-lockup--inverse .traced-logo--dark { display: block; }
+.traced-app ::selection { color: var(--traced-selection-foreground); background: var(--traced-selection-background); }
+.traced-app :where(code, pre, .traced-mono) { font-family: var(--traced-font-mono); }
+.traced-app :where(a) { text-underline-offset: 3px; }
+.traced-app :where(button, input, textarea, select) { font-family: inherit; }
+.traced-app :where(button, a, input, textarea, select, summary, [role="tab"], [role="combobox"]):focus-visible {
+  outline: 3px solid var(--traced-focus-ring);
+  outline-offset: 3px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .traced-app *, .traced-app *::before, .traced-app *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0ms !important;
+    animation-duration: 0ms !important;
+  }
+}
+@media print {
+  .traced-lockup .traced-logo--light { display: block !important; }
+  .traced-lockup .traced-logo--dark { display: none !important; }
+}

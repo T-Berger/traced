@@ -1,0 +1,650 @@
+{
+  "schema_version": "1.0",
+  "case": {
+    "id": "harbor:case-v1",
+    "title": "Harbor posts — synthetic investigation",
+    "question": "What can the supplied records establish about the posting pattern and its alleged sponsor?",
+    "synthetic": true,
+    "coverage": {
+      "records": 10,
+      "posts": 8,
+      "original_agent_search_history": "unavailable"
+    },
+    "limitations": [
+      "All records and organizations are fictional.",
+      "Original public source URLs are unavailable.",
+      "No claim of independent origins is established.",
+      "Exclusions flag dependencies; they do not rerun a specialist detector."
+    ]
+  },
+  "records": [
+    {
+      "id": "harbor:r01",
+      "kind": "domain",
+      "source_label": "Synthetic registry export",
+      "text": "The contact address for harbor-example.test is 17 Harbor Lane. The record does not identify owners of social accounts.",
+      "content_hash": "eb264d3c27a8766808a394d411a282876e5bfd608a74650f2fa9f75c53917d0e",
+      "source_url": null,
+      "artifact_ref": null,
+      "acquired_at": "2026-11-06T07:30:00+01:00",
+      "published_at": "2026-11-04T09:00:00+01:00",
+      "metadata": {
+        "synthetic": true
+      }
+    },
+    {
+      "id": "harbor:r02",
+      "kind": "company",
+      "source_label": "Synthetic company directory",
+      "text": "Orion Media lists 17 Harbor Lane as its correspondence address. This is a business centre used by multiple unrelated tenants.",
+      "content_hash": "29008a1bf1fb70215cede447da4b90267cb4a2f8302c5b7d90a344fc38ecfda1",
+      "source_url": null,
+      "artifact_ref": null,
+      "acquired_at": "2026-11-06T07:30:00+01:00",
+      "published_at": "2026-11-04T09:01:00+01:00",
+      "metadata": {
+        "synthetic": true
+      }
+    },
+    {
+      "id": "harbor:r03",
+      "kind": "post",
+      "source_label": "Synthetic public post A",
+      "text": "The public meeting has moved to Thursday. Details: harbor-example.test/update",
+      "content_hash": "0eb3a2e4bcaf8bc138b5ea74fda534a02510a04010d060e1a7deaf439600e810",
+      "source_url": null,
+      "artifact_ref": null,
+      "acquired_at": "2026-11-06T07:30:00+01:00",
+      "published_at": "2026-11-04T09:02:00+01:00",
+      "metadata": {
+        "synthetic": true
+      }
+    },
+    {
+      "id": "harbor:r04",
+      "kind": "post",
+      "source_label": "Synthetic public post B",
+      "text": "Thursday is the new meeting date. Read harbor-example.test/update for the announcement.",
+      "content_hash": "8e31b97795a95a79328406995a9a6b41227149c8a7ca20a24d7935029b1b38e7",
+      "source_url": null,
+      "artifact_ref": null,
+      "acquired_at": "2026-11-06T07:30:00+01:00",
+      "published_at": "2026-11-04T09:03:00+01:00",
+      "metadata": {
+        "synthetic": true
+      }
+    },
+    {
+      "id": "harbor:r05",
+      "kind": "post",
+      "source_label": "Synthetic repost 1",
+      "text": "The public meeting has moved to Thursday. Details: harbor-example.test/update",
+      "content_hash": "0eb3a2e4bcaf8bc138b5ea74fda534a02510a04010d060e1a7deaf439600e810",
+      "source_url": null,
+      "artifact_ref": null,
+      "acquired_at": "2026-11-06T07:30:00+01:00",
+      "published_at": "2026-11-04T09:05:00+01:00",
+      "metadata": {
+        "synthetic": true
+      }
+    },
+    {
+      "id": "harbor:r06",
+      "kind": "post",
+      "source_label": "Synthetic repost 2",
+      "text": "The public meeting has moved to Thursday. Details: harbor-example.test/update",
+      "content_hash": "0eb3a2e4bcaf8bc138b5ea74fda534a02510a04010d060e1a7deaf439600e810",
+      "source_url": null,
+      "artifact_ref": null,
+      "acquired_at": "2026-11-06T07:30:00+01:00",
+      "published_at": "2026-11-04T09:06:00+01:00",
+      "metadata": {
+        "synthetic": true
+      }
+    },
+    {
+      "id": "harbor:r07",
+      "kind": "post",
+      "source_label": "Synthetic repost 3",
+      "text": "The public meeting has moved to Thursday. Details: harbor-example.test/update",
+      "content_hash": "0eb3a2e4bcaf8bc138b5ea74fda534a02510a04010d060e1a7deaf439600e810",
+      "source_url": null,
+      "artifact_ref": null,
+      "acquired_at": "2026-11-06T07:30:00+01:00",
+      "published_at": "2026-11-04T09:07:00+01:00",
+      "metadata": {
+        "synthetic": true
+      }
+    },
+    {
+      "id": "harbor:r08",
+      "kind": "post",
+      "source_label": "Synthetic repost 4",
+      "text": "Thursday is the new meeting date. Read harbor-example.test/update for the announcement.",
+      "content_hash": "8e31b97795a95a79328406995a9a6b41227149c8a7ca20a24d7935029b1b38e7",
+      "source_url": null,
+      "artifact_ref": null,
+      "acquired_at": "2026-11-06T07:30:00+01:00",
+      "published_at": "2026-11-04T09:08:00+01:00",
+      "metadata": {
+        "synthetic": true
+      }
+    },
+    {
+      "id": "harbor:r09",
+      "kind": "post",
+      "source_label": "Synthetic repost 5",
+      "text": "Thursday is the new meeting date. Read harbor-example.test/update for the announcement.",
+      "content_hash": "8e31b97795a95a79328406995a9a6b41227149c8a7ca20a24d7935029b1b38e7",
+      "source_url": null,
+      "artifact_ref": null,
+      "acquired_at": "2026-11-06T07:30:00+01:00",
+      "published_at": "2026-11-04T09:09:00+01:00",
+      "metadata": {
+        "synthetic": true
+      }
+    },
+    {
+      "id": "harbor:r10",
+      "kind": "post",
+      "source_label": "Synthetic repost 6",
+      "text": "Thursday is the new meeting date. Read harbor-example.test/update for the announcement.",
+      "content_hash": "8e31b97795a95a79328406995a9a6b41227149c8a7ca20a24d7935029b1b38e7",
+      "source_url": null,
+      "artifact_ref": null,
+      "acquired_at": "2026-11-06T07:30:00+01:00",
+      "published_at": "2026-11-04T09:10:00+01:00",
+      "metadata": {
+        "synthetic": true
+      }
+    }
+  ],
+  "fragments": [
+    {
+      "id": "harbor:f01",
+      "record_id": "harbor:r01",
+      "selector": {
+        "kind": "text",
+        "start": 0,
+        "end": 118
+      },
+      "quote": "The contact address for harbor-example.test is 17 Harbor Lane. The record does not identify owners of social accounts."
+    },
+    {
+      "id": "harbor:f02",
+      "record_id": "harbor:r02",
+      "selector": {
+        "kind": "text",
+        "start": 0,
+        "end": 125
+      },
+      "quote": "Orion Media lists 17 Harbor Lane as its correspondence address. This is a business centre used by multiple unrelated tenants."
+    },
+    {
+      "id": "harbor:f03",
+      "record_id": "harbor:r03",
+      "selector": {
+        "kind": "text",
+        "start": 0,
+        "end": 77
+      },
+      "quote": "The public meeting has moved to Thursday. Details: harbor-example.test/update"
+    },
+    {
+      "id": "harbor:f04",
+      "record_id": "harbor:r04",
+      "selector": {
+        "kind": "text",
+        "start": 0,
+        "end": 87
+      },
+      "quote": "Thursday is the new meeting date. Read harbor-example.test/update for the announcement."
+    },
+    {
+      "id": "harbor:f05",
+      "record_id": "harbor:r05",
+      "selector": {
+        "kind": "text",
+        "start": 0,
+        "end": 77
+      },
+      "quote": "The public meeting has moved to Thursday. Details: harbor-example.test/update"
+    },
+    {
+      "id": "harbor:f06",
+      "record_id": "harbor:r06",
+      "selector": {
+        "kind": "text",
+        "start": 0,
+        "end": 77
+      },
+      "quote": "The public meeting has moved to Thursday. Details: harbor-example.test/update"
+    },
+    {
+      "id": "harbor:f07",
+      "record_id": "harbor:r07",
+      "selector": {
+        "kind": "text",
+        "start": 0,
+        "end": 77
+      },
+      "quote": "The public meeting has moved to Thursday. Details: harbor-example.test/update"
+    },
+    {
+      "id": "harbor:f08",
+      "record_id": "harbor:r08",
+      "selector": {
+        "kind": "text",
+        "start": 0,
+        "end": 87
+      },
+      "quote": "Thursday is the new meeting date. Read harbor-example.test/update for the announcement."
+    },
+    {
+      "id": "harbor:f09",
+      "record_id": "harbor:r09",
+      "selector": {
+        "kind": "text",
+        "start": 0,
+        "end": 87
+      },
+      "quote": "Thursday is the new meeting date. Read harbor-example.test/update for the announcement."
+    },
+    {
+      "id": "harbor:f10",
+      "record_id": "harbor:r10",
+      "selector": {
+        "kind": "text",
+        "start": 0,
+        "end": 87
+      },
+      "quote": "Thursday is the new meeting date. Read harbor-example.test/update for the announcement."
+    }
+  ],
+  "runs": [
+    {
+      "id": "harbor:run-v1",
+      "input_fingerprint": "fb90bd58172f253f341c58632949dc0b3aab219c214450170f8ce47b47d4738c",
+      "input_manifest": [
+        "harbor:r01",
+        "harbor:r02",
+        "harbor:r03",
+        "harbor:r04",
+        "harbor:r05",
+        "harbor:r06",
+        "harbor:r07",
+        "harbor:r08",
+        "harbor:r09",
+        "harbor:r10"
+      ],
+      "method": "synthetic_fixture",
+      "method_version": "1.0",
+      "created_at": "2026-11-06T07:42:00+01:00",
+      "full_inputs_available": true,
+      "recomputation_capability": "dependency_review_only",
+      "configuration": {},
+      "coverage": {},
+      "status": "completed"
+    }
+  ],
+  "findings": [
+    {
+      "snapshot_id": "harbor:c1-v1",
+      "lineage_id": "harbor:c1",
+      "version": 1,
+      "run_id": "harbor:run-v1",
+      "kind": "observation",
+      "statement": "Eight saved posts promoted the same URL.",
+      "details": {
+        "demo_check": [],
+        "assumptions": []
+      }
+    },
+    {
+      "snapshot_id": "harbor:c2-v1",
+      "lineage_id": "harbor:c2",
+      "version": 1,
+      "run_id": "harbor:run-v1",
+      "kind": "inference",
+      "statement": "Distribution may be coordinated.",
+      "details": {
+        "assumptions": [
+          "Close timing and repeated wording may reflect common direction."
+        ],
+        "demo_check": [
+          {
+            "finding_type": "alternative_explanation",
+            "explanation": "The posts also fit people reposting a public announcement. Repetition and close timing do not establish a shared controller.",
+            "fragment_ids": [
+              "harbor:f03",
+              "harbor:f04"
+            ],
+            "quotes": [
+              "The public meeting has moved to Thursday. Details: harbor-example.test/update",
+              "Thursday is the new meeting date. Read harbor-example.test/update for the announcement."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "snapshot_id": "harbor:c3-v1",
+      "lineage_id": "harbor:c3",
+      "version": 1,
+      "run_id": "harbor:run-v1",
+      "kind": "inference",
+      "statement": "Orion Media directs the campaign.",
+      "details": {
+        "assumptions": [
+          "A shared contact address indicates common control."
+        ],
+        "demo_check": [
+          {
+            "finding_type": "unsupported_inference",
+            "explanation": "The company directory describes a shared business centre. A matching address does not establish that Orion Media controls the domain or social accounts.",
+            "fragment_ids": [
+              "harbor:f02"
+            ],
+            "quotes": [
+              "Orion Media lists 17 Harbor Lane as its correspondence address. This is a business centre used by multiple unrelated tenants."
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "links": [
+    {
+      "id": "harbor:l01",
+      "source": {
+        "type": "fragment",
+        "id": "harbor:f03"
+      },
+      "target": {
+        "type": "finding",
+        "id": "harbor:c1-v1"
+      },
+      "relation": "supports",
+      "fragment_ids": [
+        "harbor:f03"
+      ],
+      "basis": "Saved post contains the URL.",
+      "run_id": "harbor:run-v1"
+    },
+    {
+      "id": "harbor:l02",
+      "source": {
+        "type": "fragment",
+        "id": "harbor:f04"
+      },
+      "target": {
+        "type": "finding",
+        "id": "harbor:c1-v1"
+      },
+      "relation": "supports",
+      "fragment_ids": [
+        "harbor:f04"
+      ],
+      "basis": "Saved post contains the URL.",
+      "run_id": "harbor:run-v1"
+    },
+    {
+      "id": "harbor:l03",
+      "source": {
+        "type": "fragment",
+        "id": "harbor:f05"
+      },
+      "target": {
+        "type": "finding",
+        "id": "harbor:c1-v1"
+      },
+      "relation": "supports",
+      "fragment_ids": [
+        "harbor:f05"
+      ],
+      "basis": "Saved post contains the URL.",
+      "run_id": "harbor:run-v1"
+    },
+    {
+      "id": "harbor:l04",
+      "source": {
+        "type": "fragment",
+        "id": "harbor:f06"
+      },
+      "target": {
+        "type": "finding",
+        "id": "harbor:c1-v1"
+      },
+      "relation": "supports",
+      "fragment_ids": [
+        "harbor:f06"
+      ],
+      "basis": "Saved post contains the URL.",
+      "run_id": "harbor:run-v1"
+    },
+    {
+      "id": "harbor:l05",
+      "source": {
+        "type": "fragment",
+        "id": "harbor:f07"
+      },
+      "target": {
+        "type": "finding",
+        "id": "harbor:c1-v1"
+      },
+      "relation": "supports",
+      "fragment_ids": [
+        "harbor:f07"
+      ],
+      "basis": "Saved post contains the URL.",
+      "run_id": "harbor:run-v1"
+    },
+    {
+      "id": "harbor:l06",
+      "source": {
+        "type": "fragment",
+        "id": "harbor:f08"
+      },
+      "target": {
+        "type": "finding",
+        "id": "harbor:c1-v1"
+      },
+      "relation": "supports",
+      "fragment_ids": [
+        "harbor:f08"
+      ],
+      "basis": "Saved post contains the URL.",
+      "run_id": "harbor:run-v1"
+    },
+    {
+      "id": "harbor:l07",
+      "source": {
+        "type": "fragment",
+        "id": "harbor:f09"
+      },
+      "target": {
+        "type": "finding",
+        "id": "harbor:c1-v1"
+      },
+      "relation": "supports",
+      "fragment_ids": [
+        "harbor:f09"
+      ],
+      "basis": "Saved post contains the URL.",
+      "run_id": "harbor:run-v1"
+    },
+    {
+      "id": "harbor:l08",
+      "source": {
+        "type": "fragment",
+        "id": "harbor:f10"
+      },
+      "target": {
+        "type": "finding",
+        "id": "harbor:c1-v1"
+      },
+      "relation": "supports",
+      "fragment_ids": [
+        "harbor:f10"
+      ],
+      "basis": "Saved post contains the URL.",
+      "run_id": "harbor:run-v1"
+    },
+    {
+      "id": "harbor:l09",
+      "source": {
+        "type": "finding",
+        "id": "harbor:c1-v1"
+      },
+      "target": {
+        "type": "finding",
+        "id": "harbor:c2-v1"
+      },
+      "relation": "depends_on",
+      "fragment_ids": [],
+      "basis": "Posting pattern is a premise; coordination remains an inference.",
+      "run_id": "harbor:run-v1"
+    },
+    {
+      "id": "harbor:l10",
+      "source": {
+        "type": "finding",
+        "id": "harbor:c2-v1"
+      },
+      "target": {
+        "type": "finding",
+        "id": "harbor:c3-v1"
+      },
+      "relation": "depends_on",
+      "fragment_ids": [],
+      "basis": "Imported attribution assumes a coordinated campaign.",
+      "run_id": "harbor:run-v1"
+    },
+    {
+      "id": "harbor:l11",
+      "source": {
+        "type": "fragment",
+        "id": "harbor:f01"
+      },
+      "target": {
+        "type": "finding",
+        "id": "harbor:c3-v1"
+      },
+      "relation": "supports",
+      "fragment_ids": [
+        "harbor:f01"
+      ],
+      "basis": "Imported agent cites matching address; attribution is disputed.",
+      "run_id": "harbor:run-v1"
+    },
+    {
+      "id": "harbor:l12",
+      "source": {
+        "type": "fragment",
+        "id": "harbor:f02"
+      },
+      "target": {
+        "type": "finding",
+        "id": "harbor:c3-v1"
+      },
+      "relation": "supports",
+      "fragment_ids": [
+        "harbor:f02"
+      ],
+      "basis": "Imported agent cites matching address; attribution is disputed.",
+      "run_id": "harbor:run-v1"
+    },
+    {
+      "id": "harbor:l13",
+      "source": {
+        "type": "record",
+        "id": "harbor:r03"
+      },
+      "target": {
+        "type": "record",
+        "id": "harbor:r05"
+      },
+      "relation": "documented_repost",
+      "fragment_ids": [],
+      "basis": "Synthetic platform metadata explicitly identifies the repost parent.",
+      "run_id": "harbor:run-v1"
+    },
+    {
+      "id": "harbor:l14",
+      "source": {
+        "type": "record",
+        "id": "harbor:r03"
+      },
+      "target": {
+        "type": "record",
+        "id": "harbor:r06"
+      },
+      "relation": "documented_repost",
+      "fragment_ids": [],
+      "basis": "Synthetic platform metadata explicitly identifies the repost parent.",
+      "run_id": "harbor:run-v1"
+    },
+    {
+      "id": "harbor:l15",
+      "source": {
+        "type": "record",
+        "id": "harbor:r03"
+      },
+      "target": {
+        "type": "record",
+        "id": "harbor:r07"
+      },
+      "relation": "documented_repost",
+      "fragment_ids": [],
+      "basis": "Synthetic platform metadata explicitly identifies the repost parent.",
+      "run_id": "harbor:run-v1"
+    },
+    {
+      "id": "harbor:l16",
+      "source": {
+        "type": "record",
+        "id": "harbor:r04"
+      },
+      "target": {
+        "type": "record",
+        "id": "harbor:r08"
+      },
+      "relation": "documented_repost",
+      "fragment_ids": [],
+      "basis": "Synthetic platform metadata explicitly identifies the repost parent.",
+      "run_id": "harbor:run-v1"
+    },
+    {
+      "id": "harbor:l17",
+      "source": {
+        "type": "record",
+        "id": "harbor:r04"
+      },
+      "target": {
+        "type": "record",
+        "id": "harbor:r09"
+      },
+      "relation": "documented_repost",
+      "fragment_ids": [],
+      "basis": "Synthetic platform metadata explicitly identifies the repost parent.",
+      "run_id": "harbor:run-v1"
+    },
+    {
+      "id": "harbor:l18",
+      "source": {
+        "type": "record",
+        "id": "harbor:r04"
+      },
+      "target": {
+        "type": "record",
+        "id": "harbor:r10"
+      },
+      "relation": "documented_repost",
+      "fragment_ids": [],
+      "basis": "Synthetic platform metadata explicitly identifies the repost parent.",
+      "run_id": "harbor:run-v1"
+    }
+  ],
+  "reviews": [],
+  "scenarios": []
+}

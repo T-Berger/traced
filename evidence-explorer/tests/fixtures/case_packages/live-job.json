@@ -1,0 +1,569 @@
+{
+  "id": "claim-check:321aaba9-4277-4be2-8c3f-998228e5f0b1",
+  "source_case_id": "real-esa-claimcheck-source",
+  "source_finding_id": "real-esa-claimcheck-source:finding:4916c66ff9bfadb42b996343",
+  "status": "completed",
+  "stage": "awaiting_review",
+  "payload": {
+    "source_case_id": "real-esa-claimcheck-source",
+    "source_finding_id": "real-esa-claimcheck-source:finding:4916c66ff9bfadb42b996343",
+    "source_case_title": "Evidence Explorer saved investigation",
+    "source_case_fingerprint": "d88e924f8e8de451881a560ebc6ff241b4e6041d2152cd9e752f4a036047e8bc",
+    "source_synthetic": false,
+    "origin_records": [
+      {
+        "id": "real-esa-claimcheck-source:article:5101c077e642cf47f8af69ed",
+        "kind": "article",
+        "source_label": "www.esawebb.org · Webb captures evidence of a lightweight planet around TWA 7",
+        "text": "weic2512 — Science Release\nWebb captures evidence of a lightweight planet around TWA 7\n25 June 2025\nAstronomers using the NASA/ESA/CSA James Webb Space Telescope have captured compelling evidence of a planet with a mass similar to Saturn orbiting the young nearby star TWA 7. If confirmed, this would represent Webb’s first direct image discovery of a planet, and the lightest planet ever seen with this technique.\nThe international team, led by Dr. Anne-Marie Lagrange, CNRS researcher at the Observatoire de Paris-PSL and Université Grenoble Alpes in France, detected a faint infrared source in the disc of debris surrounding TWA 7 using JWST’s Mid-Infrared Instrument (MIRI) and its coronagraph. The source is located about 1.5 arcseconds from the star on the sky which, at the distance of TWA7, is roughly fifty times the distance of the Earth to the Sun. This matches the expected position of a planet that would explain key features seen in the debris disc.\nUsing the coronagraph on Webb’s Mid-Infrared Instrument (MIRI) on 21 June 2024, the team carefully suppressed the bright glare of the host star to reveal faint nearby objects. This technique, called high-contrast imaging, enables astronomers to directly detect planets that would otherwise be lost in the overwhelming light from their host star. After subtracting residual starlight using advanced image processing, a faint infrared source was revealed near TWA 7, distinguishable from background galaxies or Solar System objects. The source is located in a gap in one of three dust rings that were discovered around TWA 7 by previous ground-based observations. Its brightness, colour, distance from the star, and position within the ring are consistent with theoretical predictions for a young, cold, Saturn-mass planet sculpting the surrounding debris disc.\n“Our observations reveal a strong candidate for a planet shaping the structure of the TWA 7 debris disc, and its position is exactly where we expected to find a planet of this mass,” said Dr. Lagrange.\n“This observatory enables us to capture images of planets with masses similar to those in the solar system, which represents an exciting step forward in our understanding of planetary systems, including our own,” added co-author Mathilde Malin of Johns Hopkins University and the Space Telescope Science Institute in Baltimore.\nInitial analysis suggests that the object — referred to as TWA 7b — could be a young, cold planet with a mass around 0.3 times that of Jupiter (~100 Earth masses) and a temperature near 320 Kelvin (roughly 47 degrees Celsius). Its location aligns with a gap in the disc, hinting at a dynamic interaction between the planet and its surroundings.\nDebris discs filled with dust and rocky material are found around both young and older stars, although they are more easily detected around younger stars as they are brighter. They often feature visible rings or gaps, thought to be created by planets that have formed around the star, but such a planet has yet to be detected within a debris disc. Once verified, this discovery would mark the first time a planet has been directly associated with sculpting a debris disc and could offer the first observational hint of a trojan disc — a collection of dust trapped in the planet’s orbit.\nTWA 7, also known as CE Antilae, is a young (~6.4 million years old) M-type star located about 111 light-years away in the TW Hydrae association. Its nearly face-on disc made it an ideal target for Webb’s high-sensitivity mid-infrared observations.\nThe findings highlight Webb’s ability to explore previously unseen, low-mass planets around nearby stars. Ongoing and future observations will aim to better constrain the properties of the candidate, verify its planetary status, and deepen our understanding of planet formation and disc evolution in young systems.This preliminary result showcases the exciting new frontier that JWST is opening for exoplanet discovery and characterisation.\nThese observations were taken as part of the Webb observing programme #3662. The results have been published today in Nature.\nMore information\nWebb is the largest, most powerful telescope ever launched into space. Under an international collaboration agreement, ESA provided the telescope’s launch service, using the Ariane 5 launch vehicle. Working with partners, ESA was responsible for the development and qualification of Ariane 5 adaptations for the Webb mission and for the procurement of the launch service by Arianespace. ESA also provided the workhorse spectrograph NIRSpec and 50% of the mid-infrared instrument MIRI, which was designed and built by a consortium of nationally funded European Institutes (The MIRI European Consortium) in partnership with JPL and the University of Arizona.\nWebb is an international partnership between NASA, ESA and the Canadian Space Agency (CSA).\nImage Credit: ESA/Webb, NASA, CSA, A.M. Lagrange, M. Zamani (ESA/Webb)\nLinks\nContacts\n        Dr. Anne-Marie Lagrange\nDirectrice de Recherche CNRS, Observatoire de Paris/PSL\nEmail: [email protected]\n        Bethany Downer\nESA/Webb Chief Science Communications Officer\nEmail: [email protected]\n        ESA Newsroom and Media Relations Office\nEmail: [email protected]",
+        "content_hash": "616c627bd7096f02e9742fe35f2a02f56afe8a2bc2b41e537bfca40f2cb2d521",
+        "source_url": "https://esawebb.org/news/weic2512/",
+        "artifact_ref": null,
+        "acquired_at": "2026-11-06T20:57:40.430565+00:00",
+        "published_at": "2025-06-25",
+        "metadata": {
+          "acquisition_time_basis": "Saved source retrieval timestamp supplied by the article collector.",
+          "author": null,
+          "feed_url": null,
+          "final_url": "https://esawebb.org/news/weic2512/",
+          "language": "en",
+          "publication_source": "article",
+          "publisher": "www.esawebb.org",
+          "requested_url": "https://esawebb.org/news/weic2512/",
+          "retrieved_at": "2026-11-06T20:57:40.430565+00:00",
+          "source_first_saved_at": "2026-11-06T20:53:09.087323+00:00",
+          "source_last_saved_at": "2026-11-06T20:57:40.461598+00:00",
+          "synthetic": false,
+          "title": "Webb captures evidence of a lightweight planet around TWA 7",
+          "topic": "TWA 7 candidate planet"
+        }
+      }
+    ],
+    "origin_fragments": [
+      {
+        "id": "real-esa-claimcheck-source:quote:dbeddc32ef0322efc8a5b8ef",
+        "record_id": "real-esa-claimcheck-source:article:5101c077e642cf47f8af69ed",
+        "selector": {
+          "kind": "text",
+          "start": 100,
+          "end": 275
+        },
+        "quote": "Astronomers using the NASA/ESA/CSA James Webb Space Telescope have captured compelling evidence of a planet with a mass similar to Saturn orbiting the young nearby star TWA 7."
+      }
+    ],
+    "origin_limitations": [],
+    "finding_snapshot": {
+      "snapshot_id": "real-esa-claimcheck-source:finding:4916c66ff9bfadb42b996343",
+      "lineage_id": "real-esa-claimcheck-source:claim:d2001c9db354f8632d38b2e5",
+      "version": 1,
+      "run_id": "real-esa-claimcheck-source:run:e487ec2baa7d888e962bafe9",
+      "kind": "inference",
+      "statement": "Astronomers using the NASA/ESA/CSA James Webb Space Telescope have captured compelling evidence of a planet with a mass similar to Saturn orbiting the young nearby star TWA 7.",
+      "details": {
+        "attribution": null,
+        "claimed_event_time": "25 June 2025",
+        "claimed_location": null,
+        "extraction_origin": "saved_model",
+        "interpretation": "Extracted source statement; quotation presence does not verify truth.",
+        "model_key": "ollama:qwen3.5:9b@56671c2ab9385f9cfcb404638e32cd62d88e3501d44822208363c010179a3c90:v1",
+        "producer": "evidence_explorer",
+        "review_state": "unreviewed",
+        "source_chunk_fragment_id": "real-esa-claimcheck-source:chunk:a75f1e04ef90616766fd53e5",
+        "subject": "",
+        "synthetic": false,
+        "version_basis": "First imported snapshot; the repository retains no extraction version sequence."
+      }
+    },
+    "policy": {
+      "queries": [
+        "TWA 7 Webb Saturn mass candidate planet 2025",
+        "TWA 7b confirmation alternative background galaxy"
+      ],
+      "seed_urls": [],
+      "max_sources": 4,
+      "results_per_query": 5
+    },
+    "requested_model": "qwen3.5:9b",
+    "retry_of": "claim-check:1b742a4c-7cbc-44c0-b026-c5382e8c8abd"
+  },
+  "snapshot": {
+    "records": [
+      {
+        "id": "external-022061cd2d1e52706bc213e9",
+        "url": "https://science.nasa.gov/missions/webb/likely-saturn-mass-planet-imaged-by-nasa-webb-is-lightest-ever-seen/",
+        "requested_url": "https://science.nasa.gov/missions/webb/likely-saturn-mass-planet-imaged-by-nasa-webb-is-lightest-ever-seen/",
+        "title": "Likely Saturn-Mass Planet Imaged by NASA Webb Is Lightest Ever Seen - NASA Science",
+        "publisher": "NASA Science",
+        "text": "Astronomers using NASA’s James Webb Space Telescope have captured compelling evidence of a planet with a mass similar to Saturn orbiting the young nearby star TWA 7. If confirmed, this would represent Webb’s first direct image discovery of a planet, and the lightest planet ever seen with this technique outside the solar system.\nThe international team detected a faint infrared source in the disk of debris surrounding TWA 7 using Webb’s MIRI (Mid-Infrared Instrument). The distance between the source and TWA 7 is estimated to be about 50 times the distance of Earth from the Sun. This matches the expected position of a planet that would explain key features seen in the debris disk. The results published Wednesday, June 25 in the journal Nature.\nImage: TWA 7 (MIRI + VLT Image)\nUsing MIRI’s coronagraph, the researchers carefully suppressed the bright glare of the host star to reveal faint nearby objects. This technique, called high-contrast imaging, enables astronomers to directly detect planets that would otherwise be lost in the overwhelming light from their host star. After subtracting residual starlight using advanced image processing, a faint infrared source was revealed near TWA 7. The team ruled out an object in our solar system that happened to be in the same part of the sky as the source. While there is a very small chance that it is a background galaxy, the evidence strongly points to the source being a previously undiscovered planet.\nThe source is located in a gap in one of three dust rings that were discovered around TWA 7 by previous ground-based observations. The object’s brightness, color, distance from the star, and position within the ring are consistent with theoretical predictions for a young, cold, Saturn-mass planet that is expected to be sculpting the surrounding debris disk.\n\"Our observations reveal a strong candidate for a planet shaping the structure of the TWA 7 debris disk, and its position is exactly where we expected to find a planet of this mass,\" said Anne-Marie Lagrange, CNRS researcher at the Observatoire de Paris-PSL and Université Grenoble Alpes in France, lead author of the paper.\n“This observatory enables us to capture images of planets with masses similar to those in the solar system, which represents an exciting step forward in our understanding of planetary systems, including our own,” added co-author Mathilde Malin of Johns Hopkins University and the Space Telescope Science Institute in Baltimore.\nInitial analysis suggests that the object — referred to as TWA 7 b — could be a young, cold planet with a mass around 0.3 times that of Jupiter (about 100 Earth masses, or one Saturn mass) and a temperature near 120 degrees Fahrenheit (47 degrees Celsius). Its location aligns with a gap in the disk, hinting at a dynamic interaction between the planet and its surroundings.\nDebris disks filled with dust and rocky material are found around both young and older stars, although they are more easily detected around younger stars as they are brighter. They often feature visible rings or gaps, thought to be created by planets that have formed around the star, but such a planet has yet to be directly detected within a debris disk. If verified, this discovery would mark the first time a planet has been directly associated with sculpting a debris disk, and could offer the first observational hint of a “trojan disk” — a collection of dust trapped in the planet’s orbit.\nTWA 7, also known as CE Antilae, is a young (about 6.4 million years old) red dwarf star located about 111 light-years away in the TW Hydrae association. Its nearly face-on disk made it an ideal target for Webb’s high-sensitivity mid-infrared observations.\nThe findings highlight Webb’s ability to explore previously unseen, low-mass planets around nearby stars. Ongoing and future observations will aim to better constrain the properties of the candidate, verify its planetary status, and deepen our understanding of planet formation and disk evolution in young systems.\nThese observations were taken as part of the Webb observing program 3662.\nThe James Webb Space Telescope is the world’s premier space science observatory. Webb is solving mysteries in our solar system, looking beyond to distant worlds around other stars, and probing the mysterious structures and origins of our universe and our place in it. Webb is an international program led by NASA with its partners, ESA (European Space Agency) and CSA (Canadian Space Agency).\nDownloads & Related Information\nThe following sections contain links to download this article's images and videos in all available resolutions followed by related information links, media contacts, and if available, research paper and Spanish translation links.",
+        "published_at": "2025-06-25T11:00:00-04:00",
+        "retrieved_at": "2026-11-06T23:13:43.995804+00:00",
+        "content_hash": "81be8d95c8d74e4e270c6d69565e0ba1bfcf9db69ff55ef5bc69f49841620922",
+        "metadata": {
+          "provenance": {
+            "requested_url": "https://science.nasa.gov/missions/webb/likely-saturn-mass-planet-imaged-by-nasa-webb-is-lightest-ever-seen/",
+            "final_url": "https://science.nasa.gov/missions/webb/likely-saturn-mass-planet-imaged-by-nasa-webb-is-lightest-ever-seen/",
+            "feed_url": null,
+            "retrieved_at": "2026-11-06T23:13:43.995804+00:00",
+            "author": "Marty McCoy; NASA Webb Mission Team",
+            "published_at": "2025-06-25T11:00:00-04:00",
+            "publication_source": "article",
+            "content_source": "article"
+          },
+          "language": "en-US",
+          "discovery_only": {
+            "url": "https://science.nasa.gov/missions/webb/likely-saturn-mass-planet-imaged-by-nasa-webb-is-lightest-ever-seen/",
+            "title": "Likely Saturn-Mass Planet Imaged by NASA Webb Is Lightest Ever Seen",
+            "snippet": "Likely Saturn-Mass Planet Imaged by NASA Webb Is Lightest Ever Seen This coronagraphic image of the star TWA 7 and its planet, TWA 7 b, features data from the SPHERE instrument on ESO's Very Large Telescope in blue and from Webb's MIRI (Mid-Infrared Instrument) in orange. Blue shows the star's debris disk; the bright orange spot is the ...",
+            "rank": 1,
+            "query": "TWA 7 Webb Saturn mass candidate planet 2025",
+            "provider": "duckduckgo_lite"
+          },
+          "content_source": "fetched_article",
+          "independence": "unreviewed"
+        }
+      },
+      {
+        "id": "external-f31da349767d9e94b561a2d0",
+        "url": "https://esawebb.org/images/weic2512/",
+        "requested_url": "https://esawebb.org/images/weic2512/",
+        "title": "High-contrast coronograph image of TWA 7b",
+        "publisher": "www.esawebb.org",
+        "text": "About the Object\nColours & filters\nHigh-contrast coronograph image of TWA 7b\nAstronomers using the NASA/ESA/CSA James Webb Space Telescope have captured compelling evidence of a planet with a mass similar to Saturn orbiting the young nearby star TWA 7. If confirmed, this would represent Webb’s first direct image discovery of a planet, and the lightest planet ever seen with this technique.\nUsing the coronagraph on Webb’s Mid-Infrared Instrument (MIRI) on 21 June 2024, the team carefully suppressed the bright glare of the host star to reveal faint nearby objects. This technique, called high-contrast imaging, enables astronomers to directly detect planets that would otherwise be lost in the overwhelming light from their host star. After subtracting residual starlight using advanced image processing, a faint infrared source was revealed near TWA 7, distinguishable from background galaxies or Solar System objects. The source is located in a gap in one of three dust rings that were discovered around TWA 7 by previous ground-based observations. Its brightness, colour, distance from the star, and position within the ring are consistent with theoretical predictions for a young, cold, Saturn-mass planet sculpting the surrounding debris disc.\nInitial analysis suggests that the object — referred to as TWA 7b — could be a young, cold planet with a mass around 0.3 times that of Jupiter (~100 Earth masses) and a temperature near 320 Kelvin (roughly 47 degrees Celsius).\nIn this image from MIRI, light from the star TWA 7 has been subtracted. The location of the star is marked with a circle and a star symbol at the centre of the image. This leaves light from the debris disc around the star, as well as other infrared sources, visible. The bright spot to the upper right of the star is the source identified as TWA 7b, within the debris disc. The more distant orange spot visible in the left of the image is an unrelated background star.\nOnly a single MIRI band was used in this image (seen here in orange). The blue colour visible in the image results from an additional band taken by the SPHERE instrument of ESO's Very Large Telescope (VLT), which showcases the location of the disc surrounding the host star and the exoplanet creating a gap within the disc that is revealed by MIRI.\n[Image Description: An image of a nearby star and its vicinity. The star itself has been blocked out and its bright light has been removed. A dashed circle with a star symbol at the centre of the image marks the star’s location. A fuzzy blue disc surrounds the star. An orange spot, near to the star and inside this disc, is identified as a planet orbiting the star. A fainter orange spot far from the centre marks a distant star.]\nCredit:\nESA/Webb, NASA, CSA, A.M. Lagrange, M. Zamani (ESA/Webb)",
+        "published_at": null,
+        "retrieved_at": "2026-11-06T23:13:45.572053+00:00",
+        "content_hash": "89aa638f4ac3e87c26e24be2fa5aa6402ea8b361106ede45c3461b612fe48e83",
+        "metadata": {
+          "provenance": {
+            "requested_url": "https://esawebb.org/images/weic2512/",
+            "final_url": "https://esawebb.org/images/weic2512/",
+            "feed_url": null,
+            "retrieved_at": "2026-11-06T23:13:45.572053+00:00",
+            "author": null,
+            "published_at": null,
+            "publication_source": "unknown",
+            "content_source": "article"
+          },
+          "language": "en",
+          "discovery_only": {
+            "url": "https://esawebb.org/images/weic2512/",
+            "title": "High-contrast coronograph image of TWA 7b | ESA/Webb",
+            "snippet": "After subtracting residual starlight using advanced image processing, a faint infrared source was revealed near TWA 7, distinguishable from background galaxies or Solar System objects. The source is located in a gap in one of three dust rings that were discovered around TWA 7 by previous ground-based observations.",
+            "rank": 1,
+            "query": "TWA 7b confirmation alternative background galaxy",
+            "provider": "duckduckgo_lite"
+          },
+          "content_source": "fetched_article",
+          "independence": "unreviewed"
+        }
+      },
+      {
+        "id": "external-0895f58ba58813d9cb76b1df",
+        "url": "https://www.esa.int/media/high-contrast-coronograph-image-of-twa-7b",
+        "requested_url": "https://www.esa.int/ESA_Multimedia/Images/2025/06/High-contrast_coronograph_image_of_TWA_7b",
+        "title": "High-contrast coronograph image of TWA 7b",
+        "publisher": "esa.int",
+        "text": "Astronomers using the NASA/ESA/CSA James Webb Space Telescope have captured compelling evidence of a planet with a mass similar to Saturn orbiting the young nearby star TWA 7. If confirmed, this would represent Webb’s first direct image discovery of a planet, and the lightest planet ever seen with this technique.\nIn this image from MIRI, light from the star TWA 7 has been subtracted. The location of the star is marked with a circle and a star symbol at the centre of the image. This leaves light from the debris disc around the star, as well as other infrared sources, visible. The bright spot to the upper right of the star is the source identified as TWA 7b, within the debris disc. The more distant orange spot visible in the left of the image is an unrelated background star.\nOnly a single MIRI band was used in this image (seen here in orange). The blue colour visible in the image results from an additional band taken by the SPHERE instrument of ESO's Very Large Telescope (VLT), which showcases the location of the disc surrounding the host star and the exoplanet creating a gap within the disc that is revealed by MIRI.\n[Image Description: An image of a nearby star and its vicinity. The star itself has been blocked out and its bright light has been removed. A dashed circle with a star symbol at the centre of the image marks the star’s location. A fuzzy blue disc surrounds the star. An orange spot, near to the star and inside this disc, is identified as a planet orbiting the star. A fainter orange spot far from the centre marks a distant star.]\nCredits\nESA/Webb, NASA, CSA, A.M. Lagrange, M. Zamani (ESA/Webb)\nLicense\nCC BY 4.0 INT or ESA Standard Licence",
+        "published_at": null,
+        "retrieved_at": "2026-11-06T23:13:49.379630+00:00",
+        "content_hash": "37bf131d6085793fbf8a3e2efb1e227f38e66ccdb5400f2d08739e026ba19033",
+        "metadata": {
+          "provenance": {
+            "requested_url": "https://www.esa.int/ESA_Multimedia/Images/2025/06/High-contrast_coronograph_image_of_TWA_7b",
+            "final_url": "https://www.esa.int/media/high-contrast-coronograph-image-of-twa-7b",
+            "feed_url": null,
+            "retrieved_at": "2026-11-06T23:13:49.379630+00:00",
+            "author": null,
+            "published_at": null,
+            "publication_source": "unknown",
+            "content_source": "article"
+          },
+          "language": "EN",
+          "discovery_only": {
+            "url": "https://www.esa.int/ESA_Multimedia/Images/2025/06/High-contrast_coronograph_image_of_TWA_7b",
+            "title": "ESA - High-contrast coronograph image of TWA 7b",
+            "snippet": "After subtracting residual starlight using advanced image processing, a faint infrared source was revealed near TWA 7, distinguishable from background galaxies or Solar System objects. The source is located in a gap in one of three dust rings that were discovered around TWA 7 by previous ground-based observations.",
+            "rank": 2,
+            "query": "TWA 7b confirmation alternative background galaxy",
+            "provider": "duckduckgo_lite"
+          },
+          "content_source": "fetched_article",
+          "independence": "unreviewed"
+        }
+      }
+    ],
+    "fragments": [
+      {
+        "id": "evidence-fragment:b87f8710e4aa04ee79a9",
+        "record_id": "external-f31da349767d9e94b561a2d0",
+        "text": "About the Object\nColours & filters\nHigh-contrast coronograph image of TWA 7b\nAstronomers using the NASA/ESA/CSA James Webb Space Telescope have captured compelling evidence of a planet with a mass similar to Saturn orbiting the young nearby star TWA 7. If confirmed, this would represent Webb’s first direct image discovery of a planet, and the lightest planet ever seen with this technique.\nUsing the coronagraph on Webb’s Mid-Infrared Instrument (MIRI) on 21 June 2024, the team carefully suppressed the bright glare of the host star to reveal faint nearby objects. This technique, called high-contrast imaging, enables astronomers to directly detect planets that would otherwise be lost in the overwhelming light from their host star. After subtracting residual starlight using advanced image processing, a faint infrared source was revealed near TWA 7, distinguishable from background galaxies or Solar System objects. The source is located in a gap in one of three dust rings that were discovered around TWA 7 by previous ground-based observations. Its brightness, colour, distance from the star, and position within the ring are consistent with theoretical predictions for a young, cold, Saturn",
+        "start": 0,
+        "end": 1200
+      },
+      {
+        "id": "evidence-fragment:d6214ce1a1a839bbf43a",
+        "record_id": "external-0895f58ba58813d9cb76b1df",
+        "text": "Astronomers using the NASA/ESA/CSA James Webb Space Telescope have captured compelling evidence of a planet with a mass similar to Saturn orbiting the young nearby star TWA 7. If confirmed, this would represent Webb’s first direct image discovery of a planet, and the lightest planet ever seen with this technique.\nIn this image from MIRI, light from the star TWA 7 has been subtracted. The location of the star is marked with a circle and a star symbol at the centre of the image. This leaves light from the debris disc around the star, as well as other infrared sources, visible. The bright spot to the upper right of the star is the source identified as TWA 7b, within the debris disc. The more distant orange spot visible in the left of the image is an unrelated background star.\nOnly a single MIRI band was used in this image (seen here in orange). The blue colour visible in the image results from an additional band taken by the SPHERE instrument of ESO's Very Large Telescope (VLT), which showcases the location of the disc surrounding the host star and the exoplanet creating a gap within the disc that is revealed by MIRI.\n[Image Description: An image of a nearby star and its vicinity. The",
+        "start": 0,
+        "end": 1200
+      },
+      {
+        "id": "evidence-fragment:15173e56dfe1f43ceb51",
+        "record_id": "external-022061cd2d1e52706bc213e9",
+        "text": "Astronomers using NASA’s James Webb Space Telescope have captured compelling evidence of a planet with a mass similar to Saturn orbiting the young nearby star TWA 7. If confirmed, this would represent Webb’s first direct image discovery of a planet, and the lightest planet ever seen with this technique outside the solar system.\nThe international team detected a faint infrared source in the disk of debris surrounding TWA 7 using Webb’s MIRI (Mid-Infrared Instrument). The distance between the source and TWA 7 is estimated to be about 50 times the distance of Earth from the Sun. This matches the expected position of a planet that would explain key features seen in the debris disk. The results published Wednesday, June 25 in the journal Nature.\nImage: TWA 7 (MIRI + VLT Image)\nUsing MIRI’s coronagraph, the researchers carefully suppressed the bright glare of the host star to reveal faint nearby objects. This technique, called high-contrast imaging, enables astronomers to directly detect planets that would otherwise be lost in the overwhelming light from their host star. After subtracting residual starlight using advanced image processing, a faint infrared source was revealed near TWA 7.",
+        "start": 0,
+        "end": 1200
+      },
+      {
+        "id": "evidence-fragment:db196928d40a0f70803f",
+        "record_id": "external-022061cd2d1e52706bc213e9",
+        "text": ". Its nearly face-on disk made it an ideal target for Webb’s high-sensitivity mid-infrared observations.\nThe findings highlight Webb’s ability to explore previously unseen, low-mass planets around nearby stars. Ongoing and future observations will aim to better constrain the properties of the candidate, verify its planetary status, and deepen our understanding of planet formation and disk evolution in young systems.\nThese observations were taken as part of the Webb observing program 3662.\nThe James Webb Space Telescope is the world’s premier space science observatory. Webb is solving mysteries in our solar system, looking beyond to distant worlds around other stars, and probing the mysterious structures and origins of our universe and our place in it. Webb is an international program led by NASA with its partners, ESA (European Space Agency) and CSA (Canadian Space Agency).\nDownloads & Related Information\nThe following sections contain links to download this article's images and videos in all available resolutions followed by related information links, media contacts, and if available, research paper and Spanish translation links.",
+        "start": 3600,
+        "end": 4748
+      },
+      {
+        "id": "evidence-fragment:7c0f2dc0b99c7d9331c6",
+        "record_id": "external-f31da349767d9e94b561a2d0",
+        "text": "source identified as TWA 7b, within the debris disc. The more distant orange spot visible in the left of the image is an unrelated background star.\nOnly a single MIRI band was used in this image (seen here in orange). The blue colour visible in the image results from an additional band taken by the SPHERE instrument of ESO's Very Large Telescope (VLT), which showcases the location of the disc surrounding the host star and the exoplanet creating a gap within the disc that is revealed by MIRI.\n[Image Description: An image of a nearby star and its vicinity. The star itself has been blocked out and its bright light has been removed. A dashed circle with a star symbol at the centre of the image marks the star’s location. A fuzzy blue disc surrounds the star. An orange spot, near to the star and inside this disc, is identified as a planet orbiting the star. A fainter orange spot far from the centre marks a distant star.]\nCredit:\nESA/Webb, NASA, CSA, A.M. Lagrange, M. Zamani (ESA/Webb)",
+        "start": 1800,
+        "end": 2793
+      },
+      {
+        "id": "evidence-fragment:b403bfa49b1012a286f3",
+        "record_id": "external-022061cd2d1e52706bc213e9",
+        "text": "by objects. This technique, called high-contrast imaging, enables astronomers to directly detect planets that would otherwise be lost in the overwhelming light from their host star. After subtracting residual starlight using advanced image processing, a faint infrared source was revealed near TWA 7. The team ruled out an object in our solar system that happened to be in the same part of the sky as the source. While there is a very small chance that it is a background galaxy, the evidence strongly points to the source being a previously undiscovered planet.\nThe source is located in a gap in one of three dust rings that were discovered around TWA 7 by previous ground-based observations. The object’s brightness, color, distance from the star, and position within the ring are consistent with theoretical predictions for a young, cold, Saturn-mass planet that is expected to be sculpting the surrounding debris disk.\n\"Our observations reveal a strong candidate for a planet shaping the structure of the TWA 7 debris disk, and its position is exactly where we expected to find a planet of this mass,\" said Anne-Marie Lagrange, CNRS researcher at the Observatoire de Paris-PSL and Université Gren",
+        "start": 900,
+        "end": 2100
+      },
+      {
+        "id": "evidence-fragment:a8e9b6aa31eb8747a3d6",
+        "record_id": "external-0895f58ba58813d9cb76b1df",
+        "text": "rom an additional band taken by the SPHERE instrument of ESO's Very Large Telescope (VLT), which showcases the location of the disc surrounding the host star and the exoplanet creating a gap within the disc that is revealed by MIRI.\n[Image Description: An image of a nearby star and its vicinity. The star itself has been blocked out and its bright light has been removed. A dashed circle with a star symbol at the centre of the image marks the star’s location. A fuzzy blue disc surrounds the star. An orange spot, near to the star and inside this disc, is identified as a planet orbiting the star. A fainter orange spot far from the centre marks a distant star.]\nCredits\nESA/Webb, NASA, CSA, A.M. Lagrange, M. Zamani (ESA/Webb)\nLicense\nCC BY 4.0 INT or ESA Standard Licence",
+        "start": 900,
+        "end": 1675
+      },
+      {
+        "id": "evidence-fragment:a066fd6f4c0dc8c2fa8c",
+        "record_id": "external-022061cd2d1e52706bc213e9",
+        "text": "rrounding debris disk.\n\"Our observations reveal a strong candidate for a planet shaping the structure of the TWA 7 debris disk, and its position is exactly where we expected to find a planet of this mass,\" said Anne-Marie Lagrange, CNRS researcher at the Observatoire de Paris-PSL and Université Grenoble Alpes in France, lead author of the paper.\n“This observatory enables us to capture images of planets with masses similar to those in the solar system, which represents an exciting step forward in our understanding of planetary systems, including our own,” added co-author Mathilde Malin of Johns Hopkins University and the Space Telescope Science Institute in Baltimore.\nInitial analysis suggests that the object — referred to as TWA 7 b — could be a young, cold planet with a mass around 0.3 times that of Jupiter (about 100 Earth masses, or one Saturn mass) and a temperature near 120 degrees Fahrenheit (47 degrees Celsius). Its location aligns with a gap in the disk, hinting at a dynamic interaction between the planet and its surroundings.\nDebris disks filled with dust and rocky material are found around both young and older stars, although they are more easily detected around younger s",
+        "start": 1800,
+        "end": 3000
+      },
+      {
+        "id": "evidence-fragment:75c06ded71ea35809091",
+        "record_id": "external-022061cd2d1e52706bc213e9",
+        "text": "Fahrenheit (47 degrees Celsius). Its location aligns with a gap in the disk, hinting at a dynamic interaction between the planet and its surroundings.\nDebris disks filled with dust and rocky material are found around both young and older stars, although they are more easily detected around younger stars as they are brighter. They often feature visible rings or gaps, thought to be created by planets that have formed around the star, but such a planet has yet to be directly detected within a debris disk. If verified, this discovery would mark the first time a planet has been directly associated with sculpting a debris disk, and could offer the first observational hint of a “trojan disk” — a collection of dust trapped in the planet’s orbit.\nTWA 7, also known as CE Antilae, is a young (about 6.4 million years old) red dwarf star located about 111 light-years away in the TW Hydrae association. Its nearly face-on disk made it an ideal target for Webb’s high-sensitivity mid-infrared observations.\nThe findings highlight Webb’s ability to explore previously unseen, low-mass planets around nearby stars. Ongoing and future observations will aim to better constrain the properties of the candid",
+        "start": 2700,
+        "end": 3900
+      },
+      {
+        "id": "evidence-fragment:38361ed8ac1efd17343b",
+        "record_id": "external-f31da349767d9e94b561a2d0",
+        "text": " Solar System objects. The source is located in a gap in one of three dust rings that were discovered around TWA 7 by previous ground-based observations. Its brightness, colour, distance from the star, and position within the ring are consistent with theoretical predictions for a young, cold, Saturn-mass planet sculpting the surrounding debris disc.\nInitial analysis suggests that the object — referred to as TWA 7b — could be a young, cold planet with a mass around 0.3 times that of Jupiter (~100 Earth masses) and a temperature near 320 Kelvin (roughly 47 degrees Celsius).\nIn this image from MIRI, light from the star TWA 7 has been subtracted. The location of the star is marked with a circle and a star symbol at the centre of the image. This leaves light from the debris disc around the star, as well as other infrared sources, visible. The bright spot to the upper right of the star is the source identified as TWA 7b, within the debris disc. The more distant orange spot visible in the left of the image is an unrelated background star.\nOnly a single MIRI band was used in this image (seen here in orange). The blue colour visible in the image results from an additional band taken by the ",
+        "start": 900,
+        "end": 2100
+      },
+      {
+        "id": "evidence-fragment:4055b22b069bae1c6109",
+        "record_id": "external-f31da349767d9e94b561a2d0",
+        "text": "entre marks a distant star.]\nCredit:\nESA/Webb, NASA, CSA, A.M. Lagrange, M. Zamani (ESA/Webb)",
+        "start": 2700,
+        "end": 2793
+      },
+      {
+        "id": "evidence-fragment:905e5d9c5e4f4239c8d8",
+        "record_id": "external-022061cd2d1e52706bc213e9",
+        "text": "elated Information\nThe following sections contain links to download this article's images and videos in all available resolutions followed by related information links, media contacts, and if available, research paper and Spanish translation links.",
+        "start": 4500,
+        "end": 4748
+      }
+    ],
+    "searches": [
+      {
+        "query": "TWA 7 Webb Saturn mass candidate planet 2025",
+        "provider": "duckduckgo_lite",
+        "searched_at": "2026-11-06T23:13:39.269839+00:00",
+        "hits": [
+          {
+            "url": "https://science.nasa.gov/missions/webb/likely-saturn-mass-planet-imaged-by-nasa-webb-is-lightest-ever-seen/",
+            "title": "Likely Saturn-Mass Planet Imaged by NASA Webb Is Lightest Ever Seen",
+            "snippet": "Likely Saturn-Mass Planet Imaged by NASA Webb Is Lightest Ever Seen This coronagraphic image of the star TWA 7 and its planet, TWA 7 b, features data from the SPHERE instrument on ESO's Very Large Telescope in blue and from Webb's MIRI (Mid-Infrared Instrument) in orange. Blue shows the star's debris disk; the bright orange spot is the ...",
+            "rank": 1,
+            "query": "TWA 7 Webb Saturn mass candidate planet 2025",
+            "provider": "duckduckgo_lite"
+          },
+          {
+            "url": "https://www.jpl.nasa.gov/news/likely-saturn-mass-planet-imaged-by-nasa-webb-is-lightest-ever-seen/",
+            "title": "Likely Saturn-Mass Planet Imaged by NASA Webb Is Lightest Ever Seen",
+            "snippet": "NASA's Webb imaged a possible planet with a mass similar to Saturn orbiting the star TWA 7. Light from the star has been subtracted from this image to reveal the candidate planet, shown in data from Webb's MIRI (orange, upper right). The star's location is indicated with a circle with a star symbol. Its debris disk (blue) was imaged by ESO's Very Large Telescope.",
+            "rank": 2,
+            "query": "TWA 7 Webb Saturn mass candidate planet 2025",
+            "provider": "duckduckgo_lite"
+          },
+          {
+            "url": "https://esawebb.org/images/weic2512/",
+            "title": "High-contrast coronograph image of TWA 7b | ESA/Webb",
+            "snippet": "Astronomers using the NASA/ESA/CSA James Webb Space Telescope have captured compelling evidence of a planet with a mass similar to Saturn orbiting the young nearby star TWA 7. If confirmed, this would represent Webb's first direct image discovery of a planet, and the lightest planet ever seen with this technique.",
+            "rank": 3,
+            "query": "TWA 7 Webb Saturn mass candidate planet 2025",
+            "provider": "duckduckgo_lite"
+          },
+          {
+            "url": "https://www.aura-astronomy.org/blog/2025/06/25/likely-saturn-mass-planet-imaged-by-nasa-webb-is-lightest-ever-seen/",
+            "title": "Likely Saturn-Mass Planet Imaged by NASA Webb Is Lightest Ever Seen",
+            "snippet": "Astronomers using NASA's James Webb Space Telescope have captured compelling evidence of a planet with a mass similar to Saturn orbiting the young nearby star TWA 7. If confirmed, this would represent Webb's first direct image discovery of a planet, and the lightest planet ever seen with this technique outside the solar system.",
+            "rank": 4,
+            "query": "TWA 7 Webb Saturn mass candidate planet 2025",
+            "provider": "duckduckgo_lite"
+          },
+          {
+            "url": "https://therelaymag.com/webb-first-planet-image-twa7b-road-to-earthlike-worlds",
+            "title": "Webb's first planet image: TWA 7 b and the new roadmap",
+            "snippet": "In June 2025, the James Webb Space Telescope's MIRI coronagraph isolated a faint, orange point inside the debris disk of the young star TWA 7. If confirmed, the Saturn mass candidate TWA 7 b would be the lightest world ever captured by direct imaging. Here is how the detection works, how it will be confirmed, and why it accelerates the route to imaging Earthlike planets. ByTalos September 21 ...",
+            "rank": 5,
+            "query": "TWA 7 Webb Saturn mass candidate planet 2025",
+            "provider": "duckduckgo_lite"
+          }
+        ],
+        "issues": []
+      },
+      {
+        "query": "TWA 7b confirmation alternative background galaxy",
+        "provider": "duckduckgo_lite",
+        "searched_at": "2026-11-06T23:13:41.012063+00:00",
+        "hits": [
+          {
+            "url": "https://esawebb.org/images/weic2512/",
+            "title": "High-contrast coronograph image of TWA 7b | ESA/Webb",
+            "snippet": "After subtracting residual starlight using advanced image processing, a faint infrared source was revealed near TWA 7, distinguishable from background galaxies or Solar System objects. The source is located in a gap in one of three dust rings that were discovered around TWA 7 by previous ground-based observations.",
+            "rank": 1,
+            "query": "TWA 7b confirmation alternative background galaxy",
+            "provider": "duckduckgo_lite"
+          },
+          {
+            "url": "https://www.esa.int/ESA_Multimedia/Images/2025/06/High-contrast_coronograph_image_of_TWA_7b",
+            "title": "ESA - High-contrast coronograph image of TWA 7b",
+            "snippet": "After subtracting residual starlight using advanced image processing, a faint infrared source was revealed near TWA 7, distinguishable from background galaxies or Solar System objects. The source is located in a gap in one of three dust rings that were discovered around TWA 7 by previous ground-based observations.",
+            "rank": 2,
+            "query": "TWA 7b confirmation alternative background galaxy",
+            "provider": "duckduckgo_lite"
+          },
+          {
+            "url": "https://esawebb.org/news/weic2512/",
+            "title": "Webb captures evidence of a lightweight planet around TWA 7",
+            "snippet": "After subtracting residual starlight using advanced image processing, a faint infrared source was revealed near TWA 7, distinguishable from background galaxies or Solar System objects. The source is located in a gap in one of three dust rings that were discovered around TWA 7 by previous ground-based observations.",
+            "rank": 3,
+            "query": "TWA 7b confirmation alternative background galaxy",
+            "provider": "duckduckgo_lite"
+          },
+          {
+            "url": "https://spaceweekly.com/?p=796909",
+            "title": "High-contrast coronograph image of TWA 7b - spaceweekly.com",
+            "snippet": "After subtracting residual starlight using advanced image processing, a faint infrared source was revealed near TWA 7, distinguishable from background galaxies or Solar System objects. The source is located in a gap in one of three dust rings that were discovered around TWA 7 by previous ground-based observations.",
+            "rank": 4,
+            "query": "TWA 7b confirmation alternative background galaxy",
+            "provider": "duckduckgo_lite"
+          },
+          {
+            "url": "https://www.esa.int/Science_Exploration/Space_Science/Webb/Webb_finds_evidence_of_a_lightweight_planet_around_TWA_7",
+            "title": "Webb finds evidence of a lightweight planet around TWA 7",
+            "snippet": "After subtracting residual starlight using advanced image processing, a faint infrared source was revealed near TWA 7, distinguishable from background galaxies or Solar System objects. The source is located in a gap in one of three dust rings that were discovered around TWA 7 by previous ground-based observations.",
+            "rank": 5,
+            "query": "TWA 7b confirmation alternative background galaxy",
+            "provider": "duckduckgo_lite"
+          }
+        ],
+        "issues": []
+      }
+    ],
+    "issues": [
+      {
+        "code": "http_error",
+        "message": "Source returned HTTP 403; no article was imported.",
+        "url": "https://www.jpl.nasa.gov/news/likely-saturn-mass-planet-imaged-by-nasa-webb-is-lightest-ever-seen/",
+        "query": null
+      },
+      {
+        "code": "collection_budget",
+        "message": "5 discovered unique URLs were not fetched because the collection limit is 4. Seeds and search queries receive alternating collection slots.",
+        "url": null,
+        "query": null
+      }
+    ],
+    "attempted_urls": [
+      "https://science.nasa.gov/missions/webb/likely-saturn-mass-planet-imaged-by-nasa-webb-is-lightest-ever-seen/",
+      "https://esawebb.org/images/weic2512/",
+      "https://www.jpl.nasa.gov/news/likely-saturn-mass-planet-imaged-by-nasa-webb-is-lightest-ever-seen/",
+      "https://www.esa.int/ESA_Multimedia/Images/2025/06/High-contrast_coronograph_image_of_TWA_7b"
+    ],
+    "created_at": "2026-11-06T23:13:49.510924+00:00",
+    "retrieval_version": "external-evidence-v1",
+    "limitations": [
+      "Search is bounded and may omit relevant evidence; it does not establish completeness.",
+      "Publisher names and distinct URLs do not establish independent corroboration.",
+      "Only saved text excerpts are supplied to the local assessment model.",
+      "Text checking does not authenticate images, identify bots, or establish deceptive intent."
+    ]
+  },
+  "result": {
+    "result_case_id": "claim-check:claim-check:321aaba9-4277-4be2-8c3f-998228e5f0b1",
+    "result_finding_id": "claim-check:claim-check:321aaba9-4277-4be2-8c3f-998228e5f0b1:finding",
+    "assessment": {
+      "status": "supported",
+      "explanation": "The claim states that astronomers using the NASA/ESA/CSA James Webb Space Telescope have captured compelling evidence of a planet with a mass similar to Saturn orbiting the young nearby star TWA 7. Multiple passages (P1, P2, P3, P6, P8, P9, P10) explicitly state that astronomers using the NASA/ESA/CSA James Webb Space Telescope have captured compelling evidence of a planet with a mass similar to Saturn orbiting the young nearby star TWA 7. Passage P8 and P10 specify that initial analysis suggests the object (TWA 7b) could be a young, cold planet with a mass around 0.3 times that of Jupiter (~100 Earth masses), which is approximately one Saturn mass. The passages consistently refer to this as 'compelling evidence' rather than a confirmed discovery, noting that if confirmed, it would represent Webb's first direct image discovery of a planet (P1, P2, P3). Therefore, the claim accurately reflects the content of the provided text regarding the capture of compelling evidence by the specified telescope team.",
+      "citations": [
+        {
+          "fragment_id": "evidence-fragment:b87f8710e4aa04ee79a9",
+          "quote": "About the Object\nColours & filters\nHigh-contrast coronograph image of TWA 7b\nAstronomers using the NASA/ESA/CSA James Webb Space Telescope have captured compelling evidence of a planet with a mass similar to Saturn orbiting the young nearby star TWA 7. If confirmed, this would represent Webb’s first direct image discovery of a planet, and the lightest planet ever seen with this technique.\nUsing the coronagraph on Webb’s Mid-Infrared Instrument (MIRI) on 21 June 2024, the team carefully suppressed the bright glare of the host star to reveal faint nearby objects. This technique, called high-contrast imaging, enables astronomers to directly detect planets that would otherwise be lost in the overwhelming light from their host star. After subtracting residual starlight using advanced image processing, a faint infrared source was revealed near TWA 7, distinguishable from background galaxies or Solar System objects. The source is located in a gap in one of three dust rings that were discovered around TWA 7 by previous ground-based observations. Its brightness, colour, distance from the star, and position within the ring are consistent with theoretical predictions for a young, cold, Saturn",
+          "stance": "supports"
+        },
+        {
+          "fragment_id": "evidence-fragment:d6214ce1a1a839bbf43a",
+          "quote": "Astronomers using the NASA/ESA/CSA James Webb Space Telescope have captured compelling evidence of a planet with a mass similar to Saturn orbiting the young nearby star TWA 7. If confirmed, this would represent Webb’s first direct image discovery of a planet, and the lightest planet ever seen with this technique.\nIn this image from MIRI, light from the star TWA 7 has been subtracted. The location of the star is marked with a circle and a star symbol at the centre of the image. This leaves light from the debris disc around the star, as well as other infrared sources, visible. The bright spot to the upper right of the star is the source identified as TWA 7b, within the debris disc. The more distant orange spot visible in the left of the image is an unrelated background star.\nOnly a single MIRI band was used in this image (seen here in orange). The blue colour visible in the image results from an additional band taken by the SPHERE instrument of ESO's Very Large Telescope (VLT), which showcases the location of the disc surrounding the host star and the exoplanet creating a gap within the disc that is revealed by MIRI.\n[Image Description: An image of a nearby star and its vicinity. The",
+          "stance": "supports"
+        },
+        {
+          "fragment_id": "evidence-fragment:15173e56dfe1f43ceb51",
+          "quote": "Astronomers using NASA’s James Webb Space Telescope have captured compelling evidence of a planet with a mass similar to Saturn orbiting the young nearby star TWA 7. If confirmed, this would represent Webb’s first direct image discovery of a planet, and the lightest planet ever seen with this technique outside the solar system.\nThe international team detected a faint infrared source in the disk of debris surrounding TWA 7 using Webb’s MIRI (Mid-Infrared Instrument). The distance between the source and TWA 7 is estimated to be about 50 times the distance of Earth from the Sun. This matches the expected position of a planet that would explain key features seen in the debris disk. The results published Wednesday, June 25 in the journal Nature.\nImage: TWA 7 (MIRI + VLT Image)\nUsing MIRI’s coronagraph, the researchers carefully suppressed the bright glare of the host star to reveal faint nearby objects. This technique, called high-contrast imaging, enables astronomers to directly detect planets that would otherwise be lost in the overwhelming light from their host star. After subtracting residual starlight using advanced image processing, a faint infrared source was revealed near TWA 7.",
+          "stance": "supports"
+        },
+        {
+          "fragment_id": "evidence-fragment:b403bfa49b1012a286f3",
+          "quote": "by objects. This technique, called high-contrast imaging, enables astronomers to directly detect planets that would otherwise be lost in the overwhelming light from their host star. After subtracting residual starlight using advanced image processing, a faint infrared source was revealed near TWA 7. The team ruled out an object in our solar system that happened to be in the same part of the sky as the source. While there is a very small chance that it is a background galaxy, the evidence strongly points to the source being a previously undiscovered planet.\nThe source is located in a gap in one of three dust rings that were discovered around TWA 7 by previous ground-based observations. The object’s brightness, color, distance from the star, and position within the ring are consistent with theoretical predictions for a young, cold, Saturn-mass planet that is expected to be sculpting the surrounding debris disk.\n\"Our observations reveal a strong candidate for a planet shaping the structure of the TWA 7 debris disk, and its position is exactly where we expected to find a planet of this mass,\" said Anne-Marie Lagrange, CNRS researcher at the Observatoire de Paris-PSL and Université Gren",
+          "stance": "supports"
+        },
+        {
+          "fragment_id": "evidence-fragment:a066fd6f4c0dc8c2fa8c",
+          "quote": "rrounding debris disk.\n\"Our observations reveal a strong candidate for a planet shaping the structure of the TWA 7 debris disk, and its position is exactly where we expected to find a planet of this mass,\" said Anne-Marie Lagrange, CNRS researcher at the Observatoire de Paris-PSL and Université Grenoble Alpes in France, lead author of the paper.\n“This observatory enables us to capture images of planets with masses similar to those in the solar system, which represents an exciting step forward in our understanding of planetary systems, including our own,” added co-author Mathilde Malin of Johns Hopkins University and the Space Telescope Science Institute in Baltimore.\nInitial analysis suggests that the object — referred to as TWA 7 b — could be a young, cold planet with a mass around 0.3 times that of Jupiter (about 100 Earth masses, or one Saturn mass) and a temperature near 120 degrees Fahrenheit (47 degrees Celsius). Its location aligns with a gap in the disk, hinting at a dynamic interaction between the planet and its surroundings.\nDebris disks filled with dust and rocky material are found around both young and older stars, although they are more easily detected around younger s",
+          "stance": "supports"
+        },
+        {
+          "fragment_id": "evidence-fragment:75c06ded71ea35809091",
+          "quote": "Fahrenheit (47 degrees Celsius). Its location aligns with a gap in the disk, hinting at a dynamic interaction between the planet and its surroundings.\nDebris disks filled with dust and rocky material are found around both young and older stars, although they are more easily detected around younger stars as they are brighter. They often feature visible rings or gaps, thought to be created by planets that have formed around the star, but such a planet has yet to be directly detected within a debris disk. If verified, this discovery would mark the first time a planet has been directly associated with sculpting a debris disk, and could offer the first observational hint of a “trojan disk” — a collection of dust trapped in the planet’s orbit.\nTWA 7, also known as CE Antilae, is a young (about 6.4 million years old) red dwarf star located about 111 light-years away in the TW Hydrae association. Its nearly face-on disk made it an ideal target for Webb’s high-sensitivity mid-infrared observations.\nThe findings highlight Webb’s ability to explore previously unseen, low-mass planets around nearby stars. Ongoing and future observations will aim to better constrain the properties of the candid",
+          "stance": "supports"
+        },
+        {
+          "fragment_id": "evidence-fragment:38361ed8ac1efd17343b",
+          "quote": " Solar System objects. The source is located in a gap in one of three dust rings that were discovered around TWA 7 by previous ground-based observations. Its brightness, colour, distance from the star, and position within the ring are consistent with theoretical predictions for a young, cold, Saturn-mass planet sculpting the surrounding debris disc.\nInitial analysis suggests that the object — referred to as TWA 7b — could be a young, cold planet with a mass around 0.3 times that of Jupiter (~100 Earth masses) and a temperature near 320 Kelvin (roughly 47 degrees Celsius).\nIn this image from MIRI, light from the star TWA 7 has been subtracted. The location of the star is marked with a circle and a star symbol at the centre of the image. This leaves light from the debris disc around the star, as well as other infrared sources, visible. The bright spot to the upper right of the star is the source identified as TWA 7b, within the debris disc. The more distant orange spot visible in the left of the image is an unrelated background star.\nOnly a single MIRI band was used in this image (seen here in orange). The blue colour visible in the image results from an additional band taken by the ",
+          "stance": "supports"
+        }
+      ],
+      "unresolved_questions": [],
+      "model": "ollama:qwen3.5:9b@56671c2ab9385f9cfcb404638e32cd62d88e3501d44822208363c010179a3c90:claims-v2-source-excerpts",
+      "provider": "ollama",
+      "prompt_version": "external-claim-assessment-v2",
+      "metadata": {
+        "requested_model": "qwen3.5:9b",
+        "actual_model": "qwen3.5:9b",
+        "model_reported": true,
+        "done_reason": "stop",
+        "evidence_fingerprint": "69d7260b11bfaf6ff47323e9db8a5b2b8953bc4c603fad91b02af5ea57736906",
+        "reviewed_fragment_ids": [
+          "evidence-fragment:b87f8710e4aa04ee79a9",
+          "evidence-fragment:d6214ce1a1a839bbf43a",
+          "evidence-fragment:15173e56dfe1f43ceb51",
+          "evidence-fragment:db196928d40a0f70803f",
+          "evidence-fragment:7c0f2dc0b99c7d9331c6",
+          "evidence-fragment:b403bfa49b1012a286f3",
+          "evidence-fragment:a8e9b6aa31eb8747a3d6",
+          "evidence-fragment:a066fd6f4c0dc8c2fa8c",
+          "evidence-fragment:75c06ded71ea35809091",
+          "evidence-fragment:38361ed8ac1efd17343b",
+          "evidence-fragment:4055b22b069bae1c6109",
+          "evidence-fragment:905e5d9c5e4f4239c8d8"
+        ],
+        "citation_validation": "selected_passage_exact_text",
+        "semantic_validation": "analyst_review_required",
+        "challenge": {
+          "status": "completed",
+          "findings": [
+            {
+              "finding_type": "unsupported_inference",
+              "explanation": "The claim states that astronomers have 'captured compelling evidence of a planet'. The supplied passages (P1, P3, P6, P8) explicitly qualify this by stating the object is a 'strong candidate', the findings represent 'compelling evidence' that requires confirmation ('If confirmed'), and ongoing observations are needed to 'verify its planetary status'. Inferring that the evidence definitively confirms the existence of a planet contradicts the text's emphasis on the object being a 'candidate' pending verification.",
+              "fragment_ids": [
+                "evidence-fragment:b87f8710e4aa04ee79a9",
+                "evidence-fragment:15173e56dfe1f43ceb51",
+                "evidence-fragment:b403bfa49b1012a286f3",
+                "evidence-fragment:a066fd6f4c0dc8c2fa8c"
+              ],
+              "quotes": [
+                "About the Object\nColours & filters\nHigh-contrast coronograph image of TWA 7b\nAstronomers using the NASA/ESA/CSA James Webb Space Telescope have captured compelling evidence of a planet with a mass similar to Saturn orbiting the young nearby star TWA 7. If confirmed, this would represent Webb’s first direct image discovery of a planet, and the lightest planet ever seen with this technique.\nUsing the coronagraph on Webb’s Mid-Infrared Instrument (MIRI) on 21 June 2024, the team carefully suppressed the bright glare of the host star to reveal faint nearby objects. This technique, called high-contrast imaging, enables astronomers to directly detect planets that would otherwise be lost in the overwhelming light from their host star. After subtracting residual starlight using advanced image processing, a faint infrared source was revealed near TWA 7, distinguishable from background galaxies or Solar System objects. The source is located in a gap in one of three dust rings that were discovered around TWA 7 by previous ground-based observations. Its brightness, colour, distance from the star, and position within the ring are consistent with theoretical predictions for a young, cold, Saturn",
+                "Astronomers using NASA’s James Webb Space Telescope have captured compelling evidence of a planet with a mass similar to Saturn orbiting the young nearby star TWA 7. If confirmed, this would represent Webb’s first direct image discovery of a planet, and the lightest planet ever seen with this technique outside the solar system.\nThe international team detected a faint infrared source in the disk of debris surrounding TWA 7 using Webb’s MIRI (Mid-Infrared Instrument). The distance between the source and TWA 7 is estimated to be about 50 times the distance of Earth from the Sun. This matches the expected position of a planet that would explain key features seen in the debris disk. The results published Wednesday, June 25 in the journal Nature.\nImage: TWA 7 (MIRI + VLT Image)\nUsing MIRI’s coronagraph, the researchers carefully suppressed the bright glare of the host star to reveal faint nearby objects. This technique, called high-contrast imaging, enables astronomers to directly detect planets that would otherwise be lost in the overwhelming light from their host star. After subtracting residual starlight using advanced image processing, a faint infrared source was revealed near TWA 7.",
+                "by objects. This technique, called high-contrast imaging, enables astronomers to directly detect planets that would otherwise be lost in the overwhelming light from their host star. After subtracting residual starlight using advanced image processing, a faint infrared source was revealed near TWA 7. The team ruled out an object in our solar system that happened to be in the same part of the sky as the source. While there is a very small chance that it is a background galaxy, the evidence strongly points to the source being a previously undiscovered planet.\nThe source is located in a gap in one of three dust rings that were discovered around TWA 7 by previous ground-based observations. The object’s brightness, color, distance from the star, and position within the ring are consistent with theoretical predictions for a young, cold, Saturn-mass planet that is expected to be sculpting the surrounding debris disk.\n\"Our observations reveal a strong candidate for a planet shaping the structure of the TWA 7 debris disk, and its position is exactly where we expected to find a planet of this mass,\" said Anne-Marie Lagrange, CNRS researcher at the Observatoire de Paris-PSL and Université Gren",
+                "rrounding debris disk.\n\"Our observations reveal a strong candidate for a planet shaping the structure of the TWA 7 debris disk, and its position is exactly where we expected to find a planet of this mass,\" said Anne-Marie Lagrange, CNRS researcher at the Observatoire de Paris-PSL and Université Grenoble Alpes in France, lead author of the paper.\n“This observatory enables us to capture images of planets with masses similar to those in the solar system, which represents an exciting step forward in our understanding of planetary systems, including our own,” added co-author Mathilde Malin of Johns Hopkins University and the Space Telescope Science Institute in Baltimore.\nInitial analysis suggests that the object — referred to as TWA 7 b — could be a young, cold planet with a mass around 0.3 times that of Jupiter (about 100 Earth masses, or one Saturn mass) and a temperature near 120 degrees Fahrenheit (47 degrees Celsius). Its location aligns with a gap in the disk, hinting at a dynamic interaction between the planet and its surroundings.\nDebris disks filled with dust and rocky material are found around both young and older stars, although they are more easily detected around younger s"
+              ]
+            },
+            {
+              "finding_type": "alternative_explanation",
+              "explanation": "The claim asserts the discovery is of a planet. The passages (P2, P5, P7) describe the image composition in detail, noting that the blue color comes from an additional band taken by the SPHERE instrument of ESO's VLT, not Webb alone, and that the orange spot is identified as TWA 7b within the debris disc. While this supports the detection, it offers an alternative explanation for the visual data (multi-instrument combination) rather than confirming the object is definitively a planet without further verification steps mentioned in P4 and P9.",
+              "fragment_ids": [
+                "evidence-fragment:d6214ce1a1a839bbf43a",
+                "evidence-fragment:7c0f2dc0b99c7d9331c6",
+                "evidence-fragment:a8e9b6aa31eb8747a3d6"
+              ],
+              "quotes": [
+                "Astronomers using the NASA/ESA/CSA James Webb Space Telescope have captured compelling evidence of a planet with a mass similar to Saturn orbiting the young nearby star TWA 7. If confirmed, this would represent Webb’s first direct image discovery of a planet, and the lightest planet ever seen with this technique.\nIn this image from MIRI, light from the star TWA 7 has been subtracted. The location of the star is marked with a circle and a star symbol at the centre of the image. This leaves light from the debris disc around the star, as well as other infrared sources, visible. The bright spot to the upper right of the star is the source identified as TWA 7b, within the debris disc. The more distant orange spot visible in the left of the image is an unrelated background star.\nOnly a single MIRI band was used in this image (seen here in orange). The blue colour visible in the image results from an additional band taken by the SPHERE instrument of ESO's Very Large Telescope (VLT), which showcases the location of the disc surrounding the host star and the exoplanet creating a gap within the disc that is revealed by MIRI.\n[Image Description: An image of a nearby star and its vicinity. The",
+                "source identified as TWA 7b, within the debris disc. The more distant orange spot visible in the left of the image is an unrelated background star.\nOnly a single MIRI band was used in this image (seen here in orange). The blue colour visible in the image results from an additional band taken by the SPHERE instrument of ESO's Very Large Telescope (VLT), which showcases the location of the disc surrounding the host star and the exoplanet creating a gap within the disc that is revealed by MIRI.\n[Image Description: An image of a nearby star and its vicinity. The star itself has been blocked out and its bright light has been removed. A dashed circle with a star symbol at the centre of the image marks the star’s location. A fuzzy blue disc surrounds the star. An orange spot, near to the star and inside this disc, is identified as a planet orbiting the star. A fainter orange spot far from the centre marks a distant star.]\nCredit:\nESA/Webb, NASA, CSA, A.M. Lagrange, M. Zamani (ESA/Webb)",
+                "rom an additional band taken by the SPHERE instrument of ESO's Very Large Telescope (VLT), which showcases the location of the disc surrounding the host star and the exoplanet creating a gap within the disc that is revealed by MIRI.\n[Image Description: An image of a nearby star and its vicinity. The star itself has been blocked out and its bright light has been removed. A dashed circle with a star symbol at the centre of the image marks the star’s location. A fuzzy blue disc surrounds the star. An orange spot, near to the star and inside this disc, is identified as a planet orbiting the star. A fainter orange spot far from the centre marks a distant star.]\nCredits\nESA/Webb, NASA, CSA, A.M. Lagrange, M. Zamani (ESA/Webb)\nLicense\nCC BY 4.0 INT or ESA Standard Licence"
+              ]
+            },
+            {
+              "finding_type": "insufficient_evidence",
+              "explanation": "The claim presents the finding as a confirmed capture of a planet. However, the passages (P1, P3, P6, P8) repeatedly state that the object is a 'candidate', requires confirmation ('If confirmed'), and that future observations aim to 'better constrain the properties' and 'verify its planetary status'. The current evidence is described as consistent with theoretical predictions but not yet definitively proven to be a planet, making the claim of having captured evidence of a planet (implying confirmation) insufficient based on the text.",
+              "fragment_ids": [
+                "evidence-fragment:b87f8710e4aa04ee79a9",
+                "evidence-fragment:15173e56dfe1f43ceb51",
+                "evidence-fragment:b403bfa49b1012a286f3",
+                "evidence-fragment:a066fd6f4c0dc8c2fa8c"
+              ],
+              "quotes": [
+                "About the Object\nColours & filters\nHigh-contrast coronograph image of TWA 7b\nAstronomers using the NASA/ESA/CSA James Webb Space Telescope have captured compelling evidence of a planet with a mass similar to Saturn orbiting the young nearby star TWA 7. If confirmed, this would represent Webb’s first direct image discovery of a planet, and the lightest planet ever seen with this technique.\nUsing the coronagraph on Webb’s Mid-Infrared Instrument (MIRI) on 21 June 2024, the team carefully suppressed the bright glare of the host star to reveal faint nearby objects. This technique, called high-contrast imaging, enables astronomers to directly detect planets that would otherwise be lost in the overwhelming light from their host star. After subtracting residual starlight using advanced image processing, a faint infrared source was revealed near TWA 7, distinguishable from background galaxies or Solar System objects. The source is located in a gap in one of three dust rings that were discovered around TWA 7 by previous ground-based observations. Its brightness, colour, distance from the star, and position within the ring are consistent with theoretical predictions for a young, cold, Saturn",
+                "Astronomers using NASA’s James Webb Space Telescope have captured compelling evidence of a planet with a mass similar to Saturn orbiting the young nearby star TWA 7. If confirmed, this would represent Webb’s first direct image discovery of a planet, and the lightest planet ever seen with this technique outside the solar system.\nThe international team detected a faint infrared source in the disk of debris surrounding TWA 7 using Webb’s MIRI (Mid-Infrared Instrument). The distance between the source and TWA 7 is estimated to be about 50 times the distance of Earth from the Sun. This matches the expected position of a planet that would explain key features seen in the debris disk. The results published Wednesday, June 25 in the journal Nature.\nImage: TWA 7 (MIRI + VLT Image)\nUsing MIRI’s coronagraph, the researchers carefully suppressed the bright glare of the host star to reveal faint nearby objects. This technique, called high-contrast imaging, enables astronomers to directly detect planets that would otherwise be lost in the overwhelming light from their host star. After subtracting residual starlight using advanced image processing, a faint infrared source was revealed near TWA 7.",
+                "by objects. This technique, called high-contrast imaging, enables astronomers to directly detect planets that would otherwise be lost in the overwhelming light from their host star. After subtracting residual starlight using advanced image processing, a faint infrared source was revealed near TWA 7. The team ruled out an object in our solar system that happened to be in the same part of the sky as the source. While there is a very small chance that it is a background galaxy, the evidence strongly points to the source being a previously undiscovered planet.\nThe source is located in a gap in one of three dust rings that were discovered around TWA 7 by previous ground-based observations. The object’s brightness, color, distance from the star, and position within the ring are consistent with theoretical predictions for a young, cold, Saturn-mass planet that is expected to be sculpting the surrounding debris disk.\n\"Our observations reveal a strong candidate for a planet shaping the structure of the TWA 7 debris disk, and its position is exactly where we expected to find a planet of this mass,\" said Anne-Marie Lagrange, CNRS researcher at the Observatoire de Paris-PSL and Université Gren",
+                "rrounding debris disk.\n\"Our observations reveal a strong candidate for a planet shaping the structure of the TWA 7 debris disk, and its position is exactly where we expected to find a planet of this mass,\" said Anne-Marie Lagrange, CNRS researcher at the Observatoire de Paris-PSL and Université Grenoble Alpes in France, lead author of the paper.\n“This observatory enables us to capture images of planets with masses similar to those in the solar system, which represents an exciting step forward in our understanding of planetary systems, including our own,” added co-author Mathilde Malin of Johns Hopkins University and the Space Telescope Science Institute in Baltimore.\nInitial analysis suggests that the object — referred to as TWA 7 b — could be a young, cold planet with a mass around 0.3 times that of Jupiter (about 100 Earth masses, or one Saturn mass) and a temperature near 120 degrees Fahrenheit (47 degrees Celsius). Its location aligns with a gap in the disk, hinting at a dynamic interaction between the planet and its surroundings.\nDebris disks filled with dust and rocky material are found around both young and older stars, although they are more easily detected around younger s"
+              ]
+            },
+            {
+              "finding_type": "contradiction",
+              "explanation": "The claim implies a definitive discovery ('captured compelling evidence of a planet'). Passage P4 and P9 explicitly state that 'Ongoing and future observations will aim to better constrain the properties... and verify its planetary status' and that if verified, it would mark the first time. This contradicts the implication in the claim that the status is already established as a confirmed planet discovery rather than a candidate awaiting verification.",
+              "fragment_ids": [
+                "evidence-fragment:db196928d40a0f70803f",
+                "evidence-fragment:75c06ded71ea35809091"
+              ],
+              "quotes": [
+                ". Its nearly face-on disk made it an ideal target for Webb’s high-sensitivity mid-infrared observations.\nThe findings highlight Webb’s ability to explore previously unseen, low-mass planets around nearby stars. Ongoing and future observations will aim to better constrain the properties of the candidate, verify its planetary status, and deepen our understanding of planet formation and disk evolution in young systems.\nThese observations were taken as part of the Webb observing program 3662.\nThe James Webb Space Telescope is the world’s premier space science observatory. Webb is solving mysteries in our solar system, looking beyond to distant worlds around other stars, and probing the mysterious structures and origins of our universe and our place in it. Webb is an international program led by NASA with its partners, ESA (European Space Agency) and CSA (Canadian Space Agency).\nDownloads & Related Information\nThe following sections contain links to download this article's images and videos in all available resolutions followed by related information links, media contacts, and if available, research paper and Spanish translation links.",
+                "Fahrenheit (47 degrees Celsius). Its location aligns with a gap in the disk, hinting at a dynamic interaction between the planet and its surroundings.\nDebris disks filled with dust and rocky material are found around both young and older stars, although they are more easily detected around younger stars as they are brighter. They often feature visible rings or gaps, thought to be created by planets that have formed around the star, but such a planet has yet to be directly detected within a debris disk. If verified, this discovery would mark the first time a planet has been directly associated with sculpting a debris disk, and could offer the first observational hint of a “trojan disk” — a collection of dust trapped in the planet’s orbit.\nTWA 7, also known as CE Antilae, is a young (about 6.4 million years old) red dwarf star located about 111 light-years away in the TW Hydrae association. Its nearly face-on disk made it an ideal target for Webb’s high-sensitivity mid-infrared observations.\nThe findings highlight Webb’s ability to explore previously unseen, low-mass planets around nearby stars. Ongoing and future observations will aim to better constrain the properties of the candid"
+              ]
+            }
+          ],
+          "model": "ollama:qwen3.5:9b@56671c2ab9385f9cfcb404638e32cd62d88e3501d44822208363c010179a3c90:claims-v2-source-excerpts",
+          "prompt_version": "external-claim-challenge-v1",
+          "scope": "Same saved passages; a second model pass is not independent evidence."
+        }
+      }
+    },
+    "evidence_fingerprint": "69d7260b11bfaf6ff47323e9db8a5b2b8953bc4c603fad91b02af5ea57736906",
+    "coverage": "partial",
+    "sources_count": 3,
+    "issues": [
+      {
+        "code": "http_error",
+        "message": "Source returned HTTP 403; no article was imported.",
+        "url": "https://www.jpl.nasa.gov/news/likely-saturn-mass-planet-imaged-by-nasa-webb-is-lightest-ever-seen/",
+        "query": null
+      },
+      {
+        "code": "collection_budget",
+        "message": "5 discovered unique URLs were not fetched because the collection limit is 4. Seeds and search queries receive alternating collection slots.",
+        "url": null,
+        "query": null
+      }
+    ]
+  },
+  "error": null,
+  "attempts": 1,
+  "lease_expires_at": null,
+  "created_at": "2026-11-06T23:21:24.032002+00:00",
+  "updated_at": "2026-11-06T23:24:23.946258+00:00",
+  "finished_at": "2026-11-06T23:24:23.946258+00:00",
+  "stale": false
+}

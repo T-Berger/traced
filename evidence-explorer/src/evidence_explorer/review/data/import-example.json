@@ -1,0 +1,110 @@
+{
+  "schema_version": "1.0",
+  "case": {
+    "id": "example:investigation-v1",
+    "title": "Import example — shared announcement",
+    "question": "Do identical posts establish that one operator controls the accounts?",
+    "synthetic": true,
+    "coverage": {
+      "description": "Two fictional records illustrating the import format."
+    },
+    "limitations": [
+      "This is an editable synthetic template, not a real investigation.",
+      "Original timestamps, source URLs and account ownership are unknown."
+    ]
+  },
+  "records": [
+    {
+      "id": "example:r1",
+      "kind": "document",
+      "source_label": "Fictional bulletin",
+      "text": "The fictional Harbor Bulletin reports that three accounts shared the same announcement at 09:00. The announcement was also available in a public press kit.",
+      "content_hash": "2b6a8f7bd1b157967e2453f53bad2477fa448d4b3637d1a579bf615e58de53cf",
+      "source_url": null,
+      "acquired_at": null,
+      "published_at": null
+    },
+    {
+      "id": "example:r2",
+      "kind": "document",
+      "source_label": "Fictional organizer note",
+      "text": "The fictional event organizer invited supporters to copy its public announcement. This record does not identify who operates the three accounts.",
+      "content_hash": "24acc6c983256954b326cc0a4a9833a20024010ca9c0acb4bad38881a61117dc",
+      "source_url": null,
+      "acquired_at": null,
+      "published_at": null
+    }
+  ],
+  "fragments": [
+    {
+      "id": "example:f1",
+      "record_id": "example:r1",
+      "selector": {
+        "kind": "text",
+        "start": 0,
+        "end": 155
+      },
+      "quote": "The fictional Harbor Bulletin reports that three accounts shared the same announcement at 09:00. The announcement was also available in a public press kit."
+    },
+    {
+      "id": "example:f2",
+      "record_id": "example:r2",
+      "selector": {
+        "kind": "text",
+        "start": 0,
+        "end": 144
+      },
+      "quote": "The fictional event organizer invited supporters to copy its public announcement. This record does not identify who operates the three accounts."
+    }
+  ],
+  "runs": [
+    {
+      "id": "example:run-v1",
+      "input_fingerprint": "dba7abef98f6c63f6499057de2762ad400089f8e0b3b98bc4484ec1353cdc8f0",
+      "input_manifest": [
+        "example:r1",
+        "example:r2"
+      ],
+      "method": "analyst_import",
+      "method_version": "1.0",
+      "created_at": "2026-11-06T12:00:00Z",
+      "full_inputs_available": false
+    }
+  ],
+  "findings": [
+    {
+      "snapshot_id": "example:c1-v1",
+      "lineage_id": "example:c1",
+      "version": 1,
+      "run_id": "example:run-v1",
+      "kind": "inference",
+      "statement": "One operator controls all three accounts.",
+      "details": {
+        "assumptions": [
+          "Identical announcements establish common account ownership."
+        ]
+      }
+    }
+  ],
+  "links": [
+    {
+      "id": "example:l1",
+      "source": {
+        "type": "fragment",
+        "id": "example:f1"
+      },
+      "target": {
+        "type": "finding",
+        "id": "example:c1-v1"
+      },
+      "relation": "supports",
+      "fragment_ids": [
+        "example:f1"
+      ],
+      "basis": "Imported analyst claim; the connection needs review.",
+      "run_id": "example:run-v1"
+    }
+  ],
+  "reviews": [],
+  "scenarios": []
+}

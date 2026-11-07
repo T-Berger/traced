@@ -1,0 +1,141 @@
+{
+  "case_id": "traced:fictional-core-demo-v1:case",
+  "native_bundle_fingerprint": "926e448d9d9201e945cd045ea5c2995e86de945a00dc84e7ce3c285bc0afe13d",
+  "package": "fictional-core-demo.zip",
+  "package_sha256": "c1d742a78db0b5043b79be6a3a878e1406569b7ad45d46513876791daf28fd7c",
+  "source_packages": {
+    "swarm": {
+      "path_from_evidence_explorer": "outputs/sample-cases/swarm.zip",
+      "sha256": "2197f152d24fb03d5244e3b26e5552ffa2a939817c51c456d5f35ad413f536f3"
+    },
+    "media": {
+      "path_from_evidence_explorer": "outputs/sample-cases/historical-media.zip",
+      "sha256": "857bac6439f9575262f9f8505deae9d35257edc43822680316b9d34f9789d32f"
+    }
+  },
+  "source_native_bundle_fingerprints": {
+    "swarm": "6500fb978a37bcc8ab6348bb9b517f333aca0043e9665b2f8ba9f1573e2193d1",
+    "media": "61c189db7ade18ef86cfb780d31310177eea0bedda956d86eee740bf166ab0db"
+  },
+  "ordered_runs": [
+    {
+      "id": "swarm:2b1d8ee8e7de:run:4d25167b923042e5cb433c01",
+      "method": "swarm_detector.detector.analyze",
+      "configuration": {
+        "max_attempts_per_slot": 100,
+        "max_pairs_per_post": 200000,
+        "min_families": 3,
+        "randomizations": 20,
+        "seed": 42,
+        "swaps_per_slot": 10,
+        "window_seconds": 120
+      },
+      "input_fingerprint": "9ad9bb1a260d388415313825a1e8200099fea09c96e90c749a18267cb47c7fc9",
+      "input_record_count": 1229,
+      "input_manifest_sha256": "1665e45aa5ef0a53c53c1b70d7ed80a1d2d09382eb4674431782497bfb5cb256"
+    },
+    {
+      "id": "media:synthetic-historical-v1:run:f9f92679b164ceebb662",
+      "method": "supplied-media-metadata-and-byte-hashes",
+      "configuration": {
+        "release_id": "synthetic-historical-v1",
+        "max_frames": 100
+      },
+      "input_fingerprint": "f9f92679b164ceebb6624d1697ef7587ac37428443750941d30a05bbdd24ab32",
+      "input_record_count": 10,
+      "input_manifest_sha256": "c654b9c4dea54d736c7e252b3d171a02fe506c5d2448c35812aedbcc0db43b86"
+    }
+  ],
+  "records": 1239,
+  "findings": 5,
+  "initial_reviews": 0,
+  "initial_scenarios": 0,
+  "initial_jobs": 0,
+  "prior_media_review_omitted_from_new_case": [
+    "media:synthetic-historical-v1:review:single-event-withheld"
+  ],
+  "recomputation_eligibility": {
+    "available": true,
+    "baseline_run_id": "swarm:2b1d8ee8e7de:run:4d25167b923042e5cb433c01",
+    "runtime_status": "not_checked",
+    "capability": "swarm_full_subset",
+    "reason": "The retained original Swarm baseline and complete declared input pass the saved provenance checks. Recompute only from that baseline after selecting a valid message or post exclusion and reason. The optional detector runtime is not checked by this receipt; no recomputation has run."
+  },
+  "swarm_finding": "swarm:2b1d8ee8e7de:run:4d25167b923042e5cb433c01:finding:case-400db8f2834f",
+  "strongest_episode_parent": "swarm:2b1d8ee8e7de:telegram_post:801ad5500dccec7c4850f5fe",
+  "timing_pair": "pair-067b3c4d000d",
+  "timing_event": {
+    "delta_seconds": 19.0,
+    "family_key": "syn-episode-01",
+    "message_a": "syn-message-00002",
+    "message_b": "syn-message-00005",
+    "post_key": "syn-episode-01",
+    "timestamp_a": "2026-10-14T08:08:09Z",
+    "timestamp_b": "2026-10-14T08:08:28Z"
+  },
+  "exact_swarm_citations": [
+    {
+      "record_id": "swarm:2b1d8ee8e7de:telegram_post:801ad5500dccec7c4850f5fe",
+      "content_sha256": "55569bc37b391a8e88a5a80e0c7de958747cc687815fdbde4155ce707f8b6541",
+      "fragment_id": "swarm:2b1d8ee8e7de:telegram_post:801ad5500dccec7c4850f5fe:fragment",
+      "exact_quote": "SYNTHETIC SCENARIO: A fictional discussion with repeated joint account arrivals. The fixture does not establish who operates accounts or whether they are automated."
+    },
+    {
+      "record_id": "swarm:2b1d8ee8e7de:telegram_message:cb9cd5db6d4bd270008279ef",
+      "content_sha256": "416e91bcb8653a1b863678b92fa6bd3188d9ae3d043e4ee1fdf3126b155dc26e",
+      "fragment_id": "swarm:2b1d8ee8e7de:telegram_message:cb9cd5db6d4bd270008279ef:fragment",
+      "exact_quote": "[Synthetic] Fictional claim example 1.2: aid is being withheld deliberately, according to this unverified scenario claim."
+    },
+    {
+      "record_id": "swarm:2b1d8ee8e7de:telegram_message:2b022f6a306e651a2cb4653c",
+      "content_sha256": "1432bdf1847ea88668ea55692c51e20b85abd4e0d06174322c08e455bd14b62a",
+      "fragment_id": "swarm:2b1d8ee8e7de:telegram_message:2b022f6a306e651a2cb4653c:fragment",
+      "exact_quote": "[Synthetic] Fictional claim example 1.5: partners cannot be relied on for support; this needs contextual review."
+    }
+  ],
+  "repeated_cards": [
+    {
+      "record_id": "media:synthetic-historical-v1:frame:frame-a",
+      "artifact_ref": "frames/card-a.svg",
+      "content_sha256": "a1667573fccc740621ff5600411e97ef5360eba24a8a08fafa1e415d6c0d8d2a",
+      "metadata": {
+        "release_id": "synthetic-historical-v1",
+        "frame_id": "frame-a",
+        "clip_id": "clip-a",
+        "video_id": "video-a",
+        "first_posted_exercise_week": 11,
+        "posting_channel_affiliation": "Blue Force",
+        "depicted_side": null,
+        "capture_time": null,
+        "event_time": null,
+        "location": null,
+        "original_publication_context": "unavailable",
+        "synthetic": true
+      }
+    },
+    {
+      "record_id": "media:synthetic-historical-v1:frame:frame-a-copy",
+      "artifact_ref": "frames/card-a-copy.svg",
+      "content_sha256": "a1667573fccc740621ff5600411e97ef5360eba24a8a08fafa1e415d6c0d8d2a",
+      "metadata": {
+        "release_id": "synthetic-historical-v1",
+        "frame_id": "frame-a-copy",
+        "clip_id": "clip-b",
+        "video_id": "video-b",
+        "first_posted_exercise_week": 12,
+        "posting_channel_affiliation": "Rusviet",
+        "depicted_side": null,
+        "capture_time": null,
+        "event_time": null,
+        "location": null,
+        "original_publication_context": "unavailable",
+        "synthetic": true
+      }
+    }
+  ],
+  "media_inference": "media:synthetic-historical-v1:finding:single-event:v1",
+  "challenge_preset_fragment_ids": [
+    "media:synthetic-historical-v1:frame:frame-a:metadata:fragment"
+  ],
+  "challenge_preset_status": "Validated fixture input only"
+}

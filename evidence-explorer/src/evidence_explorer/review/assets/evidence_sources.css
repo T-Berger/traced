@@ -1,0 +1,42 @@
+/* Saved evidence roles reuse Traced's existing semantic and reading-surface tokens. */
+.review-app .rv-evidence-card {
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid var(--rv-border);
+  border-radius: 7px;
+  background: var(--rv-surface);
+  color: var(--rv-ink);
+  overflow-wrap: anywhere;
+}
+.review-app .rv-evidence-card.is-selected { border-color: var(--rv-green); }
+.review-app .rv-evidence-card .rv-evidence-card-action {
+  width: 100%;
+  margin: 0 0 9px;
+  min-height: 44px;
+  text-align: left;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.review-app .rv-evidence-card > p { margin: 5px 0; }
+.review-app .rv-evidence-card > .rv-badges { margin: 10px 0; }
+.review-app .rv-evidence-card-details { margin-top: 12px; }
+.review-app .rv-evidence-card-details summary { min-height: 44px; align-content: center; }
+.review-app .rv-evidence-card-details .rv-text-button { display: block; white-space: normal; }
+.review-app .rv-evidence-role + .rv-evidence-role {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--rv-border);
+}
+.review-app .rv-evidence-role h4 { margin: 12px 0 8px; }
+.review-app .rv-evidence-card-quote {
+  margin: 8px 0;
+  padding: 10px 12px;
+  border-left: 3px solid var(--rv-green);
+  color: var(--rv-ink);
+  background: var(--rv-bg);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 15px;
+  line-height: 1.65;
+}
+.review-app .rv-evidence-more > .rv-evidence-card { margin-top: 10px; }

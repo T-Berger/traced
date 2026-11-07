@@ -1,0 +1,145 @@
+/* Traced identity v1.0.0. Font licenses are included in fonts/. */
+@font-face {
+  font-family: "Manrope";
+  src: url("./fonts/Manrope-Variable.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "IBM Plex Mono";
+  src: url("./fonts/IBMPlexMono-Regular.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+/* Apply these tokens to an application root; no global element styles are imposed. */
+:root {
+  --traced-color-ink: #142229;
+  --traced-color-paper: #F4F3EE;
+  --traced-color-white: #FFFFFF;
+  --traced-color-trace: #F36643;
+  --traced-color-slate: #52636C;
+  --traced-color-line: #D9E0DE;
+  --traced-color-moss: #276B63;
+
+  --traced-background: #F4F3EE;
+  --traced-surface: #FFFFFF;
+  --traced-surface-subtle: #ECEEE9;
+  --traced-surface-inverse: #142229;
+  --traced-foreground: #142229;
+  --traced-foreground-secondary: #52636C;
+  --traced-foreground-inverse: #F4F3EE;
+  --traced-border-subtle: #D9E0DE;
+  --traced-border-strong: #52636C;
+  --traced-action-primary-background: #F36643;
+  --traced-action-primary-foreground: #142229;
+  --traced-action-primary-hover-background: #EA5E3A;
+  --traced-action-primary-active-background: #E85C3B;
+  --traced-action-secondary-background: #142229;
+  --traced-action-secondary-foreground: #F4F3EE;
+  --traced-action-secondary-hover-background: #263842;
+  --traced-link: #276B63;
+  --traced-link-on-dark: #A7D7CD;
+  --traced-selection-background: #D9E9E4;
+  --traced-selection-foreground: #142229;
+  --traced-focus-ring: #142229;
+  --traced-focus-ring-on-dark: #F4F3EE;
+  --traced-focus-accent: #F36643;
+  --traced-disabled-background: #D9E0DE;
+  --traced-disabled-foreground: #607078;
+
+  /* Status colors describe workflow state, never automated truth. */
+  --traced-status-success-foreground: #245D49;
+  --traced-status-success-background: #E5F1EA;
+  --traced-status-success-border: #BDD6C7;
+  --traced-status-review-foreground: #754B05;
+  --traced-status-review-background: #FFF0CF;
+  --traced-status-review-border: #E4C589;
+  --traced-status-error-foreground: #8F2F33;
+  --traced-status-error-background: #FBE9E8;
+  --traced-status-error-border: #E8BBBD;
+  --traced-status-info-foreground: #254F64;
+  --traced-status-info-background: #EAF1F6;
+  --traced-status-info-border: #C6D7E1;
+
+  --traced-font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  --traced-font-mono: "IBM Plex Mono", ui-monospace, monospace;
+  --traced-font-weight-regular: 400;
+  --traced-font-weight-medium: 500;
+  --traced-font-weight-semibold: 600;
+  --traced-font-weight-bold: 700;
+  --traced-font-size-caption: 12px;
+  --traced-font-size-label: 14px;
+  --traced-font-size-body: 16px;
+  --traced-font-size-lead: 18px;
+  --traced-font-size-title-small: 20px;
+  --traced-font-size-title: 24px;
+  --traced-font-size-heading: 32px;
+  --traced-font-size-display: 48px;
+  --traced-font-size-hero: 64px;
+  --traced-line-height-tight: 1.08;
+  --traced-line-height-heading: 1.2;
+  --traced-line-height-label: 1.4;
+  --traced-line-height-body: 1.6;
+
+  --traced-space-0: 0px;
+  --traced-space-1: 4px;
+  --traced-space-2: 8px;
+  --traced-space-3: 12px;
+  --traced-space-4: 16px;
+  --traced-space-5: 20px;
+  --traced-space-6: 24px;
+  --traced-space-8: 32px;
+  --traced-space-10: 40px;
+  --traced-space-12: 48px;
+  --traced-space-16: 64px;
+  --traced-space-20: 80px;
+  --traced-space-24: 96px;
+  --traced-radius-none: 0px;
+  --traced-radius-small: 4px;
+  --traced-radius-card: 8px;
+  --traced-radius-large: 12px;
+  --traced-radius-round: 50%;
+  --traced-border-width: 1px;
+  --traced-border-focus-width: 2px;
+  --traced-border-focus-offset: 3px;
+  --traced-shadow-card: 0 8px 28px rgba(20, 34, 41, 0.06);
+  --traced-shadow-overlay: 0 20px 64px rgba(20, 34, 41, 0.16);
+  --traced-motion-fast: 120ms;
+  --traced-motion-standard: 180ms;
+  --traced-motion-slow: 240ms;
+  --traced-motion-easing: cubic-bezier(0.2, 0, 0, 1);
+  --traced-layout-content-max: 1280px;
+  --traced-layout-reading-max: 68ch;
+  --traced-layout-control-height: 44px;
+  --traced-layout-sidebar-width: 264px;
+}
+
+/* Keep keyboard focus distinct from the vermilion brand accent on light surfaces. */
+.traced-focus:focus-visible {
+  outline: var(--traced-border-focus-width) solid var(--traced-focus-ring);
+  outline-offset: var(--traced-border-focus-offset);
+}
+
+.traced-theme-dark {
+  --traced-focus-ring: var(--traced-color-paper);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --traced-motion-fast: 0ms;
+    --traced-motion-standard: 0ms;
+    --traced-motion-slow: 0ms;
+  }
+}
+
+/* Pairing rules:
+ * Primary actions: Ink text on Trace. Do not use white body text on Trace.
+ * Body links: Moss on Paper or White, with an underline.
+ * Essential input boundaries: Slate. Line is for decorative dividers only.
+ * Status badges: match each status foreground with its tinted background.
+ * Do not use brand accent or status colors as automatic truth ratings.
+ */

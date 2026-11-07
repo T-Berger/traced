@@ -1,0 +1,13 @@
+/* Native tab selection controls visibility without waiting for evidence callbacks.
+   Keep every page mounted so its controls, drafts, and callback IDs remain stable. */
+.review-app > .rv-main > :is(#rv-cases-page, #rv-review-page, #rv-compare-page, #rv-brief-page) {
+  display: none !important;
+}
+
+/* Override the initial inline hiding on inactive sections when their tab is selected. */
+.review-app:has(#rv-page .rv-navigation-tab--selected-cases) > .rv-main > #rv-cases-page,
+.review-app:has(#rv-page .rv-navigation-tab--selected-review) > .rv-main > #rv-review-page,
+.review-app:has(#rv-page .rv-navigation-tab--selected-compare) > .rv-main > #rv-compare-page,
+.review-app:has(#rv-page .rv-navigation-tab--selected-brief) > .rv-main > #rv-brief-page {
+  display: block !important;
+}

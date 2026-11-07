@@ -1,0 +1,89 @@
+/* Event timelines use the same reading, focus, and link roles as Compare. */
+.review-app .event-clusters-content {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.review-app .event-clusters-coverage,
+.review-app .event-clusters-role { font-weight: 600; }
+
+.review-app .event-clusters-event {
+  min-width: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--rv-border);
+  border-radius: var(--traced-radius-card);
+  background: var(--rv-surface);
+}
+
+.review-app .event-clusters-event > summary { padding: 4px 0; }
+.review-app .event-clusters-event-counts { display: block; padding-inline-start: 1rem; }
+.review-app .event-clusters-event-body { display: grid; gap: 10px; padding-block-start: 14px; }
+.review-app .event-clusters-event-body > h3 { margin-block-start: 8px; }
+
+.review-app .event-clusters-timeline {
+  display: grid;
+  gap: 6px;
+  border-block: 1px solid var(--rv-border);
+  padding-block: 6px;
+}
+
+.review-app .event-clusters-point > summary {
+  display: grid;
+  grid-template-columns: 0.75rem minmax(0, 7rem) minmax(1rem, 1fr) max-content;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  min-height: 44px;
+  border-radius: 4px;
+  color: var(--rv-ink);
+}
+
+.review-app .event-clusters-point > summary::-webkit-details-marker { display: none; }
+.review-app .event-clusters-point > summary::before { content: "▸" / ""; color: var(--rv-green); }
+.review-app .event-clusters-point[open] > summary::before { content: "▾" / ""; }
+.review-app .event-clusters-point[open] > summary,
+.review-app .event-clusters-point > summary:hover { background: var(--rv-subtle); }
+.review-app .event-clusters-date,
+.review-app .event-clusters-count { font-variant-numeric: tabular-nums; }
+.review-app .event-clusters-count { font-size: 0.875rem; font-weight: 600; }
+.review-app .event-clusters-bar { height: 0.5rem; background: var(--rv-subtle); }
+.review-app .event-clusters-bar > span { display: block; height: 100%; background: var(--rv-green); }
+.review-app .event-clusters-point > p { margin: 8px 8px 4px; }
+.review-app .event-clusters-point[data-undated="true"] {
+  border-block-start: 1px dashed var(--rv-border);
+  margin-block-start: 4px;
+}
+.review-app .event-clusters-point[data-undated="true"] .event-clusters-date { grid-column: 2 / 4; }
+
+.review-app .event-clusters-related { border-block-start: 1px solid var(--rv-border); }
+.review-app .event-clusters-related > summary { padding-block: 8px; color: var(--rv-green); }
+.review-app .event-clusters-related > p,
+.review-app .event-clusters-role { margin-block: 6px; }
+.review-app .event-clusters-reference { margin-block: 6px; padding-inline-start: 1rem; }
+.review-app .event-clusters-records { margin: 0; padding-inline-start: 1.5rem; }
+.review-app .event-clusters-record { padding-block: 3px; }
+.review-app .event-clusters-record > span { display: block; }
+.review-app .event-clusters-record .rv-text-button { text-decoration: underline; }
+
+.review-app .event-clusters-difference { padding-block: 8px; }
+.review-app .event-clusters-difference h4 { margin: 0 0 4px; }
+.review-app .event-clusters-passages {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  padding-block: 6px;
+}
+.review-app .event-clusters-passage { padding: 8px; background: var(--rv-subtle); }
+.review-app .event-clusters-passage blockquote { margin: 0 0 6px; white-space: pre-wrap; }
+
+@media (max-width: 560px) {
+  .review-app .event-clusters-event { padding-inline: 9px; }
+  .review-app .event-clusters-point > summary {
+    grid-template-columns: 0.65rem minmax(0, 6.1rem) minmax(0.75rem, 1fr) max-content;
+    gap: 5px;
+    padding-inline: 3px;
+  }
+  .review-app .event-clusters-passages { grid-template-columns: minmax(0, 1fr); }
+}

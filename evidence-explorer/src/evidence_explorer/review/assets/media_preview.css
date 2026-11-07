@@ -1,0 +1,28 @@
+/* One bounded media viewer, using the existing review and Traced role tokens. */
+.review-app .rv-media-viewer {
+  border: 1px solid var(--rv-border);
+  border-radius: var(--traced-radius-card);
+  padding: 14px;
+  margin: 12px 0 20px;
+  background: var(--rv-surface);
+  min-width: 0;
+}
+.review-app .rv-media-viewer h3 { margin-top: 0; }
+.review-app .rv-media-viewer .rv-metadata { margin: 14px 0; }
+.review-app .rv-media-image {
+  display: block;
+  max-width: 100%;
+  width: 100%;
+  height: auto;
+  max-height: 70vh;
+  object-fit: contain;
+  border-radius: var(--traced-radius-small);
+  background: var(--rv-subtle);
+}
+.review-app .rv-media-actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 0; }
+.review-app .rv-media-status { margin: 10px 0; }
+.review-app .rv-media-viewer :is(.rv-notice, .rv-small) { overflow-wrap: anywhere; }
+@media (max-width: 600px) {
+  .review-app .rv-media-viewer { padding: 12px; }
+  .review-app .rv-media-actions > .rv-button { width: 100%; }
+}

@@ -1,0 +1,5 @@
+.review-app .rv-investigation-step { margin-block: 16px; }
+.review-app .rv-investigation-step > summary { padding-block: 12px; }
+.review-app .rv-investigation-step[open] > summary { margin-bottom: 12px; }
+.review-app #trail-planning-panel, .review-app #trail-gather-evidence,
+.review-app #trail-planning-question { scroll-margin-top: 16px; }

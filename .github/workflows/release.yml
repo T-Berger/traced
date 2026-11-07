@@ -1,0 +1,52 @@
+name: Traced release packages
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  checks:
+    name: Check the exact release commit
+    uses: ./.github/workflows/ci.yml
+    permissions:
+      contents: read
+
+  publish:
+    name: Publish checked packages to GitHub Releases
+    needs: checks
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      # This job neither checks out nor executes project source with write access.
+      - name: Download the artifact produced by this run
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          artifact-ids: ${{ needs.checks.outputs.distribution-artifact-id }}
+          path: dist
+          merge-multiple: true
+          digest-mismatch: error
+      - name: Verify and publish the release assets
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          test "$(cat dist/BUILD_COMMIT)" = "$GITHUB_SHA"
+          test "$(gh api "repos/$GH_REPO/commits/$RELEASE_TAG" --jq '.sha')" = "$GITHUB_SHA"
+          (cd dist && sha256sum --check SHA256SUMS)
+          gh release create "$RELEASE_TAG" \
+            dist/*.whl dist/*.tar.gz dist/SHA256SUMS dist/BUILD_COMMIT \
+            --repo "$GH_REPO" --verify-tag --draft \
+            --title "$RELEASE_TAG" --generate-notes
+          gh release edit "$RELEASE_TAG" --repo "$GH_REPO" --draft=false
+

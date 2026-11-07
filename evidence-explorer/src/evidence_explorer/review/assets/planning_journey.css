@@ -1,0 +1,25 @@
+/* Planning uses the shared reading, border and focus roles. */
+.review-app .rv-planning-journey {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  flex-basis: 100%;
+  gap: 8px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.review-app .rv-planning-journey li {
+  display: grid;
+  gap: 4px;
+  padding: 8px;
+  border: 1px solid var(--rv-border);
+  border-radius: var(--traced-radius-card);
+  overflow-wrap: anywhere;
+}
+.review-app .rv-planning-journey li[aria-current="step"] {
+  border-color: var(--rv-ink);
+}
+.review-app .rv-planning-journey span { font-size: 0.85rem; }
+@media (max-width: 600px) {
+  .review-app .rv-planning-journey { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

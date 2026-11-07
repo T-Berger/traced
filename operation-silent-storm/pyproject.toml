@@ -1,0 +1,37 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "silent-storm"
+version = "0.1.0"
+description = "A local evidence explorer for historical open-source image archives."
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "dash>=3.2,<5",
+    "evidence-explorer",
+    "flask>=3.1,<4",
+]
+
+[dependency-groups]
+dev = ["pytest>=8,<10", "ruff>=0.11,<1"]
+
+[project.scripts]
+silent-storm = "silent_storm.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/silent_storm"]
+
+[tool.hatch.build.targets.sdist]
+include = ["/src/silent_storm", "/README.md", "/pyproject.toml"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+
+[tool.ruff]
+extend = "../pyproject.toml"
+
+[tool.uv.sources]
+evidence-explorer = { workspace = true }

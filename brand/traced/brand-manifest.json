@@ -1,0 +1,187 @@
+{
+  "schemaVersion": "1.0.0",
+  "product": "Traced",
+  "logo": "Branch Clock",
+  "selection": "accepted",
+  "date": "2026-11-07",
+  "acceptedOn": "2026-11-07",
+  "tagline": "Every claim. A clear trail.",
+  "canonicalDirectory": "brand/traced",
+  "identityFile": "IDENTITY.txt",
+  "primaryLogo": "logos/traced-primary.svg",
+  "reversedLogo": "logos/traced-reversed.svg",
+  "logoWordmarkCase": "lowercase traced",
+  "palette": {
+    "ink": "#142229",
+    "paper": "#F4F3EE",
+    "white": "#FFFFFF",
+    "trace": "#F36643",
+    "slate": "#52636C",
+    "line": "#D9E0DE",
+    "moss": "#276B63"
+  },
+  "tokens": {
+    "css": "traced-tokens.css",
+    "json": "traced-tokens.json"
+  },
+  "fonts": {
+    "primary": {
+      "family": "Manrope",
+      "file": "fonts/Manrope-Variable.ttf",
+      "license": "fonts/Manrope-OFL.txt",
+      "weights": [
+        400,
+        500,
+        600,
+        700
+      ]
+    },
+    "metadata": {
+      "family": "IBM Plex Mono",
+      "file": "fonts/IBMPlexMono-Regular.ttf",
+      "license": "fonts/IBMPlexMono-OFL.txt",
+      "weights": [
+        400
+      ]
+    },
+    "logo": "Outlined wordmark. Do not typeset or alter glyph paths."
+  },
+  "sourceFile": "output/traced-time-tree/03-branch-clock.svg",
+  "sourceReversedFile": "output/traced-time-tree/03-branch-clock-reversed.svg",
+  "sourceSha256": "bfba00889a0fde572e0b2cec75df667cc033f609a51defc86fb036278a44f68a",
+  "superseded": [
+    {
+      "logo": "T-path exploration logo",
+      "sourceFile": "output/traced-brand-kit/logos/traced-primary.svg",
+      "status": "superseded",
+      "usage": "Archive and exploration only. Use Branch Clock for all new work."
+    }
+  ],
+  "assets": {
+    "primary": {
+      "svg": "logos/traced-primary.svg",
+      "png": "logos/traced-primary.png"
+    },
+    "reversed": {
+      "svg": "logos/traced-reversed.svg",
+      "png": "logos/traced-reversed.png"
+    },
+    "monochromeInk": {
+      "svg": "logos/traced-monochrome-ink.svg",
+      "png": "logos/traced-monochrome-ink.png"
+    },
+    "monochromeWhite": {
+      "svg": "logos/traced-monochrome-white.svg",
+      "png": "logos/traced-monochrome-white.png"
+    },
+    "symbol": {
+      "svg": "logos/traced-symbol.svg",
+      "png": "logos/traced-symbol.png"
+    },
+    "symbolReversed": {
+      "svg": "logos/traced-symbol-reversed.svg",
+      "png": "logos/traced-symbol-reversed.png"
+    },
+    "symbolMonochromeInk": {
+      "svg": "logos/traced-symbol-monochrome-ink.svg",
+      "png": "logos/traced-symbol-monochrome-ink.png"
+    },
+    "symbolMonochromeWhite": {
+      "svg": "logos/traced-symbol-monochrome-white.svg",
+      "png": "logos/traced-symbol-monochrome-white.png"
+    },
+    "appIcon": {
+      "svg": "logos/traced-app-icon.svg",
+      "png": "logos/traced-app-icon.png"
+    },
+    "favicon": {
+      "svg": "logos/traced-favicon.svg",
+      "png": "logos/traced-favicon.png",
+      "png16": "logos/traced-favicon-16.png",
+      "png32": "logos/traced-favicon-32.png",
+      "ico": "logos/traced-favicon.ico"
+    },
+    "preview": "traced-identity-preview.png"
+  },
+  "darkThemeSupport": {
+    "providedRoles": {
+      "surfaceInverse": "#142229",
+      "foregroundInverse": "#F4F3EE",
+      "linkOnDark": "#A7D7CD",
+      "focusRingOnDark": "#F4F3EE"
+    },
+    "darkClassBehavior": "The .traced-theme-dark class overrides the focus ring only.",
+    "fullSemanticDarkPaletteDefined": false,
+    "implementationOwner": "UI owner coordinates complete application dark-theme roles; do not infer a complete theme from the focus class."
+  },
+  "verification": {
+    "acceptedMasterWordmarkPreserved": true,
+    "acceptedMasterIconGeometryPreserved": true,
+    "allSvgTitlesAndAccessibleNames": "Traced Branch Clock",
+    "fontsAndTokensMatchSourceBytes": true,
+    "fontReferencesResolve": true,
+    "pngLockupsAndSymbolsHaveTransparency": true,
+    "previewVisuallyInspected": true
+  },
+  "notes": [
+    "The clock arc and branching evidence timeline are the selected logo. Preserve icon proportions and outlined wordmark geometry.",
+    "The vermilion endpoint is a brand accent. It is not a truth or risk rating.",
+    "Use Ink text on Trace action backgrounds; use the supplied semantic workflow status tokens.",
+    "Use Traced in product-facing material. Package and module identifiers can remain unless their owner explicitly updates them."
+  ],
+  "fileIntegrity": {
+    "fonts/IBMPlexMono-OFL.txt": "7e6b2818edbd8f6a01ae80641cc8f16a51080d08fb4e532be3a0b6f74adb07da",
+    "fonts/IBMPlexMono-Regular.ttf": "6a3412f058c7d8dfd9170c41e85ade48e5156ecb89356110ca57a0a27734af46",
+    "fonts/Manrope-OFL.txt": "58172e0c0fac2cda8a37b348164bb55e44b0e69051e557e92b1d3f6910141f7b",
+    "fonts/Manrope-Variable.ttf": "3ae11c49db0455a3cc33e37d380f20fdb8c7f8b41dc07625c177e3d87a9d6ae6",
+    "logos/traced-app-icon.png": "2fa42e909a9a3e176ecf6b6a805369a6bf9458147468751f713f0a438069225c",
+    "logos/traced-app-icon.svg": "d44f08e21a16a25e16dfacbd6df3e32ee2e737e21d271312bdda547fc30e711c",
+    "logos/traced-favicon-16.png": "9d8b5c3c27c4319b6082957d3438edfe476a7fcb9e2fdbc515f03994fb59847c",
+    "logos/traced-favicon-32.png": "d62257786b8b8a04a86887912968739c90f5aed441ef4cb3b3bc70c8aa10a1ef",
+    "logos/traced-favicon.ico": "5eaf0810dc18e33c63385f7ce84b75372c55393096057973891f23ae459602d8",
+    "logos/traced-favicon.png": "ef41d418c43c72aede4c463920001be2012a839fd7d63def138e36a64d7c6a1f",
+    "logos/traced-favicon.svg": "cd71fe1ee71c7bb973ee9bcaab0775feb1d77ee20ce26470aeed31338d36b093",
+    "logos/traced-monochrome-ink.png": "4ddca21f652e5672f903f4eb6099c4bb60fc24f45866b0e68913270d35183e6f",
+    "logos/traced-monochrome-ink.svg": "cf5f40f8e009ca9f8fe7b0436fa1b9958cccd33a39f615d3b08f07472dc4c9dd",
+    "logos/traced-monochrome-white.png": "2426ca81b401adf9dabc9bd4aee3bc0286948fd46916a6f207a7c49870aefd7e",
+    "logos/traced-monochrome-white.svg": "4a4e7c3b44e4a49abc2d87458314cec6eed18e2137c91e201488e1e444ddf948",
+    "logos/traced-primary.png": "eef7751aa9ac718a9e89e21c8023eadfbea0667dda63974f4bc99393dffe2b38",
+    "logos/traced-primary.svg": "35fcc41321fea69d014e7b9450c42ec3d99aade6b697fd3971a9a56307de5659",
+    "logos/traced-reversed.png": "0e9146c7b846ab929ed61f7ef52f760008b69be4adcec6f3ca31dbb2c2c1db94",
+    "logos/traced-reversed.svg": "48e049492c1d246cf5c23b30630d6ecb7e9aeadf5a9e8481351f16391258f700",
+    "logos/traced-symbol-monochrome-ink.png": "a2e3fcacd5c7d8c681195f52e63dfbfca41cc43fe7bb6beaa604249ca65582b5",
+    "logos/traced-symbol-monochrome-ink.svg": "6d207598202312349e15b9f2f29dd162d97be1b4c71a068940258c35cd028ea6",
+    "logos/traced-symbol-monochrome-white.png": "5e61463ccc357fe9c5aba02f8663367584c522d8a4c3cfefc402b965ff8f6358",
+    "logos/traced-symbol-monochrome-white.svg": "129ff0c4f8df1d8ef58dab406f375e4bd8e811d537279875ac3c2d1692e4c0df",
+    "logos/traced-symbol-reversed.png": "35d0c3cb93956be8bfceedaadd93d3b64904fad4ac37fe26b68d0d5211de0129",
+    "logos/traced-symbol-reversed.svg": "75ab2f66f6346d7ef493560823f8323cdca43a5a42ba3dc4a3058670a3be492c",
+    "logos/traced-symbol.png": "bb188fee52bbe2e9fe556ef68ac415b5bfa50879854131cdda60dce4d3377449",
+    "logos/traced-symbol.svg": "177c186eeecc0363b984bc36ab3ceaa4c731748d86db44fb6c58b6b077bb8ec1",
+    "traced-identity-preview.png": "581f3639b87e5317b4f9b33b5118b5228c7dbdcc84be8c1986e6dc2b3a8ef63f",
+    "traced-tokens.css": "20eb109bea5dfe2b81fa5c9f3e85ebc0852a0d45f1637b591a81bffa54e0ee6f",
+    "traced-tokens.json": "49aa4bbbe14a2523e058e9bc316c9d3129fd3ed9bd7b0a246f595c048e8fc24d"
+  },
+  "productPositioning": {
+    "updatedOn": "2026-11-07",
+    "promise": "Traced connects claims to exact sources, shows what an assessment depends on, and helps reviewers challenge evidence, record human decisions, and share a checkable evidence dossier.",
+    "direction": "Support earlier information-risk review and evidence-led prebunking as use cases, source coverage and alert methods are developed and validated.",
+    "process": [
+      "define purpose and scope",
+      "collect or import",
+      "inspect baselines and signals",
+      "check exact evidence, compare and challenge",
+      "human review and reversible exclusions",
+      "briefing and evidence dossier"
+    ],
+    "sourceNotes": "docs/source-notes/2026-11-06-workshop-ocr.md",
+    "sourceStatus": "Workshop proposals and uncertain transcription; not verified facts or evidence of current capabilities.",
+    "businessHypotheses": [
+      "subscription model",
+      "proposed customer segments",
+      "EMEA/NA/APAC applicability"
+    ],
+    "readinessRule": "Distinguish implemented, locally verified, live-source verified and proposed behaviour. An alert rule needs a metric, baseline, window, coverage and review status.",
+    "presentationRule": "Use source-grounded demonstrations; label fictional examples. Workshop political/payment/bot-count claims remain unverified. Preparing a dossier, platform submission and platform decision are distinct.",
+    "selectedVisualIdentityChanged": false
+  }
+}

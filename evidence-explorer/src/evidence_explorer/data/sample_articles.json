@@ -1,0 +1,99 @@
+[
+  {
+    "title": "Rivergate bridge closed after storm inspection",
+    "publisher": "Rivergate City Bulletin",
+    "url": "https://city.rivergate.example/bridge-inspection",
+    "published_at": "2026-11-04T08:00:00Z",
+    "language": "en",
+    "topic": "Rivergate storm",
+    "text": "This is a fictional article created for the Evidence Explorer demo.\n\nRivergate City Council closed the East Bridge at 08:00 on Wednesday after overnight flooding. Engineers will inspect the bridge before it reopens. The council said 20 households had been temporarily evacuated from Riverside Street.\n\nThe council's incident notice says the evacuation is precautionary. Residents can use the North Bridge while the inspection continues. No reopening time has been confirmed.",
+    "sample_claims": [
+      {"claim_text": "The East Bridge was closed at 08:00 on Wednesday.", "quote": "Rivergate City Council closed the East Bridge at 08:00 on Wednesday after overnight flooding.", "subject": "Rivergate City Council", "attribution": "Council incident notice", "location": "East Bridge", "event_time": "2026-11-04T08:00:00Z"},
+      {"claim_text": "The council reported 20 temporarily evacuated households.", "quote": "The council said 20 households had been temporarily evacuated from Riverside Street.", "subject": "Households", "attribution": "Rivergate City Council", "location": "Riverside Street"}
+    ]
+  },
+  {
+    "title": "Morning report repeats council evacuation figure",
+    "publisher": "Rivergate Daily",
+    "url": "https://daily.rivergate.example/storm-morning",
+    "published_at": "2026-11-04T09:15:00Z",
+    "language": "en",
+    "topic": "Rivergate storm",
+    "text": "This is a fictional article created for the Evidence Explorer demo.\n\nThe East Bridge remains closed following flooding in Rivergate. Citing the city council's morning notice, Rivergate Daily reported that 20 households were temporarily evacuated. The newspaper has not independently verified that count.\n\nEngineers are checking the structure. The North Bridge is open as an alternative route. A council spokesperson said a further update would be published after the inspection.",
+    "sample_claims": [
+      {"claim_text": "The newspaper repeated the council's figure of 20 households.", "quote": "Citing the city council's morning notice, Rivergate Daily reported that 20 households were temporarily evacuated.", "subject": "Households", "attribution": "City council via Rivergate Daily", "location": "Rivergate"}
+    ]
+  },
+  {
+    "title": "Correction: evacuation count refers to people, not households",
+    "publisher": "Rivergate City Bulletin",
+    "url": "https://city.rivergate.example/evacuation-correction",
+    "published_at": "2026-11-04T11:30:00Z",
+    "language": "en",
+    "topic": "Rivergate storm",
+    "text": "This is a fictional article created for the Evidence Explorer demo.\n\nRivergate City Council corrected its morning evacuation notice at 11:30. The updated count is 20 people from eight households, not 20 households. The council said the earlier wording confused people with households.\n\nThe East Bridge remains closed pending the engineering inspection. This correction changes the evacuation count but does not announce a change to the bridge status. The council apologized for the error in the first notice.",
+    "sample_claims": [
+      {"claim_text": "The corrected count is 20 people from eight households.", "quote": "The updated count is 20 people from eight households, not 20 households.", "subject": "Evacuation count", "attribution": "Corrected council notice", "location": "Rivergate", "event_time": "2026-11-04T11:30:00Z"}
+    ]
+  },
+  {
+    "title": "Ostbrücke bleibt nach Hochwasser gesperrt",
+    "publisher": "Rivergate Nachrichten",
+    "url": "https://nachrichten.rivergate.example/ostbruecke",
+    "published_at": "2026-11-04T12:10:00Z",
+    "language": "de",
+    "topic": "Rivergate storm",
+    "text": "Dieser Artikel ist ein fiktives Beispiel für die Evidence Explorer Demo.\n\nDie Ostbrücke in Rivergate bleibt nach dem Hochwasser gesperrt. Laut der korrigierten Mitteilung der Stadt wurden 20 Personen aus acht Haushalten vorübergehend evakuiert. Die erste Meldung hatte fälschlich von 20 Haushalten gesprochen.\n\nFachleute prüfen die Brücke. Die Nordbrücke kann als Ausweichroute genutzt werden. Ein Zeitpunkt für die Wiedereröffnung wurde bisher nicht bestätigt.",
+    "sample_claims": [
+      {"claim_text": "20 Personen aus acht Haushalten wurden evakuiert.", "quote": "Laut der korrigierten Mitteilung der Stadt wurden 20 Personen aus acht Haushalten vorübergehend evakuiert.", "subject": "Evakuierung", "attribution": "Korrigierte Mitteilung der Stadt", "location": "Rivergate"}
+    ]
+  },
+  {
+    "title": "Evening inspection update: bridge reopening still unconfirmed",
+    "publisher": "Rivergate Transport Desk",
+    "url": "https://transport.rivergate.example/evening-update",
+    "published_at": "2026-11-04T17:00:00Z",
+    "language": "en",
+    "topic": "Rivergate storm",
+    "text": "This is a fictional article created for the Evidence Explorer demo.\n\nThe transport authority said the East Bridge inspection was continuing at 17:00. The authority has not announced a reopening time. A social media claim that the bridge reopened at noon is not supported by this transport update.\n\nBus services continue to use the North Bridge diversion. The transport authority asked travelers to check its next bulletin before starting a journey. The corrected evacuation figure remains 20 people from eight households.",
+    "sample_claims": [
+      {"claim_text": "The transport update does not announce a reopening time.", "quote": "The authority has not announced a reopening time.", "subject": "East Bridge reopening", "attribution": "Transport authority", "location": "East Bridge", "event_time": "2026-11-04T17:00:00Z"}
+    ]
+  },
+  {
+    "title": "Harbor airport reopens after fog clears",
+    "publisher": "Harbor Aviation Bulletin",
+    "url": "https://aviation.harbor.example/airport-fog",
+    "published_at": "2026-11-04T10:00:00Z",
+    "language": "en",
+    "topic": "Harbor airport",
+    "text": "This is a fictional article created for the Evidence Explorer demo.\n\nHarbor Airport reopened its runway at 10:00 after dense morning fog cleared. The airport operator reported eight delayed flights. No airport evacuation was ordered.\n\nThis airport notice concerns Harbor, a different city from Rivergate. It does not describe a bridge closure or a flood. Passengers should check individual flight departure times with their airline.",
+    "sample_claims": [
+      {"claim_text": "Harbor Airport reopened at 10:00 after fog cleared.", "quote": "Harbor Airport reopened its runway at 10:00 after dense morning fog cleared.", "subject": "Harbor Airport", "attribution": "Airport operator", "location": "Harbor", "event_time": "2026-11-04T10:00:00Z"}
+    ]
+  },
+  {
+    "title": "Riverside sensor reading revised after calibration",
+    "publisher": "Rivergate Environment Office",
+    "url": "https://environment.rivergate.example/sensor-calibration",
+    "published_at": "2026-11-05T08:30:00Z",
+    "language": "en",
+    "topic": "Rivergate storm",
+    "text": "This is a fictional article created for the Evidence Explorer demo.\n\nThe environment office revised the Riverside sensor's peak water reading from 2.8 meters to 2.6 meters after calibration. The revision applies to the overnight storm on November 4. It is not a new rise in river level.\n\nThe office published both readings and the calibration explanation. Flood barriers remain in place while teams inspect the riverbank. The sensor revision does not itself change the transport authority's bridge notice.",
+    "sample_claims": [
+      {"claim_text": "The peak reading was revised from 2.8 to 2.6 meters.", "quote": "The environment office revised the Riverside sensor's peak water reading from 2.8 meters to 2.6 meters after calibration.", "subject": "Riverside sensor", "attribution": "Environment office", "location": "Riverside"}
+    ]
+  },
+  {
+    "title": "East Bridge reopens after engineers complete inspection",
+    "publisher": "Rivergate Transport Desk",
+    "url": "https://transport.rivergate.example/bridge-reopened",
+    "published_at": "2026-11-05T14:00:00Z",
+    "language": "en",
+    "topic": "Rivergate storm",
+    "text": "This is a fictional article created for the Evidence Explorer demo.\n\nThe East Bridge reopened at 14:00 on Thursday after engineers completed their inspection. The transport authority lifted the diversion via the North Bridge. The reopening followed the closure announced on Wednesday morning.\n\nThe authority said travelers should distinguish this Thursday reopening from unconfirmed claims circulated a day earlier. The council's corrected evacuation count remains 20 people from eight households.",
+    "sample_claims": [
+      {"claim_text": "The East Bridge reopened at 14:00 on Thursday.", "quote": "The East Bridge reopened at 14:00 on Thursday after engineers completed their inspection.", "subject": "East Bridge", "attribution": "Transport authority", "location": "East Bridge", "event_time": "2026-11-05T14:00:00Z"}
+    ]
+  }
+]

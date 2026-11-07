@@ -1,0 +1,210 @@
+{
+  "schema_version": "1.0",
+  "case": {
+    "id": "source-comparison-example:case",
+    "title": "Rivergate conflicting reports — synthetic comparison",
+    "question": "Where do the saved reports differ, and which differences need a reviewer?",
+    "synthetic": true,
+    "coverage": {
+      "records": 4,
+      "description": "Authored examples of numerical and negation differences, a different location, and an incompatible counting unit."
+    },
+    "limitations": [
+      "All people, publishers, places, and events in this example are fictional.",
+      "Candidate differences do not determine which source is correct. Different units or locations must not be merged.",
+      "Publication and acquisition times describe records; they are not inferred event times."
+    ]
+  },
+  "records": [
+    {
+      "id": "source-comparison-example:bulletin",
+      "kind": "article",
+      "source_label": "Fictional Rivergate council bulletin",
+      "text": "At 09:00, Rivergate Council reported 20 households evacuated from Riverside Street. At 09:00, the East Bridge was closed for the inspection.",
+      "content_hash": "a675157a65353417611d31f13c541f5b9ce688e18a31f75a6fb8190739347695",
+      "source_url": "https://rivergate.example/comparison/bulletin",
+      "artifact_ref": null,
+      "acquired_at": "2026-11-06T20:00:00Z",
+      "published_at": "2026-11-04T09:15:00Z",
+      "metadata": {
+        "synthetic": true,
+        "publisher": "Rivergate Council",
+        "title": "Fictional Rivergate council bulletin"
+      }
+    },
+    {
+      "id": "source-comparison-example:report",
+      "kind": "article",
+      "source_label": "Fictional Rivergate news report",
+      "text": "At 09:00, Rivergate Council reported 8 households evacuated from Riverside Street. At 09:00, the East Bridge was not closed for the inspection.",
+      "content_hash": "6f5caeb4e0db2d4f36418242fa88716628906db0c3a48a6717a7972c16807905",
+      "source_url": "https://rivergate.example/comparison/report",
+      "artifact_ref": null,
+      "acquired_at": "2026-11-06T20:00:00Z",
+      "published_at": "2026-11-04T09:40:00Z",
+      "metadata": {
+        "synthetic": true,
+        "publisher": "Rivergate News",
+        "title": "Fictional Rivergate news report"
+      }
+    },
+    {
+      "id": "source-comparison-example:other-place",
+      "kind": "article",
+      "source_label": "Fictional Harbor council bulletin",
+      "text": "At 09:00, Harbor Council reported 8 households evacuated from Ocean Street. At 09:00, the West Bridge was not closed for the inspection.",
+      "content_hash": "68900c9d1a10d097e49c94cc4ef108ce9015d4208bf6ebcb73971f1b946c2f5d",
+      "source_url": "https://rivergate.example/comparison/other-place",
+      "artifact_ref": null,
+      "acquired_at": "2026-11-06T20:00:00Z",
+      "published_at": null,
+      "metadata": {
+        "synthetic": true,
+        "publisher": "Harbor Council",
+        "title": "Fictional Harbor council bulletin"
+      }
+    },
+    {
+      "id": "source-comparison-example:other-unit",
+      "kind": "article",
+      "source_label": "Fictional Rivergate residents note",
+      "text": "At 09:00, Rivergate Council reported 20 people evacuated from Riverside Street. The supplied note does not state how many households they represent.",
+      "content_hash": "6ba2c390201056d8e92f016c996b5a6235866bd297cd2c4ee08ec37237c83cf2",
+      "source_url": "https://rivergate.example/comparison/other-unit",
+      "artifact_ref": null,
+      "acquired_at": "2026-11-06T20:00:00Z",
+      "published_at": null,
+      "metadata": {
+        "synthetic": true,
+        "publisher": "Rivergate Residents",
+        "title": "Fictional Rivergate residents note"
+      }
+    }
+  ],
+  "fragments": [
+    {
+      "id": "source-comparison-example:bulletin:passage",
+      "record_id": "source-comparison-example:bulletin",
+      "selector": {
+        "kind": "text",
+        "start": 0,
+        "end": 140
+      },
+      "quote": "At 09:00, Rivergate Council reported 20 households evacuated from Riverside Street. At 09:00, the East Bridge was closed for the inspection."
+    },
+    {
+      "id": "source-comparison-example:report:passage",
+      "record_id": "source-comparison-example:report",
+      "selector": {
+        "kind": "text",
+        "start": 0,
+        "end": 143
+      },
+      "quote": "At 09:00, Rivergate Council reported 8 households evacuated from Riverside Street. At 09:00, the East Bridge was not closed for the inspection."
+    },
+    {
+      "id": "source-comparison-example:other-place:passage",
+      "record_id": "source-comparison-example:other-place",
+      "selector": {
+        "kind": "text",
+        "start": 0,
+        "end": 136
+      },
+      "quote": "At 09:00, Harbor Council reported 8 households evacuated from Ocean Street. At 09:00, the West Bridge was not closed for the inspection."
+    },
+    {
+      "id": "source-comparison-example:other-unit:passage",
+      "record_id": "source-comparison-example:other-unit",
+      "selector": {
+        "kind": "text",
+        "start": 0,
+        "end": 148
+      },
+      "quote": "At 09:00, Rivergate Council reported 20 people evacuated from Riverside Street. The supplied note does not state how many households they represent."
+    }
+  ],
+  "runs": [
+    {
+      "id": "source-comparison-example:run",
+      "input_fingerprint": "c2a633bd752292d6e45412da4f8401ff40688fa177bcccf92eea8d408f23ccba",
+      "input_manifest": [
+        "source-comparison-example:bulletin",
+        "source-comparison-example:report",
+        "source-comparison-example:other-place",
+        "source-comparison-example:other-unit"
+      ],
+      "method": "authored_synthetic_comparison_example",
+      "method_version": "1.0",
+      "created_at": "2026-11-06T20:00:00Z",
+      "full_inputs_available": false,
+      "recomputation_capability": "dependency_review_only",
+      "configuration": {},
+      "coverage": {},
+      "status": "completed"
+    }
+  ],
+  "findings": [
+    {
+      "snapshot_id": "source-comparison-example:bulletin:finding",
+      "lineage_id": "source-comparison-example:bulletin:finding",
+      "version": 1,
+      "run_id": "source-comparison-example:run",
+      "kind": "observation",
+      "statement": "The council bulletin reports 20 evacuated households at 09:00.",
+      "details": {
+        "synthetic": true,
+        "interpretation": "Authored demonstration statement; a source report is not independent confirmation."
+      }
+    },
+    {
+      "snapshot_id": "source-comparison-example:report:finding",
+      "lineage_id": "source-comparison-example:report:finding",
+      "version": 1,
+      "run_id": "source-comparison-example:run",
+      "kind": "observation",
+      "statement": "The news report reports 8 evacuated households at 09:00.",
+      "details": {
+        "synthetic": true,
+        "interpretation": "Authored demonstration statement; a source report is not independent confirmation."
+      }
+    }
+  ],
+  "links": [
+    {
+      "id": "source-comparison-example:bulletin:support",
+      "source": {
+        "type": "fragment",
+        "id": "source-comparison-example:bulletin:passage"
+      },
+      "target": {
+        "type": "finding",
+        "id": "source-comparison-example:bulletin:finding"
+      },
+      "relation": "supports",
+      "fragment_ids": [
+        "source-comparison-example:bulletin:passage"
+      ],
+      "basis": "The supplied fictional source states this count; compare the different report before briefing.",
+      "run_id": "source-comparison-example:run"
+    },
+    {
+      "id": "source-comparison-example:report:support",
+      "source": {
+        "type": "fragment",
+        "id": "source-comparison-example:report:passage"
+      },
+      "target": {
+        "type": "finding",
+        "id": "source-comparison-example:report:finding"
+      },
+      "relation": "supports",
+      "fragment_ids": [
+        "source-comparison-example:report:passage"
+      ],
+      "basis": "The supplied fictional source states this count; compare the different report before briefing.",
+      "run_id": "source-comparison-example:run"
+    }
+  ],
+  "reviews": [],
+  "scenarios": []
+}

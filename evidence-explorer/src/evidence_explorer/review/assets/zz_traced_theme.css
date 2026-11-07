@@ -1,0 +1,65 @@
+/* Application bridge to the canonical Traced role tokens. */
+.review-app {
+  --rv-bg: light-dark(var(--traced-background), var(--traced-color-ink));
+  --rv-surface: light-dark(var(--traced-surface), color-mix(in srgb, var(--traced-color-ink) 92%, var(--traced-color-paper)));
+  --rv-subtle: light-dark(var(--traced-surface-subtle), color-mix(in srgb, var(--traced-color-ink) 96%, var(--traced-color-paper)));
+  --rv-ink: light-dark(var(--traced-foreground), var(--traced-color-paper));
+  --rv-muted: light-dark(var(--traced-foreground-secondary), #bdc9c9);
+  --rv-border: light-dark(var(--traced-border-subtle), #52636c);
+  --rv-input-border: light-dark(var(--traced-border-strong), #a4b5ba);
+  --rv-green: light-dark(var(--traced-link), var(--traced-link-on-dark));
+  --rv-selected: light-dark(var(--traced-selection-background), #29443f);
+  --rv-blue: light-dark(var(--traced-status-info-foreground), #bddce9);
+  --rv-blue-bg: light-dark(var(--traced-status-info-background), #263e48);
+  --rv-amber: light-dark(var(--traced-status-review-foreground), #f4d393);
+  --rv-amber-bg: light-dark(var(--traced-status-review-background), #3e3524);
+  --rv-success: light-dark(var(--traced-status-success-foreground), #b5ddc8);
+  --rv-success-bg: light-dark(var(--traced-status-success-background), #243e34);
+  --rv-error: light-dark(var(--traced-status-error-foreground), #f4bfc0);
+  --rv-error-bg: light-dark(var(--traced-status-error-background), #452d32);
+  --rv-focus: light-dark(var(--traced-color-ink), var(--traced-color-paper));
+  --traced-focus-ring: var(--rv-focus);
+  font-family: var(--traced-font-sans);
+}
+.review-app .rv-brand { gap: 20px; flex-wrap: wrap; }
+.review-app .rv-brand-caption { font-size: 14px; font-weight: 600; color: var(--rv-ink); }
+.review-app .rv-brand-tagline { display: block; font-size: 13px; color: var(--rv-muted); margin-top: 2px; }
+.review-app :is(h1, h2, h3, strong) { font-weight: 600; }
+.review-app :is(.rv-mono, .rv-import-json) { font-family: var(--traced-font-mono) !important; }
+.review-app a { text-decoration: underline; }
+.review-app .rv-button { min-height: var(--traced-layout-control-height); }
+.review-app .rv-button--outline { border-color: var(--rv-input-border); }
+.review-app .rv-button--primary {
+  color: var(--traced-action-primary-foreground);
+  background: var(--traced-action-primary-background);
+  border-color: var(--traced-action-primary-foreground);
+  font-weight: 600;
+}
+.review-app .rv-button--primary:hover:not(:disabled) { background: var(--traced-action-primary-hover-background); }
+.review-app .rv-button--primary:active:not(:disabled) { background: var(--traced-action-primary-active-background); }
+.review-app .rv-button:disabled { opacity: 1; color: var(--traced-disabled-foreground); background: var(--traced-disabled-background); border-color: var(--traced-disabled-foreground); }
+.review-app :is(.rv-workspace, .rv-case-card) { border-radius: var(--traced-radius-card); }
+.review-app .rv-import-dropzone { background: var(--rv-subtle); border-color: var(--rv-input-border); }
+.review-app .rv-import-dropzone:hover { background: var(--rv-selected); }
+.review-app .rv-import-dropzone:focus-within { outline-color: var(--rv-focus); }
+.review-app .rv-provider-controls { background: var(--rv-subtle); }
+/* Dash renders option and search colors from its own dropdown roles. */
+.review-app .dash-dropdown-wrapper {
+  --Dash-Text-Strong: var(--rv-ink);
+  --Dash-Text-Weak: var(--rv-muted);
+  --Dash-Text-Disabled: var(--rv-muted);
+  --Dash-Fill-Inverse-Strong: var(--rv-surface);
+  --Dash-Fill-Interactive-Strong: var(--rv-green);
+  --Dash-Fill-Interactive-Weak: var(--rv-selected);
+  --Dash-Stroke-Strong: var(--rv-input-border);
+}
+/* The graph uses one high-contrast reading surface in both schemes. */
+.review-app #rv-graph { background: var(--traced-color-paper); border: 1px solid var(--traced-color-slate); }
+@media (prefers-color-scheme: dark) {
+  .review-app .traced-logo--light { display: none; }
+  .review-app .traced-logo--dark { display: block; }
+}
+@media (max-width: 600px) {
+  .review-app .rv-brand { gap: 4px 16px; }
+  .review-app .rv-brand-tagline { font-size: 12px; }
+}

@@ -1,0 +1,34 @@
+# Compare saved activity windows
+
+Use this manual comparison to decide which saved evidence needs closer review. It counts saved record snapshots of an explicitly selected kind. It does not classify hate speech, infer automation or intent, establish a real-world trend, or send an alert.
+
+This is an optional branch of **Investigate findings**, not a required step for every case. Before configuring a rule, check that the saved case contains a compatible declared bounded sample for both windows. A successful collection, a schedule, or scope confirmation does not supply that declaration. Scheduled collection only refreshes sources; this panel evaluates saved windows when requested, and there is no live alert service or notification.
+
+1. Select the evidence case on **Cases**. In **Investigation plan**, choose its draft under **Continue a saved plan** and select **Open saved plan**. Enter complete baseline and observation windows with UTC offsets and configure an explicit activity rule. Select **Save plan**, attach the exact saved evidence scope with **Attach collected evidence** if needed, and select **Confirm scope**. A changed rule or window needs a new saved revision and confirmation.
+2. In the manual activity panel, choose the record kind and timestamp meaning. Publication uses the saved `published_at`; acquisition uses `acquired_at`; event time requires an explicit saved event assertion. There is no fallback between these meanings.
+3. Inspect the saved rule, windows, scope, and declared bounded-sample coverage. Select **Evaluate saved windows** intentionally. Refreshing or changing a selection does not run the calculation.
+4. Read the result: **review needed**, **below threshold**, or **unavailable**. Inspect the counts, relative-change formula, minimum counts, coverage/exposure, exact window boundaries, omitted records, and limitations. Open a contributing record in the existing evidence inspector before drawing a conclusion.
+
+Each window includes its start and excludes its end: `[start, end)`, compared as UTC instants. A record at the boundary between adjacent windows belongs only to the observation window. A record at the observation end belongs to neither. Each unique saved record ID is counted once; this is not a count of independent sources or necessarily of unique native posts across versions.
+
+Missing or ambiguous dates, an unknown or insufficient baseline, incompatible windows or exposure, mismatched scope, and missing coverage declarations produce **unavailable**. A successful collection or an empty source response does not establish historical completeness. Failed, empty, unknown, and omitted selected sources remain visible. Unsaved planning fields cannot replace the confirmed saved rule. Resolve those edits before evaluating.
+
+When coverage is missing, continue inspecting the saved records and use other available review tools. To evaluate activity, obtain a new supplied snapshot with a truthful coverage declaration from its producer, import it, and explicitly attach and confirm its plan. There is no coverage editor or automatic backfill, and an existing case cannot be relabeled as complete. If only the rule or planning windows are wrong, correct them to match the declared saved sample, save, and reconfirm; do not infer missing timestamps or coverage.
+
+The result belongs to the saved case, plan revision, evidence/source scope, rule, record kind, and time basis displayed. Changing the relevant context clears the result or rejects the stale action. Evaluation creates no job, evidence, decision, or planning revision. It preserves existing review decisions and unsaved notes. The calculation is session-local; case packages preserve the underlying saved evidence and planning history, not an automatically approved activity finding or a durable evaluation result.
+
+## Saved coverage declaration
+
+ACT-01 recognizes only an explicit, immutable declaration at `case.coverage.saved_activity_coverage`, with policy `saved-activity-coverage/v1`. The declaration describes a bounded sample; it is attributed input, not independently verified whole-platform coverage. There is no coverage editor or automatic backfill.
+
+The typed declaration contains the exact `source_refs` of the confirmed saved scope, `record_kind`, `timestamp_basis`, and count unit `saved_record_snapshots`. Its `baseline` and `observation` each contain aware `start`/`end`, `coverage_status`, `coverage_fraction`, and nonblank `evidence` explaining the saved coverage assertion. A comparable evaluation requires complete declared sample coverage. Optional positive `exposure` and a matching `exposure_unit` support the existing exposure-normalized rule; absent or incompatible exposure produces unavailable.
+
+For collection-backed cases, scope means the frozen selected source and observation manifest, including sources without contributing records. For supplied cases, it means the whole saved evidence manifest; record IDs are not invented connector IDs. A declaration must match the exact saved windows and counting choices. Source status and observation hashes remain separate from the coverage assertion.
+
+A comparable collection-backed snapshot must reconcile the complete bundle with the declared included native records in both directions, including records outside the two windows. Source memberships are a union: observing the same native item through two sources does not require two included records. Different saved versions must follow the declared selection policy and carry consistent omission details; an omitted version cannot excuse an absent selected version. Record kind is part of this inclusion check: changing it cannot quietly remove a baseline item from the count. An unexplained missing, duplicate, or inconsistent native record makes the comparison unavailable, even if the supplied snapshot has been locally confirmed. Whole-manifest supplied cases retain explicit filtering by record kind and disclose other omitted kinds. This is an input-consistency check, not proof of source authenticity or historical completeness.
+
+The declaration is part of immutable case metadata and therefore already included in the native evidence/scope identity. Never place the resulting evidence or scope fingerprint inside that declaration. Adding or correcting coverage requires a new snapshot and explicit planning association/confirmation; it does not modify an earlier approved case or inherit its decisions.
+
+Existing collected snapshots without sufficient declarations correctly remain unavailable. The controlled verification corpus demonstrates a known closed fictional sample, not live monitoring or evaluated platform coverage. The photographed 20% proposal remains an illustration; the product supplies no silent threshold.
+
+See the [planning workflow](INVESTIGATION_PLANNING.md) for the surrounding review process.

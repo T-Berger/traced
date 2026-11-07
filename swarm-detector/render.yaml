@@ -1,0 +1,26 @@
+# Optional paid deployment template. This file does not create a service by itself.
+# Paths are relative to the EDTH repository root and use its shared uv lock.
+services:
+  - type: web
+    name: swarm-detector
+    runtime: docker
+    plan: starter
+    region: frankfurt
+    numInstances: 1
+    autoDeployTrigger: "off"
+    dockerfilePath: ./swarm-detector/Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    envVars:
+      - key: PORT
+        value: "8050"
+      - key: SWARM_DATA_DIR
+        value: /var/data
+      - key: SWARM_BASIC_AUTH_USER
+        sync: false
+      - key: SWARM_BASIC_AUTH_PASSWORD
+        sync: false
+    disk:
+      name: swarm-data
+      mountPath: /var/data
+      sizeGB: 1

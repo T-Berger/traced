@@ -1,0 +1,13 @@
+# An allowlist keeps original datasets, exports, secrets, and environments out of builds.
+**
+!pyproject.toml
+!uv.lock
+!.python-version
+!README.md
+!src/
+!src/**
+!scripts/
+!scripts/entrypoint.sh
+!gunicorn.conf.py
+src/**/__pycache__/
+src/**/*.py[cod]
