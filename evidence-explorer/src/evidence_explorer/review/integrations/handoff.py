@@ -56,14 +56,15 @@ def _purpose(purpose_id: str | None) -> dict:
     purpose = get_use_case(purpose_id) if purpose_id else None
     return {
         "id": purpose.id if purpose else None,
-        "title": purpose.title if purpose else "No purpose selected",
+        "title": purpose.title if purpose else "No output guide selected",
         "status": "session_only_unconfirmed" if purpose else "not_selected",
         "confirmed": False,
         "persisted": False,
         "scope_notes": list(purpose.scope_notes) if purpose else [],
         "note": (
-            "This purpose is a session-only guide. It is not a saved, confirmed investigation "
-            "brief and does not establish scope, policy eligibility, or approval."
+            "This session-only output guide is separate from any saved investigation plan "
+            "and attributed scope confirmations. It does not establish investigation scope, "
+            "policy eligibility, or approval."
         ),
     }
 
@@ -153,7 +154,7 @@ def project_handoff(
     if purpose_id:
         gap(
             "unconfirmed_purpose",
-            "Confirm the investigation purpose and scope",
+            "Review the session-only output guide",
             purpose["note"],
             "check_scope",
         )
@@ -408,7 +409,7 @@ def render_dossier(handoff: Mapping[str, Any]) -> str:
         "**Draft for human review. Policy eligibility is unknown. Submission status: "
         "not submitted.**",
         "",
-        f"Selected purpose: {purpose['title']}",
+        f"Session-only output guide purpose: {purpose['title']}",
         purpose["note"],
         "",
         f"Saved-assessment readiness: {readiness['status']} — {readiness['summary']}",
@@ -435,11 +436,13 @@ def render_dossier(handoff: Mapping[str, Any]) -> str:
         f"Media: {counts['available_media']} available, {counts['unavailable_media']} unavailable, "
         f"{counts['unknown_media']} availability unknown.",
         "",
-        "Saved source selection: Not recorded."
+        "Native collection source selection: Not recorded in native evidence."
         if saved_scope is None
-        else "Saved source selection: `"
+        else "Native collection source selection: `"
         + json.dumps(saved_scope, ensure_ascii=False, sort_keys=True)
         + "`",
+        "Saved planning source selections and attributed confirmations are described "
+        "separately when retained.",
         "",
     ]
     if handoff["references"]:

@@ -192,8 +192,10 @@ def test_draft_dossier_keeps_scope_missing_requirements_and_dated_references_exp
     service, case_id = desk
     view = service.view(case_id)
     unscoped_dossier = render_dossier(project_handoff(view, purpose_id=PURPOSE))
-    assert "Saved source selection: Not recorded." in unscoped_dossier
-    assert "Saved source selection: `null`" not in unscoped_dossier
+    assert (
+        "Native collection source selection: Not recorded in native evidence." in unscoped_dossier
+    )
+    assert "Native collection source selection: `null`" not in unscoped_dossier
     view["bundle"]["case"]["coverage"]["collection_scope"] = {
         "source_ids": ["saved-source-a"],
         "record_count": 10,

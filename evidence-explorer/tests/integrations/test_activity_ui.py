@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import runpy
 import sqlite3
 from contextlib import contextmanager
@@ -14,13 +15,16 @@ import pytest
 from dash import Dash, dcc, html
 from dash.development.base_component import Component
 
+from evidence_explorer import use_cases
 from evidence_explorer.config import Settings
 from evidence_explorer.review.controller import session_for_case
 from evidence_explorer.review.integrations import activity_ui
 from evidence_explorer.review.integrations.brief_editor_state import EditorStore
+from evidence_explorer.review.integrations.navigation_ui import render_next_action
 from evidence_explorer.review.integrations.snapshots import _SnapshotRepository
 from evidence_explorer.review.integrations.workspace import WorkspaceRepository, WorkspaceService
-from evidence_explorer.review.navigation import apply_navigation
+from evidence_explorer.review.navigation import apply_navigation, navigation_context
+from evidence_explorer.use_cases import alerts, saved_activity
 
 _fixtures = runpy.run_path(str(Path(__file__).resolve().parents[2] / "scripts/activity_preview.py"))
 activity_fixture = _fixtures["activity_fixture"]
@@ -180,6 +184,94 @@ def test_explicit_evaluate_uses_saved_rule_counts_and_honest_unknowns(
         assert result[4]["evaluation"]["threshold_percent"] == 30
     assert state == state_before
     assert stored_rows(service) == before
+
+
+@pytest.mark.parametrize(
+    ("case_id", "expected_status", "expected_label"),
+    [
+        ("activity:cue", "review_needed", "Review requested"),
+        ("activity:below", "not_triggered", "No threshold crossing in the saved sample"),
+        ("activity:unknown", "unavailable", "Comparison unavailable"),
+        ("activity:zero", "unavailable", "Comparison unavailable"),
+    ],
+)
+def test_manual_result_and_global_source_guidance_keep_their_separate_meaning(
+    desk, monkeypatch, record_property, case_id, expected_status, expected_label
+):
+    service, _, callback = desk
+    state = session_for_case(service, case_id)
+    # Preserve a real saved decision in another assessment of the same finding.
+    # The current baseline remains undecided, so its existing next step is Compare.
+    scenario = service.start_scenario(case_id, state["finding_id"])
+    service.review(
+        case_id,
+        state["finding_id"],
+        scenario["id"],
+        "qualify",
+        "Retain this fictional scenario review while inspecting the saved sample.",
+    )
+    saved_reviews = service.export_bundle(case_id).reviews
+    assert len(saved_reviews) == 1
+    before, original = stored_rows(service), deepcopy(state)
+    preview = run(callback, monkeypatch, state)
+    result = run(
+        callback, monkeypatch, state, trigger="trail-activity-evaluate", expected=preview[0]
+    )
+    temporary = deepcopy(result[4])
+    activity_text = text(result[5])
+    assert temporary["status"] == expected_status
+    assert expected_label in activity_text
+    assert temporary["summary"] in activity_text
+
+    def forbidden(*args, **kwargs):
+        raise AssertionError("Rendering and navigation must not evaluate activity")
+
+    monkeypatch.setattr(activity_ui, "evaluate_saved_activity", forbidden)
+    monkeypatch.setattr(saved_activity, "evaluate_saved_activity", forbidden)
+    monkeypatch.setattr(saved_activity, "evaluate_activity_alert", forbidden)
+    monkeypatch.setattr(alerts, "evaluate_activity_alert", forbidden)
+    monkeypatch.setattr(use_cases, "evaluate_activity_alert", forbidden)
+    view = service.view(case_id)
+    assert service.planning_progress_facts(view).signal_evaluation is None
+    guidance = render_next_action(service, state, "review", None)
+    guide_text = text(guidance)
+    expected_explanation = (
+        "Compare saved sources to check their context. Manual activity results appear "
+        "separately in Saved source-window comparison."
+    )
+    assert expected_explanation in guide_text
+    assert "Signal evaluation is unavailable" not in guide_text
+    button = next(
+        node
+        for node in nodes(guidance)
+        if isinstance(getattr(node, "id", None), dict) and node.id.get("type") == "rv-next-action"
+    )
+    assert button.id == {
+        "type": "rv-next-action",
+        "action": "compare",
+        "context": navigation_context(view, state),
+        "fid": state["finding_id"],
+        "rid": state["record_id"],
+        "location": "guidance",
+    }
+    destination = apply_navigation(service, state, button.id)
+    assert destination == {
+        **state,
+        "navigate_to": "compare",
+        "navigate_target": "rv-source-heading",
+    }
+    assert result[4] == temporary
+    assert text(result[5]) == activity_text
+    assert state == original
+    assert service.export_bundle(case_id).reviews == saved_reviews
+    assert stored_rows(service) == before
+    record_property("activity_status", temporary["status"])
+    record_property("activity_summary", temporary["summary"])
+    record_property("activity_text", activity_text)
+    record_property("guide_text", guide_text)
+    record_property(
+        "next_action", json.dumps({"button": button.id, "destination": destination}, sort_keys=True)
+    )
 
 
 def test_preview_requires_explicit_kind_and_basis_and_never_evaluates(desk, monkeypatch):

@@ -343,7 +343,8 @@ def contextual_next_action(
         return action(
             "compare",
             "Compare saved source context",
-            "Signal evaluation is unavailable. Compare sources without completing that evaluation.",
+            "Compare saved sources to check their context. Manual activity results appear "
+            "separately in Saved source-window comparison.",
             target,
             target_source,
         )

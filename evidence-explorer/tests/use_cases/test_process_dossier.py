@@ -268,6 +268,44 @@ def test_template_selection_is_not_scope_collection_or_verified_readiness():
     assert view == original
 
 
+@pytest.mark.parametrize("supplied", ["absent", "unknown_coverage", "zero_baseline"])
+def test_signal_progress_distinguishes_absent_result_from_real_unavailability(supplied):
+    view, facts = _synthetic_view()
+    view = _review(view)
+    evaluation = None
+    if supplied != "absent":
+        rule, baseline, observation = illustrative_activity_example()
+        updates = (
+            {"coverage_status": "unknown", "coverage_fraction": None}
+            if supplied == "unknown_coverage"
+            else {"observed_count": 0, "record_ids": ()}
+        )
+        evaluation = evaluate_activity_alert(rule, baseline.model_copy(update=updates), observation)
+        assert evaluation.status == "unavailable"
+        assert (
+            "baseline coverage is unknown"
+            if supplied == "unknown_coverage"
+            else "a relative percentage is undefined for a zero baseline"
+        ) in evaluation.summary
+    supplied_facts = facts.model_copy(update={"signal_evaluation": evaluation})
+    original_view, original_facts = deepcopy(view), supplied_facts.model_copy(deep=True)
+    progress = project_case_progress(facts.brief.use_case_id, view, facts=supplied_facts)
+    signal = next(step for step in progress.steps if step.id == "signals")
+    assert signal.status == "unavailable"
+    absent_summary = "No activity comparison result is supplied to this progress view."
+    if evaluation is None:
+        assert signal.summary == absent_summary
+        assert signal.notes == ()
+    else:
+        assert signal.summary == evaluation.summary
+        assert signal.summary != absent_summary
+        assert signal.notes == evaluation.limitations
+    assert _statuses(progress)["scope"] == "completed"
+    assert _statuses(progress)["human_review"] == "completed"
+    assert view == original_view
+    assert supplied_facts == original_facts
+
+
 def test_synthetic_scope_counts_review_and_dossier_require_current_human_decision():
     view, facts = _synthetic_view()
     original = deepcopy(view)

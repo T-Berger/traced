@@ -17,6 +17,8 @@ When coverage is missing, continue inspecting the saved records and use other av
 
 The result belongs to the saved case, plan revision, evidence/source scope, rule, record kind, and time basis displayed. Changing the relevant context clears the result or rejects the stale action. Evaluation creates no job, evidence, decision, or planning revision. It preserves existing review decisions and unsaved notes. The calculation is session-local; case packages preserve the underlying saved evidence and planning history, not an automatically approved activity finding or a durable evaluation result.
 
+The process guide uses saved planning facts and does not receive the temporary comparison result. Its message that no activity comparison result is supplied describes that missing progress fact, even after a successful manual comparison. Read the current result or the reasons it is unavailable in **Saved source-window comparison**. **Compare saved source context** opens the existing source comparison; it does not evaluate activity. Changing case or scope clears the temporary result and requires another explicit evaluation.
+
 ## Saved coverage declaration
 
 ACT-01 recognizes only an explicit, immutable declaration at `case.coverage.saved_activity_coverage`, with policy `saved-activity-coverage/v1`. The declaration describes a bounded sample; it is attributed input, not independently verified whole-platform coverage. There is no coverage editor or automatic backfill.

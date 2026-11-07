@@ -129,7 +129,7 @@ def _gap_action(gap, index, context, view, assessment):
     if action in {"review_finding", "save_draft"} and fid in current:
         return _action(context, "review", "Open review", location, finding_id=fid)
     if action == "check_scope":
-        return _action(context, "purpose", "Review purpose and scope", location)
+        return _action(context, "purpose", "Review output guide", location)
     if action == "check_references":
         return html.A("Inspect reference dates", href="#trail-handoff-references")
     return None
@@ -270,10 +270,10 @@ def render_handoff(handoff: dict, view: dict, state: dict) -> html.Div:
             ),
             html.P(
                 [
-                    "Workflow guide: ",
-                    html.Strong(purpose.get("title") or "No purpose selected"),
-                    " · Session selection. Saved planning revisions and confirmation "
-                    "history are shown below.",
+                    "Session-only output guide purpose: ",
+                    html.Strong(purpose.get("title") or "No output guide selected"),
+                    ". Saved planning source selections and attributed confirmations "
+                    "are shown separately below.",
                 ],
                 className="rv-small",
             ),
@@ -379,8 +379,8 @@ def render_handoff(handoff: dict, view: dict, state: dict) -> html.Div:
                     _facts(
                         {
                             "Analysis run": assessment.get("base_run_id") or "Unknown",
-                            "Saved collection scope": scope.get("collection_scope")
-                            or "Not recorded",
+                            "Native collection source selection": scope.get("collection_scope")
+                            or "Not recorded in native evidence.",
                             "Saved coverage": scope.get("coverage") or "Not recorded",
                         }
                     ),

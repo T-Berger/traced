@@ -170,7 +170,7 @@ def project_case_progress(
     elif definition.requires_activity_baseline:
         statuses["signals"] = (
             "unavailable",
-            "No explicit baseline/observation evaluation is supplied.",
+            "No activity comparison result is supplied to this progress view.",
             (),
         )
     elif findings and any(
