@@ -9,6 +9,7 @@ from dash import ALL, Dash, Input, Output, State, ctx, html, no_update
 
 from . import ui
 from .config import Settings
+from .explorer_handoff_ui import register_callbacks as register_handoff_callbacks
 from .feeds_ui import register_callbacks as register_feed_callbacks
 from .graphs import MAX_QUOTATIONS, graph_outline, graph_style, source_graph
 from .ingestion_ui import register_callbacks as register_ingestion_callbacks
@@ -307,4 +308,5 @@ def create_app(settings: Settings | None = None) -> Dash:
 
     register_ingestion_callbacks(app, service)
     register_feed_callbacks(app, service)
+    register_handoff_callbacks(app, service)
     return app

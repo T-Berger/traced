@@ -15,6 +15,7 @@ from dash import html
 from dash.development.base_component import Component
 
 from evidence_explorer.config import Settings
+from evidence_explorer.models import ArticleInput
 from evidence_explorer.review.contracts import EvidenceBundle
 from evidence_explorer.review.controller import session_for_case
 from evidence_explorer.review.demo import load_demo_bundle
@@ -22,6 +23,7 @@ from evidence_explorer.review.integrations import web
 from evidence_explorer.review.integrations.handoff_service import load_handoff_context
 from evidence_explorer.review.integrations.packages import export_case_package, import_case_package
 from evidence_explorer.review.integrations.workspace import WorkspaceRepository, WorkspaceService
+from evidence_explorer.web import create_app as create_explorer
 
 
 def components(node):
@@ -83,6 +85,97 @@ def upload_bytes(app, client, payload):
     response = post_upload(app, client, contents)
     assert response.status_code == 200, response.data
     return response.get_json()["response"]
+
+
+def post_explorer(app, output_id, changed, values):
+    key, spec = next(
+        (key, spec) for key, spec in app.callback_map.items() if f"{output_id}." in key
+    )
+
+    def inputs(items):
+        return [dict(item, value=values.get(f"{item['id']}.{item['property']}")) for item in items]
+
+    response = app.server.test_client().post(
+        "/_dash-update-component",
+        json={
+            "output": key,
+            "outputs": [
+                {"id": item.component_id, "property": item.component_property}
+                for item in spec["output"]
+            ],
+            "inputs": inputs(spec["inputs"]),
+            "state": inputs(spec["state"]),
+            "changedPropIds": [changed],
+        },
+    )
+    assert response.status_code == 200, response.data
+    return response.get_json()["response"]
+
+
+def test_selected_explorer_package_requires_current_preview_and_reopens_exact_quotes(tmp_path):
+    explorer = create_explorer(Settings(data_dir=tmp_path / "producer"))
+    repo = explorer.explorer_service.repo
+    selected = sorted({claim.article_id for claim in repo.claims.list_active_claims()})[:2]
+    assert len(selected) == 2
+    state = {"explorer-handoff-articles.options": [], "explorer-handoff-articles.value": []}
+    for article_id in selected:
+        state["explorer-handoff-add.n_clicks"] = 1
+        state["explorer-handoff-add.value"] = str(article_id)
+        result = post_explorer(
+            explorer, "explorer-handoff-add-status", "explorer-handoff-add.n_clicks", state
+        )["explorer-handoff-articles"]
+        state["explorer-handoff-articles.options"] = result["options"]
+        state["explorer-handoff-articles.value"] = result["value"]
+    assert state["explorer-handoff-articles.value"] == selected
+    state["explorer-handoff-preview.n_clicks"] = 1
+    state["explorer-handoff-export.n_clicks"] = 1
+
+    def prepare(action):
+        return post_explorer(
+            explorer, "explorer-handoff-version", f"explorer-handoff-{action}.n_clicks", state
+        )
+
+    preview = prepare("preview")
+    assert preview["explorer-handoff-export"]["disabled"] is False
+    state["explorer-handoff-version.data"] = preview["explorer-handoff-version"]["data"]
+    updated = ArticleInput.model_validate(repo.get_article(selected[0])).model_copy(
+        update={"title": "Revised saved article"}
+    )
+    repo.upsert_article(updated)
+    stale = prepare("export")
+    assert stale["explorer-handoff-export"]["disabled"] is True
+    assert "explorer-handoff-download" not in stale
+    assert "Preview it again" in json.dumps(stale)
+
+    preview = prepare("preview")
+    state["explorer-handoff-version.data"] = preview["explorer-handoff-version"]["data"]
+    download = prepare("export")["explorer-handoff-download"]["data"]
+    assert download["filename"].endswith(".zip")
+    payload = base64.b64decode(download["content"])
+
+    settings = Settings(data_dir=tmp_path / "recipient")
+    repository = WorkspaceRepository(settings.db_path)
+    repository.initialize()
+    service = WorkspaceService(repository, settings, settings.data_dir / "artifacts")
+    app = web.create_app(service)
+    client = app.server.test_client()
+    case_id = upload_bytes(app, client, payload)["rv-case"]["value"]
+    assert upload_bytes(app, client, payload)["rv-case"]["value"] == case_id
+    assert len(service.list_cases()) == 1
+    saved = service.repository.get_bundle(case_id)
+    assert {record.source_url for record in saved.records} == {
+        repo.get_article(article_id)["url"] for article_id in selected
+    }
+    records = {record.id: record for record in saved.records}
+    assert saved.findings and not saved.reviews and not saved.scenarios
+    fragments = {fragment.id: fragment for fragment in saved.fragments}
+    for link in (link for link in saved.links if link.relation == "supports"):
+        fragment = fragments[link.fragment_ids[0]]
+        assert (
+            records[fragment.record_id].text[fragment.selector.start : fragment.selector.end]
+            == fragment.quote
+        )
+    assert not repo.list_jobs()
 
 
 def case_zip(case_id, files, *, manifest_files=None):

@@ -233,6 +233,8 @@ h1 { font-family: Georgia, "Times New Roman", serif; font-size: 38px; font-weigh
   overflow-wrap: anywhere; }
 .article-disclosure { margin-top: 22px; border-top: 1px solid #edf0e7; padding-top: 16px; }
 .article-disclosure summary { color: #6b815e; font-size: 11px; cursor: pointer; }
+.explorer-handoff { overflow-wrap: anywhere; scroll-margin-top: 16px; }
+.explorer-handoff > .badge-row { margin: 10px 0; }
 .saved-article-text { max-height: 340px; overflow-y: auto; padding-top: 14px; }
 .saved-article-text p { color: #7c8873; font-size: 11px; line-height: 1.9; margin-bottom: 13px; }
 .overview-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 23px; margin-bottom: 25px; }
