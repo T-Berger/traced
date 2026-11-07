@@ -393,10 +393,18 @@ async def browser_checks(origin: str, selection: dict, artifacts: Path) -> dict:
             await assessment_reached(page, selection["reviewed_assessment_id"])
             await visible_page(page, "brief")
             citations = page.locator('#rv-brief-preview button[id*="rv-citation"]')
-            await citations.first.wait_for(state="visible")
+            await citations.first.wait_for(state="attached")
             require(await citations.count() > 0, "Saved reviewed fixture has no citation to open")
             citation = citations.first
             target = json.loads(await citation.get_attribute("id"))
+            disclosure = citation.locator("xpath=ancestor::details[1]")
+            require(
+                await disclosure.count() == 1,
+                "Citation must belong to an exact-evidence disclosure",
+            )
+            if await disclosure.get_attribute("open") is None:
+                await disclosure.locator(":scope > summary").click()
+            await citation.wait_for(state="visible")
             await citation.click()
             state = await visible_page(page, "review")
             require(
