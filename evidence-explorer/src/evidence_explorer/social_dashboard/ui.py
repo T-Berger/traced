@@ -949,8 +949,9 @@ def register_callbacks(app: Dash, service):
         Output(_id("selected-record"), "options"),
         Output(_id("selected-record"), "value"),
         Output(_id("selection"), "data"),
-        Input(_id("activity-chart"), "clickData"),
-        Input(_id("relationship-chart"), "clickData"),
+        # Charts mount only after a valid Compare projection; absent charts supply None.
+        Input(_id("activity-chart"), "clickData", allow_optional=True),
+        Input(_id("relationship-chart"), "clickData", allow_optional=True),
         Input(_id("browse"), "n_clicks"),
         Input(_id("capture"), "data"),
         Input("rv-session", "data"),

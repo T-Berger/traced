@@ -199,6 +199,97 @@ def filter_values(ui, **changes):
     return [filters[name] for name in ui.FILTER_NAMES]
 
 
+@pytest.mark.parametrize("situation", ["initial_review", "no_selected_case", "invalid_filter"])
+def test_absent_charts_have_optional_dependencies_and_clear_selection_without_reads(
+    dashboard, monkeypatch, situation
+):
+    service, ui, app, callback = dashboard
+    state = session_for_case(service, "saved-dashboard-case")
+    page = "review" if situation == "initial_review" else "compare"
+    values = filter_values(ui)
+    if situation == "no_selected_case":
+        state = {}
+    elif situation == "invalid_filter":
+        values[ui.FILTER_NAMES.index("start")] = "not-a-date"
+    if page == "compare":
+        output, capture, *_ = callback("output.children")(state, page, "topics", "channel", *values)
+        assert capture is None
+        next(
+            node for node in nodes(app.layout) if getattr(node, "id", None) == ui.PREFIX + "output"
+        ).children = output
+
+    mounted = {node.id for node in nodes(app.layout) if isinstance(getattr(node, "id", None), str)}
+    client = app.server.test_client()
+    dependencies = client.get("/_dash-dependencies").get_json()
+    absent = [
+        item
+        for dependency in dependencies
+        for item in dependency["inputs"]
+        if item["id"] not in mounted
+    ]
+    assert {item["id"] for item in absent} == {
+        ui.PREFIX + "activity-chart",
+        ui.PREFIX + "relationship-chart",
+    }
+    layout_json = client.get("/_dash-layout").get_data(as_text=True)
+    assert all(item["id"] not in layout_json for item in absent)
+    # The browser renderer, not just the server callback, must accept the missing inputs.
+    assert all(item.get("allow_optional") is True for item in absent)
+    assert all(
+        not item.get("allow_optional", False)
+        for dependency in dependencies
+        for item in dependency["inputs"]
+        if item["id"] in mounted
+    )
+
+    before = stored_rows(service.repository)
+
+    def forbidden(*args, **kwargs):
+        raise AssertionError("Missing chart events must not read a saved case.")
+
+    monkeypatch.setattr(ui, "workspace_snapshot", forbidden)
+    callback_key, definition = next(
+        (key, value)
+        for key, value in app.callback_map.items()
+        if ui.PREFIX + "drilldown.children" in key
+    )
+    inputs = dict(zip((ui.PREFIX + name for name in ui.FILTER_NAMES), values, strict=True))
+    inputs.update(
+        {
+            "rv-session": state,
+            "rv-page": page,
+            ui.PREFIX + "lens": "topics",
+            ui.PREFIX + "group_by": "channel",
+            ui.PREFIX + "browse": 0,
+        }
+    )
+    response = client.post(
+        "/_dash-update-component",
+        json={
+            "output": callback_key,
+            "outputs": [
+                {"id": item.component_id, "property": item.component_property}
+                for item in definition["output"]
+            ],
+            "inputs": [
+                {"id": item["id"], "property": item["property"], "value": inputs.get(item["id"])}
+                for item in definition["inputs"]
+            ],
+            "state": [],
+            "changedPropIds": ["rv-page.value"],
+        },
+    )
+    if page == "review":
+        assert response.status_code == 204
+    else:
+        assert response.status_code == 200
+        result = response.get_json()["response"]
+        assert result[ui.PREFIX + "selected-record"] == {"options": [], "value": None}
+        assert result[ui.PREFIX + "selection"]["data"] is None
+        assert result[ui.PREFIX + "drilldown"]["children"].startswith("Select a time bar")
+    assert stored_rows(service.repository) == before
+
+
 def test_export_reopen_preserves_saved_annotations_without_local_execution(desk, tmp_path):
     original = desk.repository.get_bundle("saved-dashboard-case")
     before = stored_rows(desk.repository)

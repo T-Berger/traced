@@ -302,6 +302,7 @@ async def browser_checks(origin: str, selection: dict, artifacts: Path) -> dict:
         "checks": [],
         "events": [],
         "errors": [],
+        "console_errors": [],
         "viewport": {"width": 1280, "height": 900},
         "dash_renderer_script_urls": [],
         "fixture_selection": selection,
@@ -340,6 +341,10 @@ async def browser_checks(origin: str, selection: dict, artifacts: Path) -> dict:
         observations.add(task)
         task.add_done_callback(observations.discard)
 
+    def record_console(message) -> None:
+        if message.type == "error":
+            report["console_errors"].append({"text": message.text, "location": message.location})
+
     async def choose_assessment(page, assessment_id: str) -> None:
         require(assessment_id in labels, "Pinned assessment is absent from served picker options")
         await page.locator("#rv-scenario").click()
@@ -363,6 +368,7 @@ async def browser_checks(origin: str, selection: dict, artifacts: Path) -> dict:
         page.set_default_timeout(15000)
         barrier = ResponseBarrier(origin, report["events"])
         page.on("pageerror", lambda error: report["errors"].append(str(error)))
+        page.on("console", record_console)
         page.on("response", observe)
         await context.route("**/*", barrier.route)
         try:
@@ -489,6 +495,7 @@ async def browser_checks(origin: str, selection: dict, artifacts: Path) -> dict:
                 )
                 barrier.mode = None
             require(not report["errors"], f"Browser JavaScript errors: {report['errors']}")
+            require(not report["console_errors"], f"Console errors: {report['console_errors']}")
             require(
                 not report["observation_errors"],
                 f"Response observation failed: {report['observation_errors']}",
@@ -534,6 +541,8 @@ async def browser_checks(origin: str, selection: dict, artifacts: Path) -> dict:
             await bounded_capture("browser close", browser.close(), report, timeout=5)
             cleanup_failed = report.get("passed") and (
                 report.get("capture_errors")
+                or report["errors"]
+                or report["console_errors"]
                 or report["observation_errors"]
                 or barrier.error
                 or barrier.recording_errors
