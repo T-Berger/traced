@@ -113,7 +113,36 @@ def create_app(service: WorkspaceService):
             node_id = getattr(node, "id", None)
             if isinstance(node_id, str) and node_id in slots:
                 node.children = slots[node_id]
+        _add_alerts_page(root)
         return root
+
+    def _add_alerts_page(root):
+        """Integrated desk only: an Alerts tab and page beside the shared review pages."""
+        from dash import dcc
+
+        from ...alerts.settings import AlertSettingsStore
+        from ...alerts.ui import alerts_page
+
+        for node in _walk(root):
+            if getattr(node, "id", None) == "rv-page":
+                node.children = [
+                    *node.children,
+                    dcc.Tab(
+                        label="Alerts",
+                        value="alerts",
+                        className="rv-navigation-tab rv-navigation-tab--alerts",
+                        selected_className=(
+                            "rv-navigation-tab--selected rv-navigation-tab--selected-alerts"
+                        ),
+                    ),
+                ]
+            elif getattr(node, "className", None) == "rv-main":
+                children = list(node.children)
+                # Keep the shared footer last.
+                children.insert(
+                    len(children) - 1, alerts_page(AlertSettingsStore(service.settings.data_dir))
+                )
+                node.children = children
 
     app.layout = layout
 
@@ -619,4 +648,7 @@ def create_app(service: WorkspaceService):
     register_handoff_callbacks(app, service)
     register_social_dashboard_callbacks(app, service)
     register_event_callbacks(app, service)
+    from ...alerts.ui import register_alert_callbacks
+
+    register_alert_callbacks(app, service)
     return app
