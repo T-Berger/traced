@@ -21,7 +21,13 @@ from .models import CollectionFailure
 
 SCOPE_VERSION = "1.1"
 ContentScope = Literal[
-    "post_text", "title_description", "article_text", "feed_content", "feed_summary", "unknown"
+    "post_text",
+    "title_description",
+    "article_text",
+    "feed_content",
+    "feed_summary",
+    "unknown",
+    "database_row",
 ]
 _CONTENT_LABELS = {
     "post_text": "saved post text",
@@ -30,6 +36,7 @@ _CONTENT_LABELS = {
     "feed_content": "text supplied by a feed",
     "feed_summary": "feed summaries, not complete articles",
     "unknown": "unknown content scope",
+    "database_row": "saved database rows, with original publication context unverified",
 }
 _VERSION_POLICIES = {
     "one_saved_version_per_native_identity",

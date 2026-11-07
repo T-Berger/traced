@@ -56,6 +56,9 @@ def configure_environment(root: Path, data_dir: str | None = None) -> dict[str, 
     # Settings and providers must use this captured configuration, not discover
     # another .env from a package, caller, or parent directory later in startup.
     os.environ["PYTHON_DOTENV_DISABLED"] = "1"
+    # Flask reads dotenv_values directly, bypassing python-dotenv's disable flag.
+    # Do not let app.run discover a parent project's credentials after selection.
+    os.environ["FLASK_SKIP_DOTENV"] = "1"
     return {
         "project_root": str(root),
         "environment": str(root / ".venv"),
@@ -84,12 +87,13 @@ def main(argv: list[str] | None = None, *, root: Path | None = None) -> None:
         epilog=(
             "start (default): integrated desk and combined worker; "
             "config: show paths without opening a database; "
-            "review: forward to the existing review CLI. Use '<command> --help' for details."
+            "review: forward to the existing review CLI; "
+            "supabase: check the read-only Postgres source. Use '<command> --help' for details."
         ),
     )
     parser.add_argument("--data-dir", help="Explicit store, relative to the EDTH root or absolute")
     parser.add_argument(
-        "command", choices=("start", "config", "review"), nargs="?", default="start"
+        "command", choices=("start", "config", "review", "supabase"), nargs="?", default="start"
     )
     parser.add_argument("arguments", nargs=argparse.REMAINDER)
     args = parser.parse_args(argv)
@@ -116,6 +120,10 @@ def main(argv: list[str] | None = None, *, root: Path | None = None) -> None:
     if args.command == "review":
         _run_review(root, args.arguments)
         return
+    if args.command == "supabase":
+        from evidence_explorer.collection.supabase_cli import main as supabase_main
+
+        raise SystemExit(supabase_main(args.arguments))
     assert start_args is not None
     host = start_args.host or os.getenv("EVIDENCE_HOST", "127.0.0.1")
     try:

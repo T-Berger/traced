@@ -1,6 +1,7 @@
 """Editable source presets; runtime success, rather than a preset, establishes connectivity."""
 
 PRESETS = (
+    ("supabase-content-items", "supabase", "Supabase content items", "public.content_items"),
     ("telegram-official", "telegram", "Telegram announcements", "telegram"),
     ("telegram-tips", "telegram", "Telegram Tips", "TelegramTips"),
     ("telegram-durov", "telegram", "Pavel Durov", "durov"),
@@ -27,7 +28,10 @@ PRESETS = (
 
 def catalog() -> list[dict]:
     from .apis import configuration_status
+    from .supabase import configuration_status as supabase_status
 
+    connections = {platform: configuration_status(platform) for platform in ("x", "reddit")}
+    connections["supabase"] = supabase_status()
     return [
         {
             "id": key,
@@ -37,10 +41,10 @@ def catalog() -> list[dict]:
             "content_mode": "article_links" if key == "other-hn" else "feed_content",
             **(
                 {"ready": True, "status": "Public source · not checked yet"}
-                if platform not in {"x", "reddit"}
+                if platform not in connections
                 else {
-                    "ready": configuration_status(platform)["ready"],
-                    "status": configuration_status(platform)["message"],
+                    "ready": connections[platform]["ready"],
+                    "status": connections[platform]["message"],
                 }
             ),
         }

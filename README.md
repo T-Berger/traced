@@ -48,6 +48,11 @@ from `EDTH`; existing process `EVIDENCE_DATA_DIR` and Explorer `.env` paths reta
 their `evidence-explorer` base. Use absolute process paths to avoid ambiguity.
 See [the root configuration guide](docs/PROJECT_ROOT.md) for precedence and commands.
 
+Connect an existing Supabase `content_items` table through **Live sources →
+Supabase content items**. Configure credentials in the private `.env`, then run
+`./traced supabase check` to inspect the table before collecting. See the
+[Supabase source guide](docs/SUPABASE_SOURCE.md) for column mapping and IPv4 pooler setup.
+
 Use the selected directory in the article dashboard, without starting a second
 worker. Existing databases stay in place; see the
 [workspace and legacy-directory instructions](evidence-explorer/README.md#shared-review-workspace)
