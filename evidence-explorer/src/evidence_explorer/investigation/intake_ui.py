@@ -374,7 +374,6 @@ def register_intake_callbacks(app: Dash, service) -> None:
         Output("rv-case", "options", allow_duplicate=True),
         Output("rv-case", "value", allow_duplicate=True),
         Output("rv-session", "data", allow_duplicate=True),
-        Output("rv-page", "value", allow_duplicate=True),
         Output("rv-draft-store", "data", allow_duplicate=True),
         Output("investigation-saved-message", "children"),
         Input("investigation-saved-open", "n_clicks"),
@@ -419,7 +418,6 @@ def register_intake_callbacks(app: Dash, service) -> None:
                 options,
                 case_id,
                 session,
-                "review",
                 kept,
                 _notice("Draft opened. Check its reasoning, then record your own review decision."),
             )
@@ -432,7 +430,7 @@ def register_intake_callbacks(app: Dash, service) -> None:
                 "The draft was imported, but its review context could not be opened. "
                 "Reload the saved case. " + message
             )
-        return (no_update,) * 5 + (_notice(message, error=True),)
+        return (no_update,) * 4 + (_notice(message, error=True),)
 
     @app.callback(
         Output("investigation-draft-token", "data"),
@@ -522,7 +520,6 @@ def register_intake_callbacks(app: Dash, service) -> None:
 
     @app.callback(
         Output("rv-session", "data", allow_duplicate=True),
-        Output("rv-page", "value", allow_duplicate=True),
         Output("rv-draft-store", "data", allow_duplicate=True),
         Output("investigation-draft-message", "children"),
         Output("investigation-draft-token", "data", allow_duplicate=True),
@@ -561,7 +558,6 @@ def register_intake_callbacks(app: Dash, service) -> None:
             kept = rekey_exact_review_draft(service, state, before_bundle, before_view, kept)
             return (
                 result["session"],
-                "review",
                 kept,
                 _notice("Manual draft saved. Check the reasoning before making a review decision."),
                 None,
@@ -570,4 +566,4 @@ def register_intake_callbacks(app: Dash, service) -> None:
             message = str(exc)
         except Exception:
             message = "The draft could not be saved. Your text is kept; check the source and retry."
-        return no_update, no_update, no_update, _notice(message, error=True), no_update
+        return no_update, no_update, _notice(message, error=True), no_update

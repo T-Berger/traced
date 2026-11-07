@@ -121,6 +121,12 @@ def test_layout_uses_shared_controls_and_keeps_native_form_text_in_session(desk)
     assert all(node.persistence_type == "session" for node in fields)
     assert all(node.className == "rv-textarea" for node in fields)
     assert not any("model" in str(getattr(node, "id", "")) for node in components)
+    for definition in app.callback_map.values():
+        outputs = definition["output"]
+        assert all(
+            output.component_id != "rv-page"
+            for output in (outputs if isinstance(outputs, list) else [outputs])
+        )
 
 
 def test_start_is_read_only_and_requires_an_explicit_selected_case(desk):
@@ -175,11 +181,12 @@ def test_save_opens_exact_new_claim_and_preserves_original_review_note(desk):
     token, record_id = begin(desk)
     old_key = draft_key(selected, service.view(selected["case_id"]))
     result = save(desk, token, record_id, note="Unsaved qualification on the original finding")
-    session, page, kept, message, cleared = result
+    session, kept, message, cleared = result
     assert session["case_id"] == selected["case_id"]
     assert session["finding_id"] != selected["finding_id"]
     assert session["scenario_id"]
-    assert page == "review"
+    assert session["navigate_to"] == "review"
+    assert session["navigate_target"] == "rv-finding-heading"
     assert kept["notes"][old_key] == "Unsaved qualification on the original finding"
     original_view = service.view(selected["case_id"], selected.get("scenario_id"))
     original_state = {**selected, "case_fingerprint": original_view["case_fingerprint"]}
@@ -206,14 +213,14 @@ def test_bad_quote_and_stale_case_leave_saved_evidence_and_form_unchanged(desk):
     token, record_id = begin(desk)
     before = service.get_case(selected["case_id"])
     rejected = save(desk, token, record_id, quote="invented quote")
-    assert all(rejected[index] is no_update for index in [0, 1, 2, 4])
-    assert "exact quote" in text(rejected[3])
+    assert all(rejected[index] is no_update for index in [0, 1, 3])
+    assert "exact quote" in text(rejected[2])
     assert service.get_case(selected["case_id"]) == before
     save(desk, token, record_id)
     after = service.get_case(selected["case_id"])
     stale = save(desk, token, record_id)
     assert stale[0] is no_update
-    assert "changed" in text(stale[3])
+    assert "changed" in text(stale[2])
     assert service.get_case(selected["case_id"]) == after
     assert callback("rv-session", "investigation-draft-save.disabled")(selected, token, record_id)[
         0
@@ -258,7 +265,8 @@ def test_saved_draft_preview_then_open_uses_server_fingerprint_and_exact_run(des
     result = callback("investigation-saved-open")(1, name, token, {}, {}, None)
     assert result[2]["case_id"] == result[1]
     assert result[2]["finding_id"].startswith("investigation:finding:")
-    assert result[3] == "review"
+    assert result[2]["navigate_to"] == "review"
+    assert result[2]["navigate_target"] == "rv-finding-heading"
     assert service.view(result[1], result[2]["scenario_id"])["is_baseline"]
 
 
@@ -267,14 +275,14 @@ def test_saved_draft_forgery_and_changes_require_fresh_preview(desk):
     name, folder = saved_folder(desk)
     _preview, token, _disabled = callback("investigation-saved-picker")(name, 1)
     forged = callback("investigation-saved-open")(1, name, {"fingerprint": "pretend"}, {}, {}, None)
-    assert all(value is no_update for value in forged[:5])
-    assert "preview" in text(forged[5])
+    assert all(value is no_update for value in forged[:4])
+    assert "preview" in text(forged[4])
     content = json.loads((folder / "bundle.json").read_text())
     content["case"]["title"] = "Changed after preview"
     (folder / "bundle.json").write_text(json.dumps(content))
     changed = callback("investigation-saved-open")(1, name, token, {}, {}, None)
-    assert all(value is no_update for value in changed[:5])
-    assert "unavailable" in text(changed[5])
+    assert all(value is no_update for value in changed[:4])
+    assert "unavailable" in text(changed[4])
 
 
 def test_opening_older_saved_draft_uses_its_previewed_run(desk):
@@ -343,7 +351,7 @@ def test_save_keeps_notes_for_other_findings_and_their_own_assessments(desk):
     }
     started = callback("investigation-draft-start")(2, first_claim)
     result = save(desk, started[0], record_id, state=first_claim, stored={"notes": notes})
-    kept = result[2]
+    kept = result[1]
     after = service.view(selected["case_id"])
     restored = {**original, "case_fingerprint": after["case_fingerprint"]}
     restored_scenario = {**scenario_state, "case_fingerprint": after["case_fingerprint"]}
@@ -443,11 +451,11 @@ def test_same_case_saved_import_keeps_active_and_cached_notes(desk):
     after = service.view(selected["case_id"])
     restored = {**original, "case_fingerprint": after["case_fingerprint"]}
     assert opened[2]["finding_id"] != first_claim["finding_id"]
-    assert opened[4]["notes"][draft_key(restored, after)] == "Cached original note"
+    assert opened[3]["notes"][draft_key(restored, after)] == "Cached original note"
     first_view = service.view(selected["case_id"], first_claim["scenario_id"])
     first_restored = {**first_claim, "case_fingerprint": after["case_fingerprint"]}
-    assert opened[4]["notes"][draft_key(first_restored, first_view)] == "Active claim note"
-    assert unsaved_for_export(restored, after, opened[4])
+    assert opened[3]["notes"][draft_key(first_restored, first_view)] == "Active claim note"
+    assert unsaved_for_export(restored, after, opened[3])
     assert not service.get_case(selected["case_id"])["reviews"]
 
 
@@ -461,5 +469,5 @@ def test_read_only_workspace_cannot_start_or_open_saved_drafts(desk):
     _preview, token, disabled = callback("investigation-saved-picker")(name, 1)
     assert disabled
     opened = callback("investigation-saved-open")(1, name, token, {}, {}, None)
-    assert all(value is no_update for value in opened[:5])
-    assert "read-only" in text(opened[5])
+    assert all(value is no_update for value in opened[:4])
+    assert "read-only" in text(opened[4])
