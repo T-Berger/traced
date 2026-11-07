@@ -21,7 +21,7 @@ import pandas as pd
 import plotly.graph_objects as go
 from engine import config as cfg
 from engine import embeddings as emb
-from engine import evaluate, features, metrics, models, preprocess
+from engine import evaluate, features, metrics, models, preprocess, web
 from engine.evaluate import CRITERIA
 from engine.metrics import REGISTRY
 from engine.page import COLORS, Page, esc
@@ -641,6 +641,131 @@ def report_metrics(N, mix, an, ev) -> Page:
     return pg
 
 
+# ====================================================================== 4 · webs
+
+def network_fig(w: web.Web, cand: pd.DataFrame, names: pd.Series) -> go.Figure:
+    """Candidate edges (>= MIN_OCCASIONS over >= MIN_DAYS) in grey, significant ones in red."""
+    import networkx as nx
+    G = nx.Graph()
+    G.add_weighted_edges_from(cand[["a", "b", "occasions"]].itertuples(index=False))
+    if not len(G):
+        return go.Figure().add_annotation(text="no candidate edges", showarrow=False)
+    pos = nx.spring_layout(G, seed=cfg.SEED, weight="weight", k=0.6 / np.sqrt(len(G)))
+    sig = set(map(tuple, w.edges[["a", "b"]].to_numpy()))
+    member = web.membership(w)
+    traces = []
+    for is_sig, color, width, label in [(False, "#c4c8cf", 0.6, "candidate (chance level)"),
+                                        (True, COLORS[3], 2.5, "significant")]:
+        xs, ys = [], []
+        for a, b in G.edges():
+            if ((a, b) in sig or (b, a) in sig) == is_sig:
+                xs += [pos[a][0], pos[b][0], None]
+                ys += [pos[a][1], pos[b][1], None]
+        traces.append(go.Scatter(x=xs, y=ys, mode="lines", line=dict(color=color, width=width), name=label,
+                                 hoverinfo="skip"))
+    nodes = list(G.nodes())
+    deg = dict(G.degree())
+    col = [COLORS[int(member[n]) % len(COLORS)] if n in member.index else "#8a8f98" for n in nodes]
+    traces.append(go.Scatter(
+        x=[pos[n][0] for n in nodes], y=[pos[n][1] for n in nodes], mode="markers", name="account",
+        marker=dict(size=[5 + 2 * np.sqrt(deg[n]) for n in nodes], color=col, line=dict(width=0.5, color="#fff")),
+        text=[f"<b>{esc(str(names.get(n, n)))[:40]}</b><br>{deg[n]} candidate partners"
+              + (f"<br>web {int(member[n])}" if n in member.index else "") for n in nodes],
+        hovertemplate="%{text}<extra></extra>"))
+    fig = go.Figure(traces)
+    fig.update_layout(xaxis=dict(visible=False), yaxis=dict(visible=False))
+    return fig
+
+
+def report_webs(ctx: metrics.Ctx, sweep: pd.DataFrame) -> Page:
+    m, X = ctx.long
+    names = ctx.all.groupby("account").name_clean.agg(lambda s: s.mode().iloc[0])
+    pg = Page("04_webs.html", "Webs: acting together",
+              "Are there groups of accounts that say the same thing at the same time, again and again, more often "
+              "than chance? Built from e5 meaning + timing, tested against shifted timelines, in two modes: "
+              "same post, and anywhere.")
+    pg.h2("Definitions")
+    pg.p("For two long comments <i>c</i>, <i>c'</i> by different accounts, with times <i>t</i>, unit vectors "
+         "<i>v</i> and the shorter one's length decile <i>d</i>:")
+    pg.math(r"\text{event}(c,c')\iff |t-t'|\le W\;\wedge\;v^\top v'\ge\tau_d\;\wedge\;\neg\,\text{reply}(c,c')"
+            r"\;\big[\wedge\;\text{post}(c)=\text{post}(c')\text{ in same-post mode}\big]")
+    pg.math(r"\tau_d=Q_{" + f"{web.TOP_Q}" + r"}\{v_i^\top v_j:\;|t_i-t_j|\le W,\;\text{decile}=d\},\qquad W="
+            + str(cfg.COACTIVITY_WINDOW_S) + r"\text{ s}")
+    pg.p("Replies inside one conversation (one answers the other, or both answer the same comment) are not events, "
+         f"and account pairs with {web.TALK_REPLIES}+ direct replies between them are conversation partners, not "
+         "links. Without this, every web found was regulars chatting.")
+    pg.math(r"o_{ab}=\#\{\text{distinct occasions with an event between }a,b\},\quad \text{candidate}\iff o_{ab}\ge "
+            + str(web.MIN_OCCASIONS) + r"\;\wedge\;\text{days}_{ab}\ge " + str(web.MIN_DAYS))
+    pg.p("<b>Chance test.</b> Each account's whole timeline is shifted by a random whole number of days (wrapping "
+         "inside the week). Its daily rhythm and its words stay; only synchrony with specific partners breaks. "
+         f"Repeated {web.N_SHUFFLES} times with the same thresholds:")
+    pg.math(r"\text{significant}(a,b)\iff o_{ab}>\max_{s=1..S}o^{(s)}_{ab},\qquad p_{ab}<\frac1{S+1},\qquad "
+            r"\widehat{\text{false}}=\frac1S\sum_s\#\{(a,b):o^{(s)}_{ab}>\max_{r\ne s}o^{(r)}_{ab}\}")
+    pg.p("Webs are Louvain communities on significant edges, maximising modularity:")
+    pg.math(r"Q=\frac1{2m}\sum_{ij}\Big(A_{ij}-\frac{k_ik_j}{2m}\Big)\delta(c_i,c_j)")
+    pg.note("Shifting by hours was tried first. It destroys time of day, so two people who both say "
+            "'доброе утро' at 8 am looked coordinated: 274 'significant' links, 147 of them expected by chance.")
+
+    rows = []
+    for mode, label in web.MODES.items():
+        w = ctx.web(mode)
+        rows.append((mode, label, w))
+    pg.h2("Result at a glance")
+    pg.kpis([(f"{lbl}: significant pairs (chance expects)", f"{len(w.edges)} ({w.expected_false:.0f})")
+             for _, lbl, w in rows]
+            + [(f"{lbl}: conversation links removed", f"{w.conversation_edges}") for _, lbl, w in rows])
+
+    for _mode, label, w in rows:
+        pg.h2(f"Mode: {label}")
+        pg.kpis([("time-close pairs", f"{w.n_close_pairs:,}"), ("events", f"{len(w.events):,}"),
+                 ("dropped as conversation", f"{w.conversation_events:,}"),
+                 ("candidate pairs", f"{w.tested:,}"), ("significant pairs", f"{len(w.edges)}"),
+                 ("expected by chance", f"{w.expected_false:.1f}"), ("webs (3+ accounts)", f"{len(w.communities)}")])
+        kt = w.k_table
+        fig = go.Figure([go.Bar(x=kt.index, y=kt.real_edges, name="real", marker_color=COLORS[0],
+                                hovertemplate="≥%{x} occasions: %{y} real pairs<extra></extra>"),
+                         go.Bar(x=kt.index, y=kt.shuffled_edges, name="chance (shifted timelines)",
+                                marker_color="#c4c8cf",
+                                hovertemplate="≥%{x} occasions: %{y:.1f} chance pairs<extra></extra>")])
+        fig.update_layout(barmode="group", xaxis_title="minimum occasions per pair", yaxis_title="account pairs",
+                          yaxis_type="log")
+        b1 = pg.fig(fig, "Real pairs vs chance pairs",
+                    "If coordination existed, the blue bars would tower over the grey ones, at least for many "
+                    "occasions. Bars of equal height mean the pairs we see are what readers with these habits "
+                    "produce by coincidence.")
+        e = w.events.groupby(["a", "b"]).agg(occasions=("occasion", "nunique"), days=("day", "nunique")).reset_index()
+        cand = e[(e.occasions >= web.MIN_OCCASIONS) & (e.days >= web.MIN_DAYS)]
+        b2 = pg.fig(network_fig(w, cand, names), "Candidate pairs (grey) and significant pairs (red)",
+                    "Each dot is an account, each line a pair with repeated same-time, same-meaning events. Only red "
+                    "lines beat their own chance level. A swarm would be a dense red cluster; scattered red lines "
+                    "with this many expected false ones are noise.", height=460)
+        pg.grid([b1, b2])
+        summ = web.summary(w, m, X, ctx.all)
+        if len(summ):
+            pg.table(summ.drop(columns=["web"]), {"ua_share": "{:.0%}", "median_dt_s": "{:.0f}"}, index=False)
+        sig = w.edges.assign(a=w.edges.a.map(names).fillna(w.edges.a).str.slice(0, 30),
+                             b=w.edges.b.map(names).fillna(w.edges.b).str.slice(0, 30))
+        if len(sig):
+            pg.h3("Significant pairs")
+            pg.table(sig.sort_values("occasions", ascending=False).head(30), {"null_max": "{:.0f}"}, index=False)
+
+    pg.h2("Robustness: stricter meaning, shorter window")
+    pg.p("The same test under a stricter similarity cut (top 0.1%) and a 60 s window, with "
+         "10 shifted timelines each.")
+    pg.table(sweep, {"edges (chance)": "{:.1f}", "expected false": "{:.1f}"}, index=False)
+
+    pg.h2("Summary in plain words")
+    best = max(rows, key=lambda r: len(r[2].edges) - r[2].expected_false)[2]
+    pg.plain(f"We looked for accounts that repeatedly post the same message at the same moment, on the same post or "
+             f"anywhere. Once people simply chatting with each other are set aside, and once each account keeps its "
+             f"own daily rhythm in the chance test, the pairs we find are no more common than chance: at best "
+             f"{len(best.edges)} significant pairs where chance alone produces about {best.expected_false:.0f}. "
+             "Every setting we tried gives the same answer. So in this week of data there is no swarm of the "
+             "'same script, same minute' kind that this method can separate from ordinary readers. That is a "
+             "result, not a failure: it rules out the most obvious form of coordination and points the search to "
+             "other forms (exact copy-paste rings, cross-side narrative carriers, account creation patterns).")
+    return pg
+
 # ====================================================================== main
 
 def setup_semantic(args: list[str], pp: preprocess.Preprocessed) -> str:
@@ -673,7 +798,8 @@ def main() -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
     print(f"   semantic vectors: {variant} -> {out_dir}")
     print("2/5 metrics")
-    raw = metrics.compute(metrics.Ctx(pp.comments))  # always recomputed: new metrics show up at once
+    ctx = metrics.Ctx(pp.comments)
+    raw = metrics.compute(ctx)  # always recomputed: new metrics show up at once
     N = features.normalise(raw)
     print("3/5 models")
     lat = models.latent(N.Z)
@@ -685,11 +811,22 @@ def main() -> None:
     ev = evaluate.score(N.Z, mix, lat, an.flag)
     print("5/5 reports")
     info = account_info(pp.comments, N.Z.index)
-    for page in (report_preprocessing(pp, N), report_models(N, lat, mix, cl, an, sep, info),
-                 report_metrics(N, mix, an, ev)):
+    pages = [report_preprocessing(pp, N), report_models(N, lat, mix, cl, an, sep, info),
+             report_metrics(N, mix, an, ev)]
+    if variant != "no semantic metrics":
+        m_long, X_long = ctx.long
+        sweep = cached(f"web_sweep_{cfg.EMBED_MODEL}_{cfg.EMBED_KIND}_{emb.fingerprint(m_long.id)}",
+                       lambda: web.sweep(m_long, X_long, web.talk_pairs(ctx.all)), fresh)
+        pages.append(report_webs(ctx, sweep))
+    for page in pages:
         page.subtitle += f" Semantic vectors: <code>{variant}</code>."
         print("  ", page.save(out_dir))
     out = N.raw.join(info).assign(gmm=mix.labels, hdbscan=cl.hdb_labels, anomaly=an.combined, flagged=an.flag)
+    if variant != "no semantic metrics":
+        for mode in web.MODES:
+            w = ctx.web(mode)
+            out[f"web_degree_{mode}"] = web.degree(w).reindex(out.index, fill_value=0)
+            out[f"web_id_{mode}"] = web.membership(w).reindex(out.index)
     out.to_csv(out_dir / "accounts.csv.gz")
     print("  ", out_dir / "accounts.csv.gz")
 

@@ -14,6 +14,7 @@ separability, reports) picks it up from the registry, e.g.
 
 from __future__ import annotations
 
+import pickle
 from collections.abc import Callable
 from dataclasses import dataclass
 from functools import cached_property
@@ -21,7 +22,7 @@ from functools import cached_property
 import numpy as np
 import pandas as pd
 
-from . import coactivity, embeddings, semantic
+from . import coactivity, embeddings, semantic, web
 from . import config as cfg
 
 
@@ -55,6 +56,21 @@ class Ctx:
         self.c = comments[comments.in_model]
         self.accounts = pd.Index(sorted(self.c.account.unique()), name="account")
         self.g = self.c.groupby("account")
+        self._webs: dict[str, web.Web] = {}
+
+    def web(self, mode: str) -> web.Web:
+        """Significant timing + meaning web for mode "post" or "any" (cached on disk: the shuffle
+        test rebuilds it several times)."""
+        if mode not in self._webs:
+            m, X = self.long
+            path = cfg.CACHE / (f"web2_{mode}_{cfg.EMBED_MODEL}_{cfg.EMBED_KIND}_w{cfg.COACTIVITY_WINDOW_S}_"
+                                f"{embeddings.fingerprint(m.id)}.pkl")
+            if path.exists():
+                self._webs[mode] = pickle.loads(path.read_bytes())
+            else:
+                self._webs[mode] = web.build(m, X, mode, web.talk_pairs(self.all))
+                path.write_bytes(pickle.dumps(self._webs[mode]))
+        return self._webs[mode]
 
     @cached_property
     def text(self) -> pd.DataFrame:
@@ -78,7 +94,9 @@ class Ctx:
         """Comment table aligned with the centred vectors of `kind` for the configured model."""
         mask = embeddings.embeddable(self.all)
         v = embeddings.load(cfg.EMBED_MODEL, kind, self.all.id[mask])
-        meta = self.all.set_index("id").loc[v.ids, ["account", "root_id", "text_key", "text_len"]]
+        meta = self.all.set_index("id").loc[v.ids, ["account", "root_id", "parent_id", "parent_type", "text_key", "text_len", "side", "t"]]
+        meta = meta.assign(parent_is_comment=meta.parent_type == "SOCIAL_MEDIA_COMMENT",
+                           parent_id=meta.parent_id.fillna(-1).astype("int64"))
         return meta.reset_index(), embeddings.centred(v.X)
 
     @cached_property
@@ -86,12 +104,17 @@ class Ctx:
         return self._vectors(cfg.EMBED_KIND)
 
     @cached_property
+    def long(self) -> tuple[pd.DataFrame, np.ndarray]:
+        """Texts of DUP_MIN_CHARS+ characters and their centred vectors (rows aligned)."""
+        meta, X = self.sem
+        keep = (meta.text_len >= cfg.DUP_MIN_CHARS).to_numpy()
+        return meta[keep].reset_index(drop=True), X[keep]
+
+    @cached_property
     def paraphrase(self) -> pd.DataFrame:
         """Long texts with their best match from another account (exact copies excluded) and the
         chance threshold. Cached on disk per model and kind: the exact search takes a minute or two."""
-        meta, X = self.sem
-        keep = (meta.text_len >= cfg.DUP_MIN_CHARS).to_numpy()
-        m, Xl = meta[keep].reset_index(drop=True), X[keep]
+        m, Xl = self.long
         acc = pd.factorize(m.account)[0]
         txt = pd.factorize(m.text_key)[0]
         path = cfg.CACHE / f"nn_{cfg.EMBED_MODEL}_{cfg.EMBED_KIND}_{embeddings.fingerprint(m.id)}.npy"
@@ -444,3 +467,63 @@ def partner_semantic_sim(ctx):
     sim = np.einsum("ij,ij->i", C.loc[p.a].to_numpy(), C.loc[p.b].to_numpy())
     both = pd.concat([pd.Series(sim, index=p.a.values), pd.Series(sim, index=p.b.values)])
     return both.groupby(level=0).mean()
+
+
+
+def _per_account(ctx, min_texts: int):
+    """Yield (account, row indices into ctx.long) for modelled accounts with enough long texts."""
+    m, _ = ctx.long
+    for acc, rows in m.groupby("account").indices.items():
+        if len(rows) >= min_texts and acc in ctx.accounts:
+            yield acc, rows
+
+
+@metric("semantic", "none",
+        "Standard deviation of the cosine similarities between the account's own long comments (10+ needed).",
+        "A repeated script hidden among otherwise varied comments gives a mix of near-1 twin pairs and ordinary "
+        "pairs, so a high spread; the mean (self_similarity) misses it.",
+        "A tail of accounts with unusually high spread; check their script_share.")
+def self_sim_std(ctx):
+    _, X = ctx.long
+    out = {}
+    for acc, rows in _per_account(ctx, 10):
+        S = X[rows] @ X[rows].T
+        out[acc] = S[np.triu_indices(len(rows), 1)].std()
+    return pd.Series(out)
+
+
+@metric("semantic", "none",
+        "Share of the account's long comments with a near-twin among its OWN other comments (same threshold as "
+        "paraphrase_share).",
+        "Self-repeat counterpart of paraphrase_share: one account re-posting its script in new words.",
+        "Most near 0; a group with a clear share repeats itself on purpose.")
+def script_share(ctx):
+    p = ctx.paraphrase
+    _, X = ctx.long
+    thr = p.threshold.to_numpy()
+    out = {}
+    for acc, rows in _per_account(ctx, 2):
+        S = X[rows] @ X[rows].T
+        np.fill_diagonal(S, -1)
+        out[acc] = float((S.max(axis=1) >= thr[rows]).mean())
+    return pd.Series(out)
+
+
+@metric("semantic", "none",
+        "For accounts with 3+ long comments on BOTH sides: cosine between their average message in Ukrainian "
+        "channels and in pro-Kremlin channels.",
+        "The brief's priority: the same narrative carried into both sides (high) vs. a message adapted per side "
+        "(low).",
+        "Only ~7% of accounts have a value. High values among cross-side accounts are the leads.")
+def two_faced(ctx):
+    m, X = ctx.long
+    out = {}
+    for acc, rows in _per_account(ctx, 6):
+        side = m.side.to_numpy()[rows]
+        ua, ru = rows[side == "ua"], rows[side == "ru"]
+        if len(ua) >= 3 and len(ru) >= 3:
+            a, b = X[ua].mean(axis=0), X[ru].mean(axis=0)
+            out[acc] = float(a @ b / (np.linalg.norm(a) * np.linalg.norm(b)))
+    return pd.Series(out)
+
+

@@ -12,7 +12,7 @@ PLOTLY = "https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"
 KATEX = "https://cdn.jsdelivr.net/npm/katex@0.16.11/dist"
 
 NAV = [("01_preprocessing.html", "1 · Preprocessing"), ("02_models.html", "2 · Models & theory"),
-       ("03_metrics.html", "3 · Metric evaluation")]
+       ("03_metrics.html", "3 · Metric evaluation"), ("04_webs.html", "4 · Webs")]
 
 COLORS = ["#2a6fdb", "#e8833a", "#2e9e6b", "#c94f7c", "#7b61c9", "#8a8f98", "#c9a227", "#3aa6b9",
           "#a0522d", "#5b8c2a", "#d64545", "#4b5563"]
