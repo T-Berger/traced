@@ -118,6 +118,31 @@ For application commands and demo startup, read the
 [Swarm Detector README](swarm-detector/README.md), and the
 [Silent Storm README](operation-silent-storm/README.md).
 
+## Alerts and evidence reports
+
+The **Alerts** tab shows which posts about a subject have enough evidence to be
+reported to X. It reads labeled posts read-only from the PostgreSQL `analytics_*`
+tables written by the separate content-analytics classifier. Set
+`TRACED_ANALYTICS_DATABASE_URL` in the root `.env`; the default is
+`postgresql://localhost:5432/disinfo`.
+
+- **Red alert / Ready to report:** the post has every required type of evidence:
+  content (exact URL and post ID), attribution (account and user ID), preservation
+  (original platform record, collection time and SHA-256), and classification at
+  reporting confidence. It also has category evidence: the subject's own contradicting
+  posts for false claims, a protected group for hate speech, or repeated targeting for
+  harassment.
+- **Needs evidence:** a strong violation with a required piece of evidence missing,
+  listed per post.
+- **Accounts:** accounts are reported once several of their posts are ready.
+- **Download PDF evidence report:** one page per evidence item, chain of custody,
+  integrity table, and preparer/reviewer sign-off. The original platform records and a
+  JSON manifest are attached inside the PDF so every hash can be checked.
+
+Thresholds and the report preparer are set under **Evidence standard** and saved in
+the workspace as `alert_settings.json`. Labels are model-assisted; a reviewer
+confirms each post before it is reported.
+
 ## Multiple platforms in one investigation
 
 The shared workbench offers collection from public Telegram channels, YouTube
