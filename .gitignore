@@ -44,3 +44,6 @@ build/
 *.log
 *.pem
 *.key
+/swarm-detector/analysis/cache/
+# Generated reports name real Telegram accounts; the repo is public, so they stay local.
+/swarm-detector/analysis/results/
