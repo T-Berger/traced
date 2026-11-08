@@ -1,0 +1,34 @@
+<!doctype html><meta charset="utf-8"><title>4 Timing + meaning</title><link rel="stylesheet" href="style.css"><svg id="s" viewBox="0 0 1280 720"></svg><script src="lib.js"></script><script>
+const svg=document.getElementById('s');bg(svg);
+T(svg,640,100,'Timing + meaning finds the swarm',{size:54,weight:800,anchor:'middle'});
+const sub=T(svg,640,150,'',{size:28,fill:C.soft,anchor:'middle'});
+el('rect',{x:60,y:200,width:420,height:340,rx:22,fill:C.card,stroke:C.line,'stroke-width':2},svg);
+T(svg,90,245,'SAME TIME',{size:22,weight:800,fill:C.soft});
+el('rect',{x:620,y:200,width:600,height:340,rx:22,fill:C.card,stroke:C.line,'stroke-width':2},svg);
+T(svg,650,245,'MEANING  (embedding space)',{size:22,weight:800,fill:C.soft});
+const mid=el('g',{},svg);
+el('path',{d:'M505 370 h85 m-22 -16 l22 16 l-22 16',fill:'none',stroke:C.green,'stroke-width':6,'stroke-linecap':'round','stroke-linejoin':'round'},mid);
+T(mid,548,330,'+ words',{size:22,weight:700,fill:C.green,anchor:'middle'});
+const R=rng(5),CX=1060,CY=370,dots=[];
+for(let i=0;i<40;i++){const bot=i<10;
+ const x0=90+R()*360,y0=380+R()*120;R();
+ const x1=bot?CX+gauss(R)*13:650+R()*540,y1=bot?CY+gauss(R)*13:275+R()*245;
+ dots.push({bot,x0,y0,x1:clamp(x1,660,1190),y1:clamp(y1,275,520),st:1.5+R()*1.3,c:el('circle',{r:10,stroke:'#fff','stroke-width':2},svg)})}
+dots.forEach(d=>svg.insertBefore(el('circle',{cx:d.x0,cy:d.y0,r:10,fill:C.greyBg}),dots[0].c));
+T(svg,270,520,'40 accounts, all within minutes',{size:22,fill:C.soft,anchor:'middle'});
+const ring=el('circle',{cx:CX,cy:CY,r:50,fill:'none',stroke:C.red,'stroke-width':5,'stroke-linecap':'round',transform:`rotate(-90 ${CX} ${CY})`},svg);
+const len=2*Math.PI*50;ring.setAttribute('stroke-dasharray',len);
+const lab=T(svg,CX-60,CY-72,'same time + same words',{size:27,weight:800,fill:C.red,anchor:'middle'});
+const lab2=T(svg,640,610,'Humans say different things. A swarm repeats one idea.',{size:28,weight:600,fill:C.green,anchor:'middle'});
+run(10,t=>{
+ sub.textContent=t<1.5?'Step 1 · Who reacted at the same time?':t<4.2?'Step 2 · Place each comment by what it says.':'A tight cluster stands out.';
+ mid.setAttribute('opacity',lin(t,1.2,1.8));
+ const rev=seg(t,5.4,6.1);
+ dots.forEach(d=>{const p=seg(t,d.st,d.st+1.1);
+  const x=lerp(d.x0,d.x1,p),y=lerp(d.y0,d.y1,p)-70*Math.sin(Math.PI*p);
+  d.c.setAttribute('cx',x);d.c.setAttribute('cy',y);
+  d.c.setAttribute('fill',rev>0?(d.bot?C.amber:C.green):C.grey);d.c.setAttribute('fill-opacity',rev>0&&!d.bot?.55:1)});
+ const r=seg(t,4.2,5.0);ring.setAttribute('stroke-dashoffset',len*(1-r));ring.setAttribute('opacity',r>0?1:0);
+ lab.setAttribute('opacity',lin(t,4.9,5.5));lab2.setAttribute('opacity',lin(t,6.3,7));
+});
+</script>

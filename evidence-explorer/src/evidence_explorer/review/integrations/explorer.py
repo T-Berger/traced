@@ -11,14 +11,42 @@ from __future__ import annotations
 import hashlib
 import json
 from collections import defaultdict
-from typing import TYPE_CHECKING, Any
+from collections.abc import Iterator
+from contextlib import contextmanager
+from pathlib import Path
+from sqlite3 import Connection
+from typing import Any
 
 from ...analysis import validate_claims
+from ...db import Repository
+from ...feeds.adapters.base import SourceAdapterError
+from ...feeds.adapters.conversion import source_item_from_article
 from ...models import ClaimInput
+from ...persistence.connection import sqlite_connection
 from ..contracts import EvidenceBundle
 
-if TYPE_CHECKING:
-    from ...db import Repository
+MAX_SELECTED_ARTICLES = 20
+_SOURCE_FIELDS = (
+    "content_source",
+    "content_scope",
+    "source_platform",
+    "source_channel_id",
+    "source_native_id",
+    "source_author_id",
+    "acquisition_method",
+)
+
+
+class _SnapshotRepository(Repository):
+    def __init__(self, path: Path, connection: Connection):
+        self._snapshot = connection
+        super().__init__(path, read_only=True)
+
+    @contextmanager
+    def _connection(self, *, write: bool = False) -> Iterator[Connection]:
+        if write:
+            raise PermissionError("Explorer export snapshots are read-only.")
+        yield self._snapshot
 
 
 def _digest(value: Any) -> str:
@@ -28,6 +56,43 @@ def _digest(value: Any) -> str:
 
 def _optional_text(value: Any) -> str | None:
     return value if isinstance(value, str) and value.strip() else None
+
+
+def bundle_for_selected_articles(repo: Repository, article_ids: list[int]) -> EvidenceBundle:
+    """Capture only selected articles and their saved quotations in one read snapshot."""
+    if not isinstance(article_ids, list) or not 1 <= len(article_ids) <= MAX_SELECTED_ARTICLES:
+        raise ValueError(f"Select between 1 and {MAX_SELECTED_ARTICLES} saved articles.")
+    if any(type(item) is not int or not 0 < item < 2**63 for item in article_ids):
+        raise ValueError("The article selection is invalid. Select the articles again.")
+    if len(set(article_ids)) != len(article_ids):
+        raise ValueError("Select each article only once.")
+
+    articles, chunks, claims, keys = [], [], [], set()
+    with sqlite_connection(repo.db_path, read_only=True) as connection:
+        connection.execute("BEGIN")
+        snapshot = _SnapshotRepository(repo.db_path, connection)
+        for article_id in sorted(article_ids):
+            article = snapshot.get_article(article_id)
+            if article is None:
+                raise ValueError("A selected article is unavailable. Remove it and preview again.")
+            articles.append(article)
+            chunks.extend(snapshot.list_chunks(article_id))
+            claims.extend(snapshot.list_active_claims(article_id))
+            keys.update(snapshot.claims.active_model_keys(article_id))
+
+    # Derive the namespace from the detached, normalized snapshot, including quotes
+    # and source metadata. Reuse the same rows when constructing the final case.
+    preview = _bundle_from_rows(
+        articles, chunks, claims, keys, case_id="explorer:selected", selected=True
+    )
+    return _bundle_from_rows(
+        articles,
+        chunks,
+        claims,
+        keys,
+        case_id=f"explorer:selected:{preview.fingerprint()}",
+        selected=True,
+    )
 
 
 def bundle_from_repository(
@@ -47,13 +112,33 @@ def bundle_from_repository(
     """
     if not case_id.strip():
         raise ValueError("Case ID must be a nonempty namespace.")
-    articles = sorted(repo.list_articles(), key=lambda row: (row["url"], row["id"]))
+    articles = repo.list_articles()
     chunks = repo.list_chunks()
     if model_key is not None:
         claims = [claim for claim in repo.list_claims() if claim["model_key"] == model_key]
     else:
         claims = repo.list_active_claims()
+    return _bundle_from_rows(
+        articles,
+        chunks,
+        claims,
+        repo.claims.active_model_keys() if model_key is None else set(),
+        case_id=case_id,
+        model_key=model_key,
+    )
 
+
+def _bundle_from_rows(
+    articles: list[dict],
+    chunks: list[dict],
+    claims: list[dict],
+    active_keys: set[str],
+    *,
+    case_id: str,
+    model_key: str | None = None,
+    selected: bool = False,
+) -> EvidenceBundle:
+    articles = sorted(articles, key=lambda row: (row["url"], row["id"]))
     article_by_id = {article["id"]: article for article in articles}
     chunks_by_id = {chunk["id"]: chunk for chunk in chunks}
     chunks_by_article: dict[int, list[dict]] = defaultdict(list)
@@ -114,6 +199,19 @@ def bundle_from_repository(
                 ),
             },
         }
+        if selected:
+            record["metadata"].update({field: article.get(field) for field in _SOURCE_FIELDS})
+            try:
+                source_item = source_item_from_article(article)
+            except SourceAdapterError as exc:
+                raise ValueError(
+                    f"Saved source details do not match article {article['id']}. "
+                    "Remove that article and preview again."
+                ) from exc
+            if source_item is not None:
+                record["metadata"]["source_item"] = source_item.model_dump(
+                    mode="json", exclude={"text"}
+                )
         record_id = f"{case_id}:article:{_digest(record)[:24]}"
         record["id"] = record_id
         record_ids[article["id"]] = record_id
@@ -166,17 +264,24 @@ def bundle_from_repository(
     if articles and not snapshot_times:
         raise ValueError("Saved articles have no retained timestamp for this repository snapshot.")
     latest_snapshot_time = max(snapshot_times) if snapshot_times else None
-    keys = sorted(
-        {claim["model_key"] for claim in normalized_claims}
-        | (repo.claims.active_model_keys() if model_key is None else set())
-    )
+    keys = sorted({claim["model_key"] for claim in normalized_claims} | active_keys)
     if articles and not keys:
         keys = [model_key or "saved_articles_without_claims"]
     input_fingerprint = _digest(records)
     runs, findings = [], []
-    for key in keys:
-        saved_claims = [claim for claim in normalized_claims if claim["model_key"] == key]
-        run_id = f"{case_id}:run:{_digest([input_fingerprint, key, saved_claims])[:24]}"
+    # One selected assessment exposes all the transferred quotations together.
+    # Each finding still carries its original extractor identity.
+    groups = (
+        [(keys, normalized_claims)]
+        if selected
+        else [
+            (key, [claim for claim in normalized_claims if claim["model_key"] == key])
+            for key in keys
+        ]
+    )
+    for group_key, saved_claims in groups:
+        run_id = f"{case_id}:run:{_digest([input_fingerprint, group_key, saved_claims])[:24]}"
+        configuration = {"model_keys": keys} if selected else {"model_key": group_key}
         runs.append(
             {
                 "id": run_id,
@@ -191,7 +296,7 @@ def bundle_from_repository(
                 "original_model_created_at": None,
                 "full_inputs_available": True,
                 "recomputation_capability": "dependency_review_only",
-                "configuration": {"model_key": key, "inference_performed_by_adapter": False},
+                "configuration": {**configuration, "inference_performed_by_adapter": False},
                 "coverage": {
                     "articles": len(records),
                     "saved_chunks": len(chunks),
@@ -200,6 +305,7 @@ def bundle_from_repository(
             }
         )
         for claim in saved_claims:
+            key = claim["model_key"]
             quote_id = f"{case_id}:quote:{_digest(claim)[:24]}"
             fragments.append(
                 {
@@ -294,11 +400,17 @@ def bundle_from_repository(
         limitations.append(
             "This case mixes synthetic demonstration articles with non-sample records."
         )
+    title = "Evidence Explorer saved investigation"
+    if selected:
+        title = f"Selected reporting · {articles[0]['title']}"
+        if len(articles) > 1:
+            title += f" + {len(articles) - 1} more"
+        limitations.append("Coverage is limited to the saved articles selected in Explorer.")
     return EvidenceBundle.model_validate(
         {
             "case": {
                 "id": case_id,
-                "title": "Evidence Explorer saved investigation",
+                "title": title,
                 "question": (
                     "Which saved article findings are supported well enough for a briefing?"
                 ),

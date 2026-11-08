@@ -7,7 +7,11 @@ import pytest
 from evidence_explorer.demo import DEMO_CLAIMS_KEY, seed_demo
 from evidence_explorer.models import ChunkInput, ClaimInput
 from evidence_explorer.review.contracts import EvidenceBundle
-from evidence_explorer.review.integrations.explorer import bundle_from_repository
+from evidence_explorer.review.integrations.explorer import (
+    bundle_for_selected_articles,
+    bundle_from_repository,
+)
+from evidence_explorer.source_contracts import SourceAcquisition, SourceItem
 
 
 def _save_claim(repo, article, *, model_key="test:claims-v1", is_sample=False):
@@ -150,6 +154,54 @@ def test_model_filter_preserves_extraction_identity_without_inference(repo, arti
     assert selected.runs[0].configuration["model_key"] == "ollama:qwen@retained-digest"
     assert selected.runs[0].configuration["inference_performed_by_adapter"] is False
     assert len(repo.list_claims()) == 2
+
+
+def test_selected_snapshot_excludes_unselected_versions_and_keeps_claim_origins(repo, article):
+    first, _, _ = _save_claim(repo, article, model_key="demo:quoted", is_sample=True)
+    item = SourceItem(
+        platform="youtube",
+        channel_id="source-channel",
+        channel_name="Example video channel",
+        native_id="source-video",
+        source_url="https://www.youtube.com/watch?v=source-video",
+        text=article.text,
+        acquired_at="2026-11-01T09:30:00Z",
+        provenance=SourceAcquisition(method="youtube_feed", content_scope="title_description"),
+    )
+    second_article = article.model_copy(
+        update={
+            "url": item.source_url,
+            "title": "Platform description",
+            "content_source": "platform_post",
+            "source_platform": "youtube",
+            "source_channel_id": item.channel_id,
+            "source_native_id": "source-video",
+            "content_scope": "title_description",
+            "source_metadata_json": item.model_dump_json(exclude={"text"}),
+            "retrieved_at": item.acquired_at,
+        }
+    )
+    second, _, _ = _save_claim(repo, second_article, model_key="test:other")
+    unrelated = article.model_copy(update={"url": "https://other.example/unselected"})
+    _save_claim(repo, unrelated, model_key="test:excluded")
+
+    bundle = bundle_for_selected_articles(repo, [second, first])
+    assert {r.source_url for r in bundle.records} == {article.url, second_article.url}
+    assert bundle.case.coverage["content_provenance"] == "mixed"
+    assert len(bundle.runs) == 1
+    assert bundle.runs[0].configuration["model_keys"] == ["demo:quoted", "test:other"]
+    assert {finding.details["model_key"] for finding in bundle.findings} == {
+        "demo:quoted",
+        "test:other",
+    }
+    platform_record = next(r for r in bundle.records if r.source_url == second_article.url)
+    assert platform_record.metadata["content_scope"] == "title_description"
+    assert platform_record.metadata["source_native_id"] == "source-video"
+    assert platform_record.metadata["source_item"] == item.model_dump(mode="json", exclude={"text"})
+    repo.upsert_article(unrelated.model_copy(update={"title": "Changed unrelated reporting"}))
+    assert bundle_for_selected_articles(repo, [first, second]) == bundle
+    with pytest.raises(ValueError, match="unavailable"):
+        bundle_for_selected_articles(repo, [first, 2**63 - 1])
 
 
 def test_duplicate_wording_does_not_become_documented_origin(repo, article):

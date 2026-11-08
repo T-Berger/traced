@@ -1,0 +1,51 @@
+/* Reasoning checks share the review desk's reading surfaces and semantic roles. */
+.review-app .investigation-check {
+  margin-block: 16px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.review-app .investigation-check h4 { margin: 18px 0 8px; }
+.review-app .investigation-check .rv-badge--red {
+  background: var(--rv-error-bg);
+  color: var(--rv-error);
+}
+.review-app .investigation-conclusion summary {
+  min-height: 44px;
+  padding-block: 8px;
+  line-height: 1.6;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.review-app .investigation-concern {
+  border-top: 1px solid var(--rv-border);
+  margin-top: 12px;
+  padding-top: 12px;
+  min-width: 0;
+}
+.review-app .investigation-selected {
+  padding: 12px;
+  border: 1px solid var(--rv-border);
+  border-radius: 7px;
+  background: var(--rv-surface);
+  color: var(--rv-ink);
+}
+.review-app .investigation-passage { margin-block: 10px; min-width: 0; }
+.review-app .investigation-check .rv-text-button { min-height: 44px; white-space: normal; }
+.review-app .rv-investigation-draft-fields {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+  min-width: 0;
+}
+.review-app .rv-investigation-draft-fields label { display: block; margin-bottom: 6px; }
+.review-app .rv-investigation-draft-fields .rv-textarea {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+.review-app .rv-investigation-draft-fields .rv-source-text {
+  max-height: 320px;
+  overflow: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}

@@ -1,0 +1,25 @@
+<!doctype html><meta charset="utf-8"><title>1 Flip</title><link rel="stylesheet" href="style.css"><svg id="s" viewBox="0 0 1280 720"></svg><script src="lib.js"></script><script>
+const svg=document.getElementById('s');bg(svg);
+T(svg,640,100,'Bot or human?',{size:54,weight:800,anchor:'middle'});
+const sub=T(svg,640,150,'',{size:28,fill:C.soft,anchor:'middle'});
+const Q={label:'?',fill:C.greyBg,stroke:C.line,txt:C.soft},B={label:'BOT',fill:C.amberBg,stroke:C.amberLine,txt:C.amber},H={label:'HUMAN',fill:C.greenBg,stroke:C.greenLine,txt:C.green};
+const defs=[
+ {x:90,name:'Account A',lines:["Honestly can't believe they left the","town undefended again. Third night","this week and nobody answers for it."],seq:[{t:0,...Q},{t:1.8,...B},{t:5,...H}]},
+ {x:690,name:'Account B',lines:["Same here. Three nights this week","and still nobody is accountable.","I'm tired of it."],seq:[{t:0,...Q},{t:1.8,...H},{t:5,...B}]}];
+defs.forEach(d=>{
+ el('rect',{x:d.x,y:200,width:500,height:330,rx:22,fill:C.card,stroke:C.line,'stroke-width':2},svg);
+ el('circle',{cx:d.x+56,cy:262,r:26,fill:C.greyBg},svg);el('circle',{cx:d.x+56,cy:255,r:9,fill:C.grey},svg);el('path',{d:`M${d.x+40} 278 a16 12 0 0 1 32 0z`,fill:C.grey},svg);
+ T(svg,d.x+100,272,d.name,{size:26,weight:700,fill:C.green});
+ d.lines.forEach((l,i)=>T(svg,d.x+34,340+i*40,l,{size:25,fill:C.ink}));
+ const g=el('g',{},svg);d.g=g;d.cx=d.x+250;
+ d.r=el('rect',{x:-120,y:-30,width:240,height:60,rx:30,'stroke-width':3},g);d.tx=T(g,0,11,'',{size:32,weight:800,anchor:'middle'});
+});
+const swap=T(svg,640,385,'⇄',{size:72,weight:700,anchor:'middle',fill:C.green});
+run(9,t=>{
+ sub.textContent=t<1.8?'Pick the bot.':t<4.6?'A is the bot. B is the human.':t<5.8?'Now flip the labels…':'Same words. Opposite labels. No way to tell.';
+ defs.forEach(d=>{const{s,sx}=chipState(t,d.seq);d.g.setAttribute('transform',`translate(${d.cx},470) scale(${sx},1)`);
+  d.r.setAttribute('fill',s.fill);d.r.setAttribute('stroke',s.stroke);d.tx.textContent=s.label;d.tx.setAttribute('fill',s.txt)});
+ const p=lin(t,4.2,5.6);const a=p>0&&p<1?Math.sin(Math.PI*p):0;
+ swap.setAttribute('opacity',a);swap.setAttribute('transform',`rotate(${p*180} 640 363)`);
+});
+</script>

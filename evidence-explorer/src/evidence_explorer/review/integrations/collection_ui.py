@@ -9,12 +9,14 @@ from __future__ import annotations
 from dash import ALL, Dash, Input, Output, State, ctx, dcc, html, no_update
 from dash.exceptions import PreventUpdate
 
+from ...collection.registry import COLLECTABLE_PLATFORMS
 from ..presentation import badge, empty
 from .sources import PLATFORM_LABELS
 
 _SETUP_LINKS = {
     "x": ("X developer setup", "https://console.x.com"),
     "reddit": ("Reddit app setup", "https://www.reddit.com/prefs/apps/"),
+    "supabase": ("Supabase connection setup", "https://supabase.com/dashboard"),
 }
 _STATUS_LABELS = {
     "idle": "Not collected yet",
@@ -85,8 +87,8 @@ def source_picker():
                                 dcc.Dropdown(
                                     id="live-platform",
                                     options=[
-                                        {"label": label, "value": key}
-                                        for key, label in PLATFORM_LABELS.items()
+                                        {"label": PLATFORM_LABELS[key], "value": key}
+                                        for key in COLLECTABLE_PLATFORMS
                                     ],
                                     value="news",
                                     clearable=False,
@@ -103,7 +105,7 @@ def source_picker():
                                 ),
                             ),
                             _field(
-                                "Channel, account, or feed URL",
+                                "Channel, account, feed URL, or table",
                                 dcc.Input(
                                     id="live-locator",
                                     type="text",
@@ -117,7 +119,9 @@ def source_picker():
                     ),
                     html.P(
                         "Telegram: public channel name. X: account name. Reddit: community name. "
-                        "YouTube: channel ID or channel URL. News and other: public RSS/Atom URL.",
+                        "YouTube: channel ID or channel URL. News and other: public RSS/Atom URL. "
+                        "Supabase: schema.table, such as public.content_items. "
+                        "Database credentials are configured on the server.",
                         className="rv-small rv-muted",
                     ),
                     _field(

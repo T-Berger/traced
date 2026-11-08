@@ -48,6 +48,11 @@ from `EDTH`; existing process `EVIDENCE_DATA_DIR` and Explorer `.env` paths reta
 their `evidence-explorer` base. Use absolute process paths to avoid ambiguity.
 See [the root configuration guide](docs/PROJECT_ROOT.md) for precedence and commands.
 
+Connect an existing Supabase `content_items` table through **Live sources →
+Supabase content items**. Configure credentials in the private `.env`, then run
+`./traced supabase check` to inspect the table before collecting. See the
+[Supabase source guide](docs/SUPABASE_SOURCE.md) for column mapping and IPv4 pooler setup.
+
 Use the selected directory in the article dashboard, without starting a second
 worker. Existing databases stay in place; see the
 [workspace and legacy-directory instructions](evidence-explorer/README.md#shared-review-workspace)
@@ -133,6 +138,18 @@ retain their source scope. Existing Explorer feed schedules and optional analysi
 remain available under their current owner. See the
 [multi-source workflow and input format](evidence-explorer/REVIEW_MVP.md#combine-platforms-and-news-sources)
 for the 5 MiB / 2,000-item limits and steps to combine sources.
+
+### Maltego Data MCP lookups
+
+Each person signs in once with their own Maltego account (`./traced maltego login`),
+then runs explicit lookups: `search` and `describe` find and explain capabilities,
+`run` executes one on an entity and spends shared team credits. Every Data MCP call
+is frozen as a hashed record in the selected workspace; `./traced maltego case`
+turns records with result entities into a review case whose findings can cite an
+exact record line. A record shows what Maltego returned at a time, not a verified
+fact, and lookups run from the command line rather than a schedule. See the
+[Maltego data source guide](docs/MALTEGO_DATA_SOURCE.md) for setup, record format,
+credits, verification, and limits.
 
 ## Folder responsibilities
 

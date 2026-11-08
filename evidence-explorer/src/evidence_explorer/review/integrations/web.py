@@ -91,6 +91,7 @@ def create_app(service: WorkspaceService):
     def layout():
         root = original_layout()
         from ...claim_check.ui import claim_check_panel
+        from ...investigation.ui import check_panel
         from .collection_scope_ui import saved_scope_panel
         from .components import case_tools, comparison_tools, export_tools
         from .media_ui import media_panel
@@ -102,6 +103,7 @@ def create_app(service: WorkspaceService):
             "rv-compare-tools": comparison_tools(),
             "rv-media-slot": media_panel(),
             "rv-domain-slot": [
+                check_panel(),
                 html.Div(id="trail-domain-context"),
                 saved_scope_panel(),
                 claim_check_panel(),
@@ -591,6 +593,8 @@ def create_app(service: WorkspaceService):
         )
 
     from ...claim_check.ui import register_claim_check_callbacks
+    from ...investigation.intake_ui import register_intake_callbacks
+    from ...investigation.ui import register_check_callbacks
     from ...social_dashboard.events_ui import register_event_callbacks
     from ...social_dashboard.ui import register_callbacks as register_social_dashboard_callbacks
     from .activity_ui import register_activity_callbacks
@@ -603,6 +607,8 @@ def create_app(service: WorkspaceService):
     from .use_cases_ui import register_use_case_callbacks
 
     register_source_callbacks(app, service)
+    register_intake_callbacks(app, service)
+    register_check_callbacks(app, service)
     register_collection_callbacks(app, service)
     register_planning_brief_callbacks(app, service)
     register_activity_callbacks(app, service)

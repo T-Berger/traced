@@ -69,8 +69,12 @@ jobs:
         run: make lint
       - name: Check shared identity assets
         run: make identity-check
-      - name: Test packaging verification tools
+      - name: Test workspace tools and investigator
         run: make test-tools
+      - name: Check investigation command entry points
+        run: |
+          ./traced-investigate --help
+          ./traced maltego --help
 
   tests:
     name: Tests / ${{ matrix.package }}
