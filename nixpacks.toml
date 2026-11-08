@@ -1,0 +1,14 @@
+# Nixpacks configuration for Railpack
+# This ensures Railpack uses Docker
+
+[phases.setup]
+aptPkgs = []
+
+[phases.install]
+cmds = []
+
+[phases.build]
+cmds = []
+
+[start]
+cmd = "gunicorn -k uvicorn.workers.UvicornWorker traced_wsgi:server --bind 0.0.0.0:$PORT --workers 2 --threads 4 --timeout 120"

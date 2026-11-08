@@ -1,0 +1,15 @@
+version: '1.0'
+services:
+  traced:
+    builder: docker
+    dockerfile: Dockerfile
+    start: gunicorn -k uvicorn.workers.UvicornWorker traced_wsgi:server --bind 0.0.0.0:$PORT --workers 2 --threads 4 --timeout 120
+    healthcheck:
+      path: /health
+      timeout: 5
+    env:
+      EVIDENCE_HOST: 0.0.0.0
+      EVIDENCE_DATA_DIR: /app/data
+      EVIDENCE_READ_ONLY: false
+      PYTHONUNBUFFERED: "1"
+      PYTHONDONTWRITEBYTECODE: "1"

@@ -4,11 +4,14 @@ version = "0.1.0"
 description = "Development workspace for the Traced evidence workbench."
 requires-python = ">=3.12,<3.13"
 
+[project.scripts]
+traced = "main:main"
+app = "app:main"
+
 [dependency-groups]
 dev = ["pytest>=8,<10", "ruff>=0.11,<1"]
 
 [tool.uv]
-package = false
 required-version = "==0.11.3"
 
 [tool.uv.workspace]
