@@ -1,8 +1,0 @@
-# Nixpacks configuration to force Docker builder
-# This prevents Railpack from using Python builder
-
-[build]
-builder = "docker"
-
-[start]
-cmd = "gunicorn -k uvicorn.workers.UvicornWorker traced_wsgi:server --bind 0.0.0.0:$PORT --workers 2 --threads 4 --timeout 120"

@@ -1,4 +1,4 @@
-.PHONY: setup check check-all lint format test test-explorer test-swarm test-silent-storm test-tools runtime-check browser-setup browser-check locks build package-check identity-sync identity-check clean docker-build docker-push railway-deploy railway-deploy-integrated railway-deploy-explorer railway-deploy-swarm railway-deploy-silent-storm
+.PHONY: setup check check-all lint format test test-explorer test-swarm test-silent-storm test-tools runtime-check browser-setup browser-check locks build package-check identity-sync identity-check clean docker-build docker-push
 .NOTPARALLEL: check check-all test
 
 UV = uv
@@ -67,28 +67,8 @@ package-check:
 clean:
 	rm -rf dist build
 
-# Docker and Railway deployment targets
 docker-build:
 	docker build -t traced-integrated .
 
 docker-push:
 	docker push traced-integrated
-
-railway-deploy: railway-deploy-integrated
-
-railway-deploy-integrated:
-	@echo "Deploying integrated Traced workspace to Railway..."
-	@echo "Use: railway up --detach"
-	@echo "Or deploy via GitHub in Railway dashboard"
-
-railway-deploy-explorer:
-	@echo "Deploying Evidence Explorer to Railway..."
-	@echo "Use: railway up --detach -d evidence-explorer"
-
-railway-deploy-swarm:
-	@echo "Deploying Swarm Detector to Railway..."
-	@echo "Use: railway up --detach -d swarm-detector"
-
-railway-deploy-silent-storm:
-	@echo "Deploying Silent Storm to Railway..."
-	@echo "Use: railway up --detach -d silent-storm"
