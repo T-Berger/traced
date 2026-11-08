@@ -1,0 +1,84 @@
+/* Policies page (integrated desk). Shares the branded components in alerts.css (.al-*);
+   this file adds visibility and guide-specific layout (.pg-*). Scoped to #rv-policies-page. */
+
+.review-app > .rv-main > #rv-policies-page { display: none !important; }
+.review-app:has(#rv-page .rv-navigation-tab--selected-policies) > .rv-main > #rv-policies-page { display: block !important; }
+.review-app:has(#rv-page .rv-navigation-tab--selected-policies) > .rv-main > :is(.rv-assessment-header, #rv-next-action-slot, #rv-scenario-banner, #rv-synthetic) { display: none !important; }
+.review-app #rv-page .rv-navigation-tab--selected-policies { box-shadow: inset 0 -3px 0 #038095; }
+
+#rv-policies-page .al-top-controls { min-width: 320px; }
+#rv-policies-page .al-top-controls .al-dropdown { margin-bottom: 6px; }
+
+/* Reporting flows */
+#rv-policies-page .pg-flows { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+#rv-policies-page .pg-flow {
+  display: grid; gap: 10px; align-content: start; padding: 20px; border-radius: 10px;
+  background: var(--al-bg); border: 1px solid var(--al-line); border-top: 4px solid var(--al-primary);
+}
+#rv-policies-page .pg-steps { margin: 0; padding: 0; list-style: none; counter-reset: pg-step; display: grid; gap: 10px; }
+#rv-policies-page .pg-steps > li {
+  counter-increment: pg-step; display: grid; grid-template-columns: 26px 1fr; gap: 10px; font-size: 14px; line-height: 1.45;
+}
+#rv-policies-page .pg-steps > li::before {
+  content: counter(pg-step); width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--al-primary); color: #FDFCFD; font-size: 13px; font-weight: 700;
+}
+#rv-policies-page .pg-after { margin-top: 16px; padding: 16px 20px; border-radius: 10px; background: var(--al-yellow-50); border: 1px solid #F3DFA8; }
+#rv-policies-page .pg-list { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 14px; }
+
+/* Rules table */
+#rv-policies-page .pg-rules td { font-size: 14px; }
+#rv-policies-page .pg-rules td:first-child { width: 14%; white-space: nowrap; }
+#rv-policies-page .pg-rules td:nth-child(2) { width: 22%; }
+#rv-policies-page .pg-rules tr.pg-row-first td { border-top: 2px solid var(--al-line-2); }
+#rv-policies-page .pg-rule { font-size: 14px; }
+
+/* Enforcement levels */
+#rv-policies-page .pg-levels { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+#rv-policies-page .pg-level { padding: 18px 20px; border-radius: 10px; border: 1px solid var(--al-line); background: var(--al-surface); display: grid; gap: 8px; align-content: start; }
+#rv-policies-page .pg-level--1 { border-top: 4px solid #8FBFC6; }
+#rv-policies-page .pg-level--2 { border-top: 4px solid var(--al-yellow); background: var(--al-yellow-50); }
+#rv-policies-page .pg-level--3 { border-top: 4px solid var(--al-red); }
+#rv-policies-page .pg-level-head { display: flex; gap: 10px; align-items: center; }
+#rv-policies-page .pg-level-n { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; background: var(--al-ink); color: #FDFCFD; font-size: 12px; font-weight: 700; }
+#rv-policies-page .pg-level-text { font-size: 14px; color: var(--al-ink-2); }
+#rv-policies-page .pg-source { grid-column: 1 / -1; font-size: 13px; color: var(--al-ink-3); }
+
+/* Documentation */
+#rv-policies-page .pg-doc { display: grid; grid-template-columns: 1.2fr 1fr; gap: 24px; }
+#rv-policies-page .pg-doc > .pg-source { grid-column: 1 / -1; }
+#rv-policies-page .pg-doc-steps { margin: 0; padding: 0; list-style: none; counter-reset: pg-doc; display: grid; gap: 12px; }
+#rv-policies-page .pg-doc-steps > li { counter-increment: pg-doc; display: grid; grid-template-columns: 26px 1fr; column-gap: 10px; font-size: 14px; }
+#rv-policies-page .pg-doc-steps > li::before {
+  content: counter(pg-doc); grid-row: span 2; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--al-yellow); color: var(--al-ink); font-size: 13px; font-weight: 700;
+}
+#rv-policies-page .pg-step-detail { display: block; color: var(--al-ink-2); line-height: 1.45; }
+#rv-policies-page .pg-types { display: grid; gap: 8px; margin-top: 6px; }
+#rv-policies-page .pg-type { display: grid; gap: 2px; padding: 10px 12px; border-radius: 8px; background: var(--al-bg); border: 1px solid var(--al-line); font-size: 14px; }
+#rv-policies-page .pg-callout { margin-top: 12px; padding: 12px 16px; border-radius: 8px; background: var(--al-primary-50); border-left: 4px solid var(--al-primary); font-size: 14px; }
+
+/* Case guide */
+#rv-policies-page .pg-case-top { display: grid; grid-template-columns: 1.4fr 1fr; gap: 16px; margin-bottom: 16px; }
+#rv-policies-page .pg-strategy, #rv-policies-page .pg-accounts { padding: 16px 20px; border-radius: 10px; background: var(--al-bg); border: 1px solid var(--al-line); }
+#rv-policies-page .pg-cats { display: grid; gap: 10px; }
+#rv-policies-page .pg-cat { border: 1px solid var(--al-line); border-radius: 10px; background: var(--al-surface); }
+#rv-policies-page .pg-cat > summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 18px; }
+#rv-policies-page .pg-cat > summary::-webkit-details-marker { display: none; }
+#rv-policies-page .pg-cat > summary::before { content: "›"; font-weight: 700; color: var(--al-primary); margin-right: -4px; }
+#rv-policies-page .pg-cat[open] > summary::before { content: "⌄"; }
+#rv-policies-page .pg-cat-name { flex: 1; font-weight: 700; font-size: 15px; }
+#rv-policies-page .pg-cat[open] > summary { border-bottom: 1px solid var(--al-line); }
+#rv-policies-page .pg-cat-body { padding: 16px 18px 18px; display: grid; gap: 12px; font-size: 14px; }
+#rv-policies-page .pg-example { display: grid; gap: 6px; }
+
+/* Regulation and sources */
+#rv-policies-page .pg-reg { display: grid; gap: 10px; font-size: 14px; }
+#rv-policies-page .pg-two { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+#rv-policies-page .pg-sources { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+#rv-policies-page .pg-source-group { padding: 16px 18px; border-radius: 10px; background: var(--al-bg); border: 1px solid var(--al-line); }
+
+@media (max-width: 900px) {
+  #rv-policies-page :is(.pg-levels, .pg-doc, .pg-case-top, .pg-two) { grid-template-columns: 1fr; }
+  #rv-policies-page .al-top-controls { min-width: 0; width: 100%; }
+}

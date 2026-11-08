@@ -1,0 +1,103 @@
+{
+  "evidence_status": "Unsupported and unreviewed planning material; source records and exact citations not supplied. Do not treat examples, interpretations, account descriptions or strategy as verified findings or review decisions.",
+  "id": "zohran-mamdani",
+  "subject": "Zohran Mamdani",
+  "role": "112th Mayor of New York City (sworn in 1 January 2026)",
+  "platforms": ["twitter", "tiktok"],
+  "analytics_case_slug": "mamdani-nyc-2025",
+  "official_accounts": [
+    {"platform": "twitter", "handle": "@ZohranKMamdani", "url": "https://x.com/ZohranKMamdani", "note": "Personal and campaign account"},
+    {"platform": "twitter", "handle": "@NYCMayor", "url": "https://x.com/NYCMayor", "note": "Official mayoral account from 1 January 2026"}
+  ],
+  "strategy": {
+    "title": "Seek restricted reach as well as removal",
+    "points": [
+      "X's enforcement model is \"Freedom of Speech, Not Reach\": many violating posts are restricted (left out of search, timelines and recommendations) rather than removed. Ask for restriction as well as removal.",
+      "Report accounts, not only posts, when the same account repeatedly posts violating content about the subject.",
+      "For false claims, show the subject's own posts or credible reporting next to the claim. Contradiction by the record is the strongest evidence of falsity.",
+      "Use the New York Stop Hiding Hate Act filings to quote each platform's own published rules back to it."
+    ]
+  },
+  "categories": [
+    {
+      "id": "disinformation",
+      "name": "Disinformation",
+      "definition": "A form of misinformation: false or engineered information created or spread deliberately to cause harm. Match each claim against factual information: the subject's own accounts and credible sources, compared with other accounts.",
+      "x_rules": ["civic-integrity", "manipulated-media", "impersonation", "violent-entities"],
+      "tiktok_rules": ["misinformation", "civic-integrity"],
+      "evidence_needed": "The claim, plus the subject's own post or credible reporting that contradicts it.",
+      "examples": [
+        {"quote": "“Leftists celebrated”", "analysis": "An engineered generalisation."},
+        {"quote": "“Zohran Mamdani allies himself with terrorists and became the mayor of New York City”", "analysis": "“Allies with terrorists” is unsubstantiated: an engineered phrase designed to trigger hostility."},
+        {"quote": "“Foreigner” / “never held a real job”", "analysis": "Misleading framing that builds a false narrative. He is a naturalised U.S. citizen and has worked as a housing counsellor and in local government."},
+        {"quote": "Claims he performed “4 Nazi salutes” after a victory speech", "analysis": "A fabricated visual narrative designed to equate a mainstream candidate with fascism and extremism."}
+      ]
+    },
+    {
+      "id": "racism",
+      "name": "Racism",
+      "definition": "Negative, hostile or derogatory rhetoric that targets individuals or groups based on their race, ethnicity, nationality or religious identity, to demean or exclude them or to incite hatred against them.",
+      "x_rules": ["hateful-conduct", "violent-entities"],
+      "tiktok_rules": ["hate-speech"],
+      "evidence_needed": "The words that target national origin, ethnicity or religion, and who is targeted.",
+      "examples": [
+        {"quote": "Rep. Andy Ogles (@repogles): “This man came to America for one reason: to turn America into an Islamic theocracy”; calls for him to be “sent back to Uganda”", "analysis": "Targets national origin (Uganda) and religious identity (“Islamic”, “sharia law”), with us-versus-them language (“our country”). The call to send him back is xenophobic."},
+        {"quote": "Calling a Muslim candidate a “jihadist”", "analysis": "Weaponises religious identity by applying a term for violent extremism to a civilian politician, to demean him and incite hatred against him and his supporters."},
+        {"quote": "Targets his “entire Islamic network” and links his campaign to the “Muslim Brotherhood” and “Islamic Terror” non-profits", "analysis": "Hostile rhetoric based on religious identity that frames his political success as part of a terrorist religious network: an Islamophobic trope."}
+      ]
+    },
+    {
+      "id": "harassment",
+      "name": "Harassment",
+      "definition": "Malicious, unreciprocated targeting of an individual through a high volume of content (bursts of posts or continuous replies), designed to humiliate, degrade or incite abuse against them. Shown through the volume of targeted attacks.",
+      "x_rules": ["abuse-harassment"],
+      "tiktok_rules": ["harassment"],
+      "evidence_needed": "Several posts from the same account aimed at the same person over a short period, with times.",
+      "examples": [
+        {"quote": "“Everything about this dude is a fraud” / “caught red-handed”", "analysis": "Targeted character assassination: framing a family anecdote as “exposed fraud” is a degradation ritual meant to incite pile-on behaviour."},
+        {"quote": "Calling him a “famous pedophile” without factual basis", "analysis": "Uses a severe criminal accusation as an insult to degrade him and incite outrage against him and his supporters."}
+      ]
+    },
+    {
+      "id": "hate_speech",
+      "name": "Hate speech",
+      "definition": "Spreading prejudice, including socioeconomic prejudice, designed to create negative sentiment, hostility or systemic violence based on race, ethnicity, national origin, caste, sexual orientation, gender, gender identity, religious affiliation, age, disability or serious disease.",
+      "x_rules": ["hateful-conduct"],
+      "tiktok_rules": ["hate-speech"],
+      "evidence_needed": "The prejudiced words and the group or attribute they target.",
+      "examples": [
+        {"quote": "Michael Rapaport (@michaelrapaport): “clown, moron”, “Qatar-funded”, “fraud class”", "analysis": "Derogatory and prejudiced rhetoric. “Fraud class” attacks the working class, using socioeconomic status as a weapon against the “working class candidate”."},
+        {"quote": "“Utterly disgusting” / “October 7th as a silver lining”, about his attendance at a mosque", "analysis": "Islamophobic trope linking a religious visit to extremist violence, to generate hostility based on religious identity."},
+        {"quote": "“Nightmare”, “worst enemies”, about his supporters and “socialism”", "analysis": "Language designed to create severe hostility toward his supporters and constituency, framing their policies as an existential threat."}
+      ]
+    }
+  ],
+  "resources": [
+    {
+      "group": "Fact-checking and verification",
+      "items": [
+        {"title": "PolitiFact", "url": "https://www.politifact.com/"},
+        {"title": "NewsGuard", "url": "https://www.newsguardtech.com/"},
+        {"title": "PEN America: guide to combating protest disinformation", "url": "https://pen.org/disinformation/pen-americas-guide-for-combating-protest-disinformation/"}
+      ]
+    },
+    {
+      "group": "News of record",
+      "items": [
+        {"title": "NPR", "url": "https://www.npr.org/"},
+        {"title": "The Associated Press", "url": "https://apnews.com/"},
+        {"title": "The Hill", "url": "https://thehill.com/"},
+        {"title": "C-SPAN", "url": "https://www.c-span.org/"}
+      ]
+    },
+    {
+      "group": "Policy research",
+      "items": [
+        {"title": "Pew Research Center", "url": "https://www.pewresearch.org/"},
+        {"title": "Brookings", "url": "https://www.brookings.edu/"}
+      ]
+    }
+  ],
+  "regulations": ["ny-stop-hiding-hate-act"],
+  "notes": "Category definitions and examples come from the case team's analysis. Platform rules and reporting steps come from each platform's official pages; see the platform files for sources and verification dates."
+}

@@ -113,7 +113,42 @@ def create_app(service: WorkspaceService, *, server=None, workbench_links=None):
             node_id = getattr(node, "id", None)
             if isinstance(node_id, str) and node_id in slots:
                 node.children = slots[node_id]
+        _add_alerts_page(root)
         return root
+
+    def _add_alerts_page(root):
+        """Integrated desk only: Alerts and Policies tabs and pages beside the shared pages."""
+        from dash import dcc
+
+        from ...alerts.settings import AlertSettingsStore
+        from ...alerts.ui import alerts_page
+        from ...policies.ui import policies_page
+
+        def tab(label, value):
+            return dcc.Tab(
+                label=label,
+                value=value,
+                className=f"rv-navigation-tab rv-navigation-tab--{value}",
+                selected_className=(
+                    f"rv-navigation-tab--selected rv-navigation-tab--selected-{value}"
+                ),
+            )
+
+        for node in _walk(root):
+            if getattr(node, "id", None) == "rv-page":
+                node.children = [
+                    *node.children,
+                    tab("Alerts", "alerts"),
+                    tab("Policies", "policies"),
+                ]
+            elif getattr(node, "className", None) == "rv-main":
+                children = list(node.children)
+                # Keep the shared footer last.
+                children[-1:-1] = [
+                    alerts_page(AlertSettingsStore(service.settings.data_dir)),
+                    policies_page(),
+                ]
+                node.children = children
 
     app.layout = layout
 
@@ -619,4 +654,10 @@ def create_app(service: WorkspaceService, *, server=None, workbench_links=None):
     register_handoff_callbacks(app, service)
     register_social_dashboard_callbacks(app, service)
     register_event_callbacks(app, service)
+    from ...alerts.ui import register_alert_callbacks
+
+    register_alert_callbacks(app, service)
+    from ...policies.ui import register_policy_callbacks
+
+    register_policy_callbacks(app)
     return app

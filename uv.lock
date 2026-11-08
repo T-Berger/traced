@@ -304,6 +304,7 @@ dependencies = [
     { name = "dash" },
     { name = "dash-cytoscape" },
     { name = "feedparser" },
+    { name = "fpdf2" },
     { name = "httpx" },
     { name = "numpy" },
     { name = "psycopg", extra = ["binary"] },
@@ -335,6 +336,7 @@ requires-dist = [
     { name = "dash", specifier = ">=3.2,<4.2" },
     { name = "dash-cytoscape", specifier = ">=1.0,<2" },
     { name = "feedparser", specifier = ">=6.0.11,<7" },
+    { name = "fpdf2", specifier = ">=2.8,<3" },
     { name = "gunicorn", marker = "sys_platform != 'win32' and extra == 'hosting'", specifier = ">=23,<26" },
     { name = "httpx", specifier = ">=0.28,<1" },
     { name = "numpy", specifier = ">=2.0,<3" },
@@ -417,6 +419,19 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/1c/3e/ef786310a3774ae7aacaa288ca6d1e1dfd03c24214137478e4b630b76af0/fonttools-4.68.0-cp312-cp312-win_amd64.whl", hash = "sha256:fedc183bdbc3fdbfbdca26e0e04566d089cbb404712509a4e824608e9304cc77", size = 2533508, upload-time = "2026-10-27T16:28:37.085Z" },
     { url = "https://files.pythonhosted.org/packages/06/11/2cc4272ddd485c448c0363be9beb0a24d3f429f1cc8c5aafa716c508e899/fonttools-4.68.0-cp312-cp312-win_arm64.whl", hash = "sha256:95628bbc5ea81d5761268f4c4f1ba709af510b970f363498ac801c0c1fd7a4a8", size = 2502049, upload-time = "2026-10-27T16:28:39.355Z" },
     { url = "https://files.pythonhosted.org/packages/35/74/4ea331ecc65ba05a58b1e4e8ccd604c8a15565f876dfbf93fc2a2ea2e22b/fonttools-4.68.0-py3-none-any.whl", hash = "sha256:d76f8fdcb6936f5e1045a0c9dd721a4bf11112e60d1e243bfa1d39f06a8b3104", size = 1248357, upload-time = "2026-10-27T16:30:24.389Z" },
+]
+
+[[package]]
+name = "fpdf2"
+version = "2.9.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "fonttools" },
+    { name = "pillow" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/ec/be/440da8ede1cf7aaff73be5c5a6d0dc6f2938df6604ffbc313f9c6dc63f55/fpdf2-2.9.0.tar.gz", hash = "sha256:af2e7e06a5a2f9e32e24b146b56f58166142dfff45f55370ab03bfac9c8e3e21", size = 408671, upload-time = "2026-10-29T23:13:20.353Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/2f/b0/f0e770163d0e635c81e8ba117686e31c6b172715e1185ff00ea2eb0b2f3d/fpdf2-2.9.0-py3-none-any.whl", hash = "sha256:e57f9eb183a61bbfc1a16ccb3eb68654f9ef3de0d9a78e37015a0df2eb29ab89", size = 360586, upload-time = "2026-10-29T23:13:18.341Z" },
 ]
 
 [[package]]

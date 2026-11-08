@@ -1,0 +1,126 @@
+{
+  "id": "tiktok",
+  "name": "TikTok",
+  "last_reviewed": "2026-11-07",
+  "summary": "TikTok removes content that breaks its Community Guidelines and bans accounts that repeatedly or severely violate them. Some content stays up but is made ineligible for the For You feed. People who report can follow the outcome in the in-app Safety Center.",
+  "enforcement_model": {
+    "title": "Remove, restrict recommendation, or label",
+    "summary": "Ask for removal of content that breaks the guidelines. Where removal is not justified, ask TikTok to make it ineligible for the For You feed, which limits its reach.",
+    "levels": [
+      {
+        "name": "Remove",
+        "detail": "Videos, livestreams and comments that violate the Community Guidelines are removed. Accounts that repeatedly violate, commit severe violations, or evade enforcement are banned. Violating searches and hashtags are blocked or redirected."
+      },
+      {
+        "name": "Not recommended",
+        "detail": "Content with misinformation that may cause moderate harm is ineligible for the For You feed."
+      },
+      {
+        "name": "Label and fact-check",
+        "detail": "TikTok works with independent fact-checkers and uses their assessments in moderation decisions."
+      }
+    ],
+    "source": {
+      "title": "TikTok New York Terms of Service Report, Oct–Dec 2025 (submitted 1 Apr 2026)",
+      "url": "https://ag.ny.gov/sites/default/files/social-media-policy-report/2025-q4-tiktok-inc-policy.pdf",
+      "local": "documents/2025-q4-tiktok-inc-policy.pdf",
+      "verified": "2026-11-07",
+      "method": "fetched"
+    }
+  },
+  "policies": [
+    {
+      "id": "hate-speech",
+      "title": "Hate speech and hateful behaviours",
+      "covers": ["racism", "hate_speech"],
+      "summary": "No content that attacks people based on protected attributes: caste, disability, ethnicity, gender, gender identity, immigration status, national origin, race, religion, serious disease, sex, sexual orientation or tribe. Promoting hateful ideologies and hateful organisations is also not allowed.",
+      "enforcement": "Removal; account bans for repeated or severe violations.",
+      "url": "https://www.tiktok.com/community-guidelines/en/safety-civility",
+      "verified": "2026-11-07",
+      "method": "TikTok filing with NY AG (fetched); guideline page via search index"
+    },
+    {
+      "id": "harassment",
+      "title": "Harassment and bullying",
+      "covers": ["harassment"],
+      "summary": "No harassment or bullying, including inciting harassment or coordinated abuse, such as encouraging others to leave abusive comments or to falsely report an account.",
+      "enforcement": "Removal; account bans for repeated or severe violations.",
+      "url": "https://www.tiktok.com/community-guidelines/en/safety-civility",
+      "verified": "2026-11-07",
+      "method": "TikTok filing with NY AG (fetched); guideline page via search index"
+    },
+    {
+      "id": "misinformation",
+      "title": "Misinformation",
+      "covers": ["disinformation"],
+      "summary": "False or misleading content that may cause significant harm is not allowed, regardless of intent. This includes hoaxes, misleading AI-generated content and harmful conspiracy theories. Misinformation that may cause moderate harm is not shown in the For You feed.",
+      "enforcement": "Removal for significant harm; For You ineligibility for moderate harm; independent fact-checking.",
+      "url": "https://www.tiktok.com/community-guidelines/en/integrity-authenticity",
+      "verified": "2026-11-07",
+      "method": "TikTok filing with NY AG (fetched); guideline page via search index"
+    },
+    {
+      "id": "civic-integrity",
+      "title": "Civic and election integrity",
+      "covers": ["disinformation"],
+      "summary": "No misinformation about civic and electoral processes, regardless of intent. This covers how, when and where to vote, voter eligibility or candidate qualifications, election procedures and election results. Voter intimidation and threats to election workers are also not allowed.",
+      "enforcement": "Removal; accounts that repeatedly post such misinformation can be removed.",
+      "url": "https://www.tiktok.com/community-guidelines/en/integrity-authenticity",
+      "verified": "2026-11-07",
+      "method": "TikTok filing with NY AG (fetched); guideline page via search index"
+    }
+  ],
+  "reporting": [
+    {
+      "id": "video",
+      "title": "Report a video",
+      "steps": [
+        "In the app, tap the Share arrow on the video and select Report. On the web, open More options (⋯) on the video and select Report.",
+        "Pick the reason that fits, such as Hate and harassment or Misinformation.",
+        "Submit. This reports the video only, not the account."
+      ],
+      "source": "https://support.tiktok.com/en/safety-hc/report-a-problem"
+    },
+    {
+      "id": "account",
+      "title": "Report an account",
+      "steps": [
+        "Open the profile and tap Share (or ⋯) at the top.",
+        "Select Report, then Report account.",
+        "Choose the reason and submit. Use this when the account repeatedly posts violating content."
+      ],
+      "source": "https://support.tiktok.com/en/safety-hc/report-a-problem"
+    },
+    {
+      "id": "comment",
+      "title": "Report a comment",
+      "steps": [
+        "Press and hold the comment.",
+        "Tap Report, choose a reason and submit."
+      ],
+      "source": "https://support.tiktok.com/en/safety-hc/report-a-problem"
+    }
+  ],
+  "after_reporting": [
+    "Reports are anonymous; TikTok does not tell the account who reported it.",
+    "Follow the outcome in the in-app Safety Center.",
+    "Mass reporting does not help get a video or account removed; one accurate report does."
+  ],
+  "regulatory_reports": [
+    {
+      "title": "TikTok NY Terms of Service Report: Q4 2025",
+      "date": "2026-04-01",
+      "url": "https://ag.ny.gov/sites/default/files/social-media-policy-report/2025-q4-tiktok-inc-policy.pdf",
+      "local": "documents/2025-q4-tiktok-inc-policy.pdf"
+    }
+  ],
+  "notes": [
+    "The in-app menu wording changes between app versions. The steps above come from TikTok's reporting help and recent guides; check the in-app labels before you rely on them."
+  ],
+  "sources": [
+    {"title": "TikTok Community Guidelines", "url": "https://www.tiktok.com/community-guidelines/en", "verified": "2026-11-07"},
+    {"title": "Report a problem (TikTok Support)", "url": "https://support.tiktok.com/en/safety-hc/report-a-problem", "verified": "2026-11-07"},
+    {"title": "TikTok reporting and legal feedback", "url": "https://www.tiktok.com/legal/report/feedback", "verified": "2026-11-07"},
+    {"title": "TikTok Transparency Center", "url": "https://www.tiktok.com/transparency/en", "verified": "2026-11-07"}
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "title": "How to document a post before reporting it",
+  "summary": "Posts get deleted or edited once they are reported. Capture the evidence first, then report. One complete, well-documented report carries more weight than many quick ones.",
+  "steps": [
+    {"title": "Save the exact link", "detail": "Copy the post URL (it contains the post ID) and the account's profile URL. Note the handle and display name; the handle can change, the URL and ID do not."},
+    {"title": "Capture the post as it appears", "detail": "Take a full screenshot showing the post, the account, the date and time, and the engagement counts. Include the device clock or a visible timestamp."},
+    {"title": "Archive an independent copy", "detail": "Submit the URL to the Internet Archive's Wayback Machine (web.archive.org/save) or archive.today so a third party holds a copy with its own timestamp."},
+    {"title": "Keep the original record", "detail": "Where possible, keep the platform's own data for the post, not just the screenshot. Traced stores the native record and computes its SHA-256 hash, so the copy can be checked later."},
+    {"title": "Record context and pattern", "detail": "For harassment, list every post from the same account aimed at the same person, with times; volume over a short period shows a pile-on. For false claims, save the subject's own posts or credible reporting that shows the claim is false."},
+    {"title": "Write down why it breaks a rule", "detail": "Name the platform rule (e.g. X Hateful conduct) and quote the words that break it. Keep it factual."},
+    {"title": "Don't engage", "detail": "Don't reply, quote or share the post; that spreads it further and can complicate the report."},
+    {"title": "Keep a log", "detail": "Record when you captured each item, when you reported it, the report reference and the outcome."}
+  ],
+  "evidence_types": [
+    {"type": "Content evidence", "what": "The post as published, verbatim, with its exact URL and post ID."},
+    {"type": "Attribution evidence", "what": "The account that posted it: handle, platform user ID, profile."},
+    {"type": "Preservation evidence", "what": "Screenshot, archive copy, and the original record with its collection time and hash."},
+    {"type": "Classification evidence", "what": "The platform rule it breaks and why, in plain words."},
+    {"type": "Contextual evidence", "what": "For false claims: the subject's own posts or credible reporting that contradict them."},
+    {"type": "Reach evidence", "what": "Views, likes, reposts and replies when captured."},
+    {"type": "Pattern evidence", "what": "Repeated posting at one target, or repeated violations by one account."}
+  ],
+  "tools": [
+    {"title": "Wayback Machine: save a page", "url": "https://web.archive.org/save"},
+    {"title": "archive.today", "url": "https://archive.ph/"},
+    {"title": "Berkeley Protocol on Digital Open Source Investigations (UN OHCHR)", "url": "https://www.ohchr.org/en/publications/policy-and-methodological-publications/berkeley-protocol-digital-open-source"}
+  ]
+}

@@ -121,6 +121,26 @@ For application commands and demo startup, read the
 [Swarm Detector README](swarm-detector/README.md), and the
 [Silent Storm README](operation-silent-storm/README.md).
 
+## Alerts and evidence reports
+
+The **Alerts** tab reads model-labeled posts from the separate PostgreSQL
+`analytics_*` tables. Set `TRACED_ANALYTICS_DATABASE_URL` in the root `.env`;
+the default is `postgresql://localhost:5432/disinfo`. Scores and categories are
+model proposals, not verified claims, policy violations, or human decisions.
+
+The page lists candidates with available material and highlights missing evidence.
+References must resolve within the selected analytics case. An archive link does
+not establish that an independent copy has been saved. Select candidates explicitly
+to export a draft PDF. Export rechecks the selection against a fresh, consistent
+case snapshot and fails if a selected or linked saved capture is missing or changed.
+The PDF includes the saved captures and their export-time hashes. Those hashes do
+not prove source authenticity, collection-time integrity, or that extracted text
+matches the capture. Inspect the originals and record any human decision through
+the existing Evidence Trail review workflow before a separate reporting decision.
+
+Thresholds and the report preparer are saved in `alert_settings.json` in the chosen
+workspace. The Alerts tab does not record human approval or submit platform reports.
+
 ## Multiple platforms in one investigation
 
 The shared workbench offers collection from public Telegram channels, YouTube

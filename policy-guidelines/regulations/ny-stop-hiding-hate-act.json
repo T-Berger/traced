@@ -1,0 +1,33 @@
+{
+  "id": "ny-stop-hiding-hate-act",
+  "title": "New York Stop Hiding Hate Act",
+  "jurisdiction": "New York State",
+  "citation": "N.Y. General Business Law §§ 1100–1104 (S895B / A6789B)",
+  "summary": "Large social media companies operating in New York must publish their terms of service and report to the NY Attorney General twice a year on how those terms deal with hate speech and racism, extremism and radicalisation, disinformation and misinformation, harassment, and foreign political interference.",
+  "applies_to": "Social media companies operating in New York with more than $100 million in gross annual revenue.",
+  "key_dates": [
+    {"date": "2024-12", "event": "Signed into law"},
+    {"date": "2025-10-01", "event": "Reporting starts; companies file twice a year"}
+  ],
+  "requirements": [
+    "Publish the terms of service in accessible language, with a contact for questions.",
+    "Describe how users can report violations and how the company may respond.",
+    "Report whether the terms define each category, and how moderation addresses it, including automated systems and human review.",
+    "Report the number of posts flagged and actioned (removal, demonetisation, deprioritisation)."
+  ],
+  "penalties": "Up to $15,000 per violation per day after a 30-day notice period.",
+  "what_you_can_do": [
+    "Read each platform's filed reports to see its current rules and how it responds to user reports.",
+    "If a platform does not handle reports according to its published rules, contact the NY Attorney General's office using the complaint form."
+  ],
+  "status_note": "X Corp. is challenging parts of the law (X Corp. v. James, S.D.N.Y. No. 1:25-cv-05068). The court has paused enforcement of the definitions and enforcement-data provisions against X while the case is pending, so X's filings omit them.",
+  "links": [
+    {"title": "AG announcement: social media companies must start reporting (2 Oct 2025)", "url": "https://ag.ny.gov/press-release/2025/attorney-general-james-announces-social-media-companies-must-start-reporting"},
+    {"title": "Stop Hiding Hate Act: overview (NY AG)", "url": "https://ag.ny.gov/resources/organizations/social-media-tos-reporting/stop-hiding-hate-act"},
+    {"title": "All platform reports filed with the NY AG", "url": "https://ag.ny.gov/resources/organizations/social-media-tos-reporting/reports"},
+    {"title": "Bill text S895B (NY Senate)", "url": "https://legislation.nysenate.gov/pdf/bills/2023/S895B"},
+    {"title": "File a complaint about a social media company (NY AG)", "url": "https://formsnym.ag.ny.gov/OAGOnlineSubmissionForm/faces/OAGBITHome"}
+  ],
+  "verified": "2026-11-07",
+  "method": "fetched (ag.ny.gov pages); X filing read in full"
+}
