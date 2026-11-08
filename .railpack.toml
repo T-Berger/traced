@@ -1,0 +1,22 @@
+# Railpack configuration for Traced Evidence Workbench
+# This tells Railpack how to build and deploy the application
+
+[build]
+# Use Docker build
+builder = "docker"
+
+[deploy]
+# Start command for the integrated workspace
+startCommand = "gunicorn -k uvicorn.workers.UvicornWorker traced_wsgi:server --bind 0.0.0.0:$PORT --workers 2 --threads 4 --timeout 120"
+
+# Health check
+healthCheckPath = "/health"
+healthCheckTimeout = 5
+
+# Environment variables
+[env]
+EVIDENCE_HOST = "0.0.0.0"
+EVIDENCE_DATA_DIR = "/app/data"
+EVIDENCE_READ_ONLY = "false"
+PYTHONUNBUFFERED = "1"
+PYTHONDONTWRITEBYTECODE = "1"

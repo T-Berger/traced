@@ -1,0 +1,61 @@
+{
+  "name": "swarm-detector",
+  "description": "Swarm Detector - Behavioral analysis workbench for Telegram coordination evidence",
+  "service": {
+    "name": "swarm-detector",
+    "type": "web",
+    "dockerfile": "swarm-detector/Dockerfile",
+    "dockerContext": ".",
+    "port": 8051,
+    "healthCheckPath": "/health",
+    "healthCheckTimeout": 5,
+    "healthCheckInterval": 30,
+    "startupProbe": {
+      "path": "/health",
+      "initialDelaySeconds": 30,
+      "periodSeconds": 10,
+      "failureThreshold": 20
+    },
+    "environment": {
+      "PORT": "8051",
+      "SWARM_DATA_DIR": "/var/data",
+      "SWARM_BASIC_AUTH_USER": {
+        "sync": false,
+        "description": "Username for basic authentication (optional)"
+      },
+      "SWARM_BASIC_AUTH_PASSWORD": {
+        "sync": false,
+        "description": "Password for basic authentication (optional)"
+      }
+    },
+    "volumes": [
+      {
+        "name": "swarm-data",
+        "mountPath": "/var/data",
+        "sizeGB": 5
+      }
+    ],
+    "resources": {
+      "cpu": 1,
+      "memoryGB": 2
+    },
+    "autoDeploy": true
+  },
+  "notes": "Swarm Detector provides specialist behavioral analysis for Telegram coordination. Features include: network graph visualization, episode detection, stress testing, queue management, case review, and evidence comparison. Supports basic authentication for private deployments.",
+  "envVars": {
+    "SWARM_DATA_DIR": {
+      "description": "Path to the Swarm Detector data directory",
+      "value": "/var/data"
+    },
+    "SWARM_BASIC_AUTH_USER": {
+      "description": "Username for basic authentication (leave empty to disable)",
+      "value": "",
+      "sync": false
+    },
+    "SWARM_BASIC_AUTH_PASSWORD": {
+      "description": "Password for basic authentication (leave empty to disable)",
+      "value": "",
+      "sync": false
+    }
+  }
+}

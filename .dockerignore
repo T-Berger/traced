@@ -1,28 +1,76 @@
-# Root build context allowlist for the Explorer and Swarm production images.
-# Source datasets, working databases, exports, credentials and environments stay out.
-**
-!pyproject.toml
-!uv.lock
-!.python-version
-!README.md
-!evidence-explorer/
-!evidence-explorer/pyproject.toml
-!evidence-explorer/README.md
-!evidence-explorer/Dockerfile
-!evidence-explorer/src/
-!evidence-explorer/src/**
-!swarm-detector/
-!swarm-detector/pyproject.toml
-!swarm-detector/README.md
-!swarm-detector/Dockerfile
-!swarm-detector/src/
-!swarm-detector/src/**
-!swarm-detector/scripts/
-!swarm-detector/scripts/entrypoint.sh
-!swarm-detector/gunicorn.conf.py
-!operation-silent-storm/
-!operation-silent-storm/pyproject.toml
-**/__pycache__/
-**/*.py[cod]
-**/.env
-**/.env.*
+# Ignore files that don't need to be in the Docker image
+
+# Git
+.git
+.gitignore
+
+# Python
+.venv
+.venv-trail
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+ENV/
+env/
+venv/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Test
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+
+# Local data
+*.sqlite3
+data/
+
+# Local configuration
+.env
+.env.local
+.env.*.local
+
+# Documentation build
+docs/_build/
+
+# Node (if present)
+node_modules/
+npm-debug.log
+
+# Temporary files
+*.tmp
+*.temp
