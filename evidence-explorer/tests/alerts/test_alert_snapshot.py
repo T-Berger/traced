@@ -90,8 +90,7 @@ def test_fingerprint_detects_changed_displayed_data_without_changed_raw():
     row["text"] = "changed extracted text"
     assert before != _snapshot_fingerprint(data, settings)
     assert (
-        "no human"
-        in analysis.verdict([analysis.assess(row, settings, data.references)])["detail"]
+        "no human" in analysis.verdict([analysis.assess(row, settings, data.references)])["detail"]
     )
 
 
