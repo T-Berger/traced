@@ -1,72 +1,31 @@
-"""WSGI entry point for the integrated Traced workspace with all dashboards.
+"""WSGI entry for hosted runs of the Traced workbench (Docker, Railway).
 
-This module provides a production-ready WSGI application that includes:
-- Evidence Explorer dashboard
-- Swarm Detector dashboard  
-- Operation Silent Storm dashboard
-- Integrated review workspace
+Selects the workspace exactly like ``./traced`` (``EVIDENCE_DATA_DIR``, absolute
+or relative to the repository root) and builds the same Flask server that
+``./traced start`` serves: the review desk at ``/``, Swarm Detector at
+``/swarm/``, Silent Storm at ``/silent-storm/``, and the workspace worker in this
+process. Serve it with one gunicorn worker process (``deploy/gunicorn.conf.py``)
+so the workspace keeps one worker lifecycle. ``TRACED_NO_WORKER=1`` serves the
+dashboards without the worker.
 """
 
 from __future__ import annotations
 
 import os
+import sys
 from pathlib import Path
 
-from evidence_explorer.config import Settings
-from evidence_explorer.review.integrations.workspace import WorkspaceRepository, WorkspaceService
-from evidence_explorer.review.integrations.web import create_app
+ROOT = Path(__file__).resolve().parent
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
+from tools.traced import configure_environment  # noqa: E402
+from tools.workbench import create_workbench  # noqa: E402
 
-def create_integrated_app():
-    """Create and return the integrated Traced workspace application."""
-    # Determine data directory
-    data_dir = Path(os.getenv("EVIDENCE_DATA_DIR", "/app/data"))
-    data_dir.mkdir(parents=True, exist_ok=True)
-    
-    # Create settings from environment
-    settings = Settings.from_env()
-    
-    # Override data_dir if specified
-    settings = Settings(
-        data_dir=data_dir,
-        ollama_url=settings.ollama_url,
-        embedding_model=settings.embedding_model,
-        chat_model=settings.chat_model,
-        host=os.getenv("EVIDENCE_HOST", "0.0.0.0"),
-        port=int(os.getenv("TRACED_PORT", os.getenv("PORT", "8000"))),
-        read_only=os.getenv("EVIDENCE_READ_ONLY", "false").lower() in {"true", "1", "yes"},
-    )
-    
-    # Initialize repository
-    repository = WorkspaceRepository(settings.db_path)
-    repository.initialize()
-    
-    # Create service
-    service = WorkspaceService(
-        repository,
-        settings,
-        settings.data_dir / "trail-artifacts",
-    )
-    
-    # Create and return the app
-    app = create_app(service)
-    return app
-
-
-# Create the application instance
-app = create_integrated_app()
-server = app.server
-
-# Health check endpoint
-@server.get("/health")
-def health():
-    return {"status": "ok", "service": "traced-integrated"}, 200
-
-
-if __name__ == "__main__":
-    import argparse
-    parser = argparse.ArgumentParser(description="Integrated Traced Workspace")
-    parser.add_argument("--host", default="0.0.0.0")
-    parser.add_argument("--port", type=int, default=8000)
-    args = parser.parse_args()
-    app.run(host=args.host, port=args.port, debug=False)
+configuration = configure_environment(ROOT, os.environ.get("EVIDENCE_DATA_DIR") or None)
+Path(configuration["data_dir"]).mkdir(parents=True, exist_ok=True)
+# The review desk already serves /health (Swarm Detector and Silent Storm add
+# /swarm/health and /silent-storm/health); Railway's health check uses /health.
+application, _stop, _worker = create_workbench(
+    with_worker=os.environ.get("TRACED_NO_WORKER", "").lower() not in {"1", "true", "yes"}
+)

@@ -1,0 +1,15 @@
+# Railway configuration as code (https://docs.railway.com/reference/config-as-code).
+# It overrides the service's dashboard settings, so Railway builds the root
+# Dockerfile even when the service was created with the Railpack builder.
+# Variables, volumes, and the public domain are set in the Railway dashboard;
+# see RAILWAY_DEPLOY.md.
+
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+healthcheckPath = "/health"
+healthcheckTimeout = 300
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10

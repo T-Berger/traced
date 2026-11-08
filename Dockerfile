@@ -1,77 +1,61 @@
-# Dockerfile for Traced Evidence Workbench - Railway Deployment
-# This builds and deploys the complete integrated workspace with all dashboards
-
-# Use official Python image
-FROM python:3.12-slim-bookworm as builder
-
-# Install uv for dependency management
-RUN pip install uv==0.11.3
-
+# Traced workbench in one image: the review desk at /, Swarm Detector at /swarm/,
+# and Silent Storm at /silent-storm/, with the workspace worker, the same server
+# that `./traced start` runs locally. Railway builds it through railway.toml.
+#
+#   docker build -t traced-workbench .
+#   docker run --rm -p 8053:8053 traced-workbench      # http://127.0.0.1:8053/
+#
+# No BuildKit cache mounts: Railway rejects cache mounts without its service ID.
+# uv comes from PyPI, which the build needs anyway, pinned to the workspace's version.
+FROM python:3.12-slim-bookworm
+RUN pip install --no-cache-dir --disable-pip-version-check uv==0.11.3
 WORKDIR /app
+ENV UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy \
+    UV_HTTP_TIMEOUT=600 \
+    UV_PYTHON_DOWNLOADS=never \
+    UV_NO_CACHE=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PATH="/app/.venv/bin:$PATH"
 
-# Copy lock file and project configuration
-COPY pyproject.toml uv.lock .python-version ./
+# Dependencies first, so code changes reuse this layer. No extras: Swarm Detector's
+# optional embeddings extra would add torch and about 1.9 GB of CUDA wheels that
+# the dashboards never import.
+COPY pyproject.toml uv.lock .python-version README.md ./
 COPY evidence-explorer/pyproject.toml evidence-explorer/pyproject.toml
 COPY swarm-detector/pyproject.toml swarm-detector/pyproject.toml
 COPY operation-silent-storm/pyproject.toml operation-silent-storm/pyproject.toml
+RUN uv sync --frozen --no-default-groups --all-packages --no-install-workspace
 
-# Install all dependencies from the root lock file
-RUN uv sync --frozen --all-extras --all-packages --no-install-workspace
-
-# Copy application source code
-COPY evidence-explorer/src evidence-explorer/src
 COPY evidence-explorer/README.md evidence-explorer/README.md
-COPY swarm-detector/src swarm-detector/src
+COPY evidence-explorer/src evidence-explorer/src
 COPY swarm-detector/README.md swarm-detector/README.md
-COPY operation-silent-storm/src operation-silent-storm/src
+COPY swarm-detector/src swarm-detector/src
 COPY operation-silent-storm/README.md operation-silent-storm/README.md
-COPY tools tools
-COPY traced traced
-COPY traced-investigate traced-investigate
+COPY operation-silent-storm/src operation-silent-storm/src
+RUN uv sync --locked --no-default-groups --all-packages --no-editable
 
-# Install with locked dependencies
-RUN uv sync --locked --all-extras --all-packages --no-editable
-
-# Final runtime stage
-FROM python:3.12-slim-bookworm as runtime
-
-WORKDIR /app
-
-# Set up environment
-ENV PATH="/app/.venv/bin:$PATH" \
-    PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
-    EVIDENCE_HOST=0.0.0.0 \
-    EVIDENCE_DATA_DIR=/app/data \
-    EVIDENCE_READ_ONLY=false
-
-# Create non-root user for security
-RUN groupadd --gid 10001 traced \
+COPY tools/traced.py tools/workbench.py tools/
+COPY traced_wsgi.py ./
+COPY deploy/ deploy/
+RUN chmod 0755 deploy/start.sh \
+    && groupadd --gid 10001 traced \
     && useradd --uid 10001 --gid traced --create-home --shell /bin/sh traced \
-    && mkdir -p /app/data /app/.venv \
+    && mkdir -p /app/data \
     && chown traced:traced /app/data
 
-# Copy virtual environment from builder
-COPY --from=builder /app/.venv /app/.venv
+# One data directory for all three surfaces, so one Railway volume at /app/data
+# keeps every case, Swarm Detector run, and Silent Storm review across deploys.
+ENV EVIDENCE_HOST=0.0.0.0 \
+    EVIDENCE_DATA_DIR=/app/data \
+    SWARM_DATA_DIR=/app/data/swarm \
+    SILENT_STORM_PROJECT=/app/operation-silent-storm \
+    SILENT_STORM_DB=/app/data/silent-storm/silent-storm.sqlite3 \
+    PORT=8053
+EXPOSE 8053
+HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
+    CMD python -c "import os, urllib.request; urllib.request.urlopen('http://127.0.0.1:' + os.environ.get('PORT', '8053') + '/health', timeout=4).read()"
 
-# Copy application files
-COPY --chown=traced:traced evidence-explorer/src evidence-explorer/src
-COPY --chown=traced:traced swarm-detector/src swarm-detector/src
-COPY --chown=traced:traced operation-silent-storm/src operation-silent-storm/src
-COPY --chown=traced:traced tools tools
-COPY --chown=traced:traced traced traced
-COPY --chown=traced:traced traced-investigate traced-investigate
-COPY --chown=traced:traced traced_wsgi.py traced_wsgi.py
-
-# Switch to non-root user
-USER 10001:10001
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=5s --start-period=45s --retries=3 \
-    CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:${PORT:-8000}/health', timeout=4).read()" || exit 1
-
-# Expose port
-EXPOSE 8000
-
-# Start the application
-CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "traced_wsgi:server", "--bind", "0.0.0.0:${PORT:-8000}", "--workers", "2", "--threads", "4", "--timeout", "120"]
+# Starts as root only to take ownership of a mounted volume, then runs as traced.
+CMD ["/app/deploy/start.sh"]

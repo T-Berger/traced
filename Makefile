@@ -1,4 +1,4 @@
-.PHONY: setup check check-all lint format test test-explorer test-swarm test-silent-storm test-tools runtime-check browser-setup browser-check locks build package-check identity-sync identity-check clean docker-build docker-push
+.PHONY: setup check check-all lint format test test-explorer test-swarm test-silent-storm test-tools runtime-check browser-setup browser-check locks build package-check identity-sync identity-check clean
 .NOTPARALLEL: check check-all test
 
 UV = uv
@@ -66,9 +66,3 @@ package-check:
 
 clean:
 	rm -rf dist build
-
-docker-build:
-	docker build -t traced-integrated .
-
-docker-push:
-	docker push traced-integrated
