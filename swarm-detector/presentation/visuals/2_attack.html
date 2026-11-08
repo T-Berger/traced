@@ -1,0 +1,40 @@
+<!doctype html><meta charset="utf-8"><title>2 Attack</title><link rel="stylesheet" href="style.css"><svg id="s" viewBox="0 0 1280 720"></svg><script src="lib.js"></script><script>
+const svg=document.getElementById('s');bg(svg);
+T(svg,640,100,'A bot attack is a group effort',{size:54,weight:800,anchor:'middle'});
+const sub=T(svg,640,150,'',{size:28,fill:C.soft,anchor:'middle'});
+const R=rng(11),sw=[];
+for(let i=0;i<16;i++){const a=R()*6.283,r=Math.sqrt(R())*105;sw.push({x:200+Math.cos(a)*r,y:390+Math.sin(a)*r,c:el('circle',{r:12,fill:C.amber,stroke:'#fff','stroke-width':3},svg)})}
+T(svg,200,555,'The swarm',{size:28,weight:700,fill:C.amber,anchor:'middle'});
+el('rect',{x:900,y:290,width:290,height:200,rx:22,fill:C.card,stroke:C.line,'stroke-width':2},svg);
+T(svg,930,340,'One post',{size:30,weight:700,fill:C.green});T(svg,930,378,'War-news channel',{size:22,fill:C.soft});
+const cnt=T(svg,930,450,'',{size:34,weight:800,fill:C.ink});
+const X1=380,X2=870,arrows=[
+ {y:260,start:1.0,n:'1',t:'Coordinated',d:'all at the same moment'},
+ {y:390,start:2.2,n:'2',t:'Directed',d:'all at the same post'},
+ {y:520,start:3.4,n:'3',t:'Intentional',d:'again and again, on purpose'}];
+arrows.forEach(a=>{
+ a.line=el('line',{x1:X1,y1:a.y,x2:X1,y2:a.y,stroke:C.green,'stroke-width':7,'stroke-linecap':'round'},svg);
+ a.head=el('path',{d:'M0 -16 L28 0 L0 16z',fill:C.green},svg);
+ a.lab=T(svg,(X1+X2)/2,a.y-26,a.n+' · '+a.t,{size:30,weight:800,fill:C.green,anchor:'middle'});
+ a.dsc=T(svg,(X1+X2)/2,a.y+46,a.d,{size:23,fill:C.soft,anchor:'middle'});
+ a.pk=[0,1,2].map(()=>el('circle',{r:9,fill:C.amber},svg));
+});
+run(9,t=>{
+ sub.textContent=t<1?'A swarm of accounts…':t<5?'…acts on a post in three ways.':'Individually human. Together, a pattern.';
+ const pulse=1+.12*Math.sin(t*4)*lin(t,1,2);
+ sw.forEach(s=>{s.c.setAttribute('cx',s.x);s.c.setAttribute('cy',s.y);s.c.setAttribute('r',12*pulse)});
+ arrows.forEach((a,k)=>{
+  const p=seg(t,a.start,a.start+.8),tip=lerp(X1,X2,p);
+  a.line.setAttribute('x2',tip);a.line.setAttribute('opacity',p>0?1:0);
+  a.head.setAttribute('transform',`translate(${tip-10},${a.y})`);a.head.setAttribute('opacity',p>0?1:0);
+  a.lab.setAttribute('opacity',lin(t,a.start+.3,a.start+.8));a.dsc.setAttribute('opacity',lin(t,a.start+.5,a.start+1.1));
+  const on=t>a.start+.9;
+  a.pk.forEach((c,i)=>{
+   let u=((t-a.start)/1.5)%1;if(k==2)u=((t-a.start)/1.5-i/3+3)%1;
+   const x=lerp(X1+20,X2-20,u);let y=a.y;
+   if(k==0)y=a.y+(i-1)*20;if(k==1)y=a.y+(i-1)*34*(1-u);
+   c.setAttribute('cx',x);c.setAttribute('cy',y);c.setAttribute('opacity',on?Math.min(1,u*8,(1-u)*8):0)});
+ });
+ const n=Math.max(0,Math.floor((t-2.2)*9));cnt.textContent=n>0?n+' comments':'';
+});
+</script>
