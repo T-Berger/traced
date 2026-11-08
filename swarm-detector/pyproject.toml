@@ -24,7 +24,9 @@ dev = ["pytest>=8.0", "ruff>=0.11"]
 swarm-detector = "swarm_detector.cli:main"
 
 [dependency-groups]
-analysis = ["pandas>=3.0", "matplotlib>=3.10"]
+analysis = ["pandas>=3.0", "matplotlib>=3.10", "scikit-learn>=1.6", "scipy>=1.14"]
+# Only for analysis/embed.py (pulls in PyTorch); run.py reads the stored vectors without it.
+embeddings = ["sentence-transformers>=3.0"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/swarm_detector"]
