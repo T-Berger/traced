@@ -57,7 +57,7 @@ def test_missing_or_cross_case_context_is_never_treated_as_available():
         a = analysis.assess(row, settings, refs)
         assert a.status == analysis.NEEDS
         assert not next(c for c in a.checks if c.key == "proof").ok
-        assert "decision" in analysis.verdict([a], [])["detail"]
+        assert "decision" in analysis.verdict([a])["detail"]
     a = analysis.assess(row, settings, {"ref": _reference()})
     assert a.status == analysis.READY
     assert analysis.STATUS_LABELS[a.status] == "Candidate for review"
@@ -91,7 +91,7 @@ def test_fingerprint_detects_changed_displayed_data_without_changed_raw():
     assert before != _snapshot_fingerprint(data, settings)
     assert (
         "no human"
-        in analysis.verdict([analysis.assess(row, settings, data.references)], [])["detail"]
+        in analysis.verdict([analysis.assess(row, settings, data.references)])["detail"]
     )
 
 

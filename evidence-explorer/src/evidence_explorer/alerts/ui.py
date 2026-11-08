@@ -337,7 +337,7 @@ def alerts_page(store: AlertSettingsStore) -> html.Section:
 
 
 def _summary(data, assessments, accounts, settings) -> html.Div:
-    verdict = analysis.verdict(assessments, accounts)
+    verdict = analysis.verdict(assessments)
     ready = [a for a in assessments if a.status == READY]
     needs = [a for a in assessments if a.status == NEEDS]
     ready_accounts = [x for x in accounts if x["status"] == READY]
