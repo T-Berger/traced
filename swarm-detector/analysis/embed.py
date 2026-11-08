@@ -1,4 +1,7 @@
-"""Create sentence embeddings once and store them in embeddings/ (git-ignored).
+"""Proposed embeddings helper; generation is currently unavailable.
+
+The source lacks a verified sender identity contract. The command stops before
+loading legacy preprocessing caches, downloading models, or writing vectors.
 
     uvx uv@0.11.3 run --locked --package swarm-detector --group analysis --group embeddings \
         python swarm-detector/analysis/embed.py --model minilm --kind content
@@ -7,7 +10,7 @@
 --kind   content | context | posts | all
 --force  rebuild even if the vectors exist and match the current comments
 
-Text recipes
+Proposed text recipes (not currently executed)
   content  the comment alone. URLs become the word "link" (a URL is dozens of meaningless tokens).
   context  "<comment> || post: <first 400 chars of the root post>". The comment comes FIRST: when the
            model's token window is full (MiniLM: 128 tokens) the end is cut, so the post is trimmed and

@@ -106,6 +106,22 @@ def test_direct_preprocessing_is_guarded(isolated_analysis, monkeypatch):
         preprocess.run()
 
 
+def test_direct_metrics_context_rejects_cached_or_supplied_accounts(isolated_analysis, monkeypatch):
+    pytest.importorskip("numpy")
+    pd = pytest.importorskip("pandas")
+    pytest.importorskip("networkx")
+    write_input(
+        isolated_analysis, [{"id": 1, "type": "SOCIAL_MEDIA_COMMENT", "name_orig": "Alice"}]
+    )
+    monkeypatch.syspath_prepend(str(isolated_analysis))
+    from engine import config, metrics, readiness
+
+    monkeypatch.setattr(config, "DATA", isolated_analysis.parent / "data")
+    cached = pd.DataFrame({"account": ["guessed-name"], "in_model": [True]})
+    with pytest.raises(readiness.IdentityUnavailable, match="1 are comments"):
+        metrics.Ctx(cached)
+
+
 def test_readiness_reports_bounded_sample(isolated_analysis):
     rows = [{"id": i, "type": "SOCIAL_MEDIA_COMMENT", "name_orig": "Alice"} for i in range(1001)]
     write_input(isolated_analysis, rows)

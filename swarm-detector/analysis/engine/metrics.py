@@ -22,7 +22,7 @@ from functools import cached_property
 import numpy as np
 import pandas as pd
 
-from . import coactivity, embeddings, semantic, web
+from . import coactivity, embeddings, readiness, semantic, web
 from . import config as cfg
 
 
@@ -52,6 +52,8 @@ class Ctx:
     """Shared inputs. Expensive derived tables are cached properties, built once on first use."""
 
     def __init__(self, comments: pd.DataFrame):
+        # A cached or manually supplied table does not establish source identity.
+        readiness.require_source_identity()
         self.all = comments
         self.c = comments[comments.in_model]
         self.accounts = pd.Index(sorted(self.c.account.unique()), name="account")

@@ -1,13 +1,13 @@
-"""Run the whole theory pipeline and write the three reports to results/.
+"""Proposed theory pipeline; account analysis is currently unavailable.
+
+The source has no verified sender identity contract. The command fails before
+loading legacy identity caches, running models, or writing account reports.
 
     uvx uv@0.11.3 run --locked --package swarm-detector --group analysis \
         python swarm-detector/analysis/run.py [--fresh]
 
-1 preprocessing  -> results/01_preprocessing.html
-2 models         -> results/02_models.html
-3 metric scores  -> results/03_metrics.html
-
-Preprocessing and raw metrics are cached in cache/ (git-ignored); --fresh rebuilds them.
+The former preprocessing, model and metric-report workflow is retained for
+review only. ``--fresh`` cannot bypass the identity boundary.
 """
 
 from __future__ import annotations

@@ -1,4 +1,6 @@
-"""Raw export -> clean comment table.
+"""Proposed export preprocessing; account analysis is currently unavailable.
+
+``run`` fails before deriving accounts while source identities are unverified.
 
 Every step is recorded as a `Step` (rows in, rows out, what changed and why) so the
 preprocessing report is generated from the same code that does the work.
