@@ -61,24 +61,36 @@ def _close_pairs(t: np.ndarray, acc: np.ndarray, root: np.ndarray, X: np.ndarray
                  window: float, block: int = 2048):
     """All pairs (i, j) of different accounts within `window` seconds (same root in mode 'post'),
     with their cosine. Block-wise dense products on the time-sorted rows: one BLAS call per block."""
-    key = t.astype(np.float64) if mode == "any" else root.astype(np.float64) * 1e7 + t
-    order = np.argsort(key, kind="stable")
-    key, Xo, acc_o = key[order], X[order], acc[order]
-    ends = np.searchsorted(key, key + window, side="right")
+    if mode not in MODES:
+        raise ValueError(f"Unknown comparison mode: {mode}")
     rows_i, cols_j, sims = [], [], []
-    for a in range(0, len(key), block):
-        b = min(a + block, len(key))
-        e = ends[b - 1]
-        rows = np.arange(a, b)[:, None]
-        cols = np.arange(a, e)[None, :]
-        valid = (cols > rows) & (cols < ends[a:b, None]) & (acc_o[a:b, None] != acc_o[None, a:e])
-        if not valid.any():
+    if mode == "post":
+        by_root = np.argsort(root, kind="stable")
+        boundaries = np.flatnonzero(root[by_root][1:] != root[by_root][:-1]) + 1
+        groups = np.split(by_root, boundaries)
+    else:
+        groups = [np.arange(len(t))]
+    for group in groups:
+        if not len(group):
             continue
-        sim = Xo[a:b] @ Xo[a:e].T
-        ii, jj = np.nonzero(valid)
-        rows_i.append(order[a + ii])
-        cols_j.append(order[a + jj])
-        sims.append(sim[ii, jj].astype(np.float32))
+        order = group[np.argsort(t[group], kind="stable")]
+        time, Xo, acc_o = t[order], X[order], acc[order]
+        ends = np.searchsorted(time, time + window, side="right")
+        for a in range(0, len(time), block):
+            b = min(a + block, len(time))
+            e = ends[b - 1]
+            rows = np.arange(a, b)[:, None]
+            cols = np.arange(a, e)[None, :]
+            valid = (cols > rows) & (cols < ends[a:b, None]) & (acc_o[a:b, None] != acc_o[None, a:e])
+            if not valid.any():
+                continue
+            sim = Xo[a:b] @ Xo[a:e].T
+            ii, jj = np.nonzero(valid)
+            rows_i.append(order[a + ii])
+            cols_j.append(order[a + jj])
+            sims.append(sim[ii, jj].astype(np.float32))
+    if not rows_i:
+        return np.array([], dtype=np.int64), np.array([], dtype=np.int64), np.array([], dtype=np.float32)
     return np.concatenate(rows_i), np.concatenate(cols_j), np.concatenate(sims)
 
 
@@ -117,7 +129,11 @@ def _count(edges: pd.DataFrame, k: int) -> int:
 def build(m: pd.DataFrame, X: np.ndarray, mode: str, talk_pairs: set) -> Web:
     """m: long-text table (id, account, root_id, parent_id, parent_is_comment, text_len, t);
     X: centred vectors, rows aligned; talk_pairs: (a, b) account pairs that reply to each other."""
+    if m.empty:
+        raise ValueError("Timing-and-meaning comparison unavailable: no eligible records.")
     t = (m.t - m.t.min()).dt.total_seconds().to_numpy()
+    if not np.isfinite(t).all() or int(np.ceil((t.max() + 1) / 86400)) < MIN_DAYS:
+        raise ValueError("Timing-and-meaning comparison unavailable: at least two days of valid timestamps are needed.")
     acc = pd.factorize(m.account)[0]
     root = m.root_id.fillna(-1).astype("int64").to_numpy()
     if mode == "post":  # orphans have no post: give each its own key so they never pair
@@ -125,8 +141,12 @@ def build(m: pd.DataFrame, X: np.ndarray, mode: str, talk_pairs: set) -> Web:
     W = cfg.COACTIVITY_WINDOW_S
 
     i, j, sim = _close_pairs(t, acc, root, X, mode, W)
+    if not len(sim):
+        raise ValueError("Timing-and-meaning comparison unavailable: no close pairs in this sample.")
     short = np.minimum(m.text_len.to_numpy()[i], m.text_len.to_numpy()[j])
     len_edges = np.unique(np.quantile(m.text_len, np.linspace(0, 1, 11)))
+    if len(len_edges) < 2:
+        raise ValueError("Timing-and-meaning comparison unavailable: text lengths do not vary.")
     thr = pd.Series(sim).groupby(_decile(short, len_edges)).quantile(TOP_Q)
     ev = _events(m, t, i, j, sim, thr, len_edges, mode)
     n_talk_events = int((sim >= thr.reindex(_decile(short, len_edges)).to_numpy()).sum() - len(ev))

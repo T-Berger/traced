@@ -15,6 +15,7 @@ import numpy as np
 import pandas as pd
 
 from . import config as cfg
+from . import readiness
 
 COMMENT, POST = "SOCIAL_MEDIA_COMMENT", "SOCIAL_MEDIA_POST"
 
@@ -106,6 +107,9 @@ def resolve_threads(c: pd.DataFrame, items: pd.DataFrame) -> pd.DataFrame:
 
 
 def run() -> Preprocessed:
+    # No declared source-native sender identity mapping exists for this export.
+    # Never collapse records by a display name or an inferred handle.
+    readiness.require_source_identity()
     steps: list[Step] = []
     facts: dict = {}
 

@@ -16,6 +16,20 @@ import pickle
 import sys
 import warnings
 
+from engine import readiness
+
+
+def require_account_analysis() -> None:
+    try:
+        readiness.require_source_identity()
+    except readiness.IdentityUnavailable as exc:
+        raise SystemExit(str(exc)) from exc
+
+
+if __name__ == "__main__":
+    # Fail before reading legacy caches, importing model libraries, or writing output.
+    require_account_analysis()
+
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
@@ -58,6 +72,8 @@ def hist(x, bins: int, color: str, hover: str, **kw) -> go.Bar:
 # ====================================================================== 1 · preprocessing
 
 def report_preprocessing(pp: preprocess.Preprocessed, N: features.Normalised) -> Page:
+    # The legacy identity narrative below must not be rendered from an old cache.
+    require_account_analysis()
     c, f, steps = pp.comments, pp.facts, pp.steps
     raw_rows = steps[0].rows_in
     pg = Page("01_preprocessing.html", "Preprocessing report",
@@ -787,6 +803,7 @@ def setup_semantic(args: list[str], pp: preprocess.Preprocessed) -> str:
 
 
 def main() -> None:
+    require_account_analysis()
     fresh = "--fresh" in sys.argv
     cfg.CACHE.mkdir(exist_ok=True)
     print("1/5 preprocessing")

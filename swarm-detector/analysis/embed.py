@@ -26,6 +26,20 @@ import sys
 import time
 from datetime import UTC, datetime
 
+from engine import readiness
+
+
+def require_account_analysis() -> None:
+    try:
+        readiness.require_source_identity()
+    except readiness.IdentityUnavailable as exc:
+        raise SystemExit(str(exc)) from exc
+
+
+if __name__ == "__main__":
+    # Do not load legacy identity caches or download embedding models.
+    require_account_analysis()
+
 import numpy as np
 import pandas as pd
 from engine import config as cfg
@@ -41,6 +55,7 @@ def clean(text: str) -> str:
 
 
 def load_comments() -> pd.DataFrame:
+    require_account_analysis()
     path = cfg.CACHE / "preprocessed.pkl"
     if path.exists():
         return pickle.loads(path.read_bytes()).comments

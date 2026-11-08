@@ -115,6 +115,11 @@ jobs:
         env:
           MAKE_TARGET: ${{ matrix.target }}
         run: make "$MAKE_TARGET"
+      - name: Exercise the optional Swarm analysis safety boundary
+        if: matrix.package == 'swarm-detector'
+        run: >-
+          uv --directory swarm-detector run --locked --all-packages --all-extras
+          --group dev --group analysis pytest tests/test_theory_safety.py -q
 
   runtime:
     name: Root launcher runtime integration
