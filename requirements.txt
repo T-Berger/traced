@@ -1,8 +1,0 @@
-# Requirements for Railpack Python builder
-# This ensures Railpack can install dependencies
-
-# Core dependencies
-uv==0.11.3
-
-# The actual dependencies are in pyproject.toml and uv.lock
-# This file is just to make Railpack happy
