@@ -302,7 +302,7 @@ def timeline(assessments: list[Assessment]) -> list[dict]:
     return [days[k] for k in sorted(days)]
 
 
-def verdict(assessments: list[Assessment], account_rows: list[dict]) -> dict:
+def verdict(assessments: list[Assessment]) -> dict:
     """Summarize model candidates without assigning a human decision."""
     ready = sum(a.status == READY for a in assessments)
     needs = sum(a.status == NEEDS for a in assessments)
