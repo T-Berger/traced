@@ -2,12 +2,15 @@
 
 from __future__ import annotations
 
+import hashlib
+import json
 from typing import Any
 
 import plotly.graph_objects as go
 from dash import Input, Output, State, ctx, dcc, html, no_update
 from pydantic import ValidationError
 
+from ..review.comparison_ui import safe_source_url
 from . import analysis
 from .analysis import NEEDS, READY, Assessment
 from .pdf_report import build_pdf
@@ -26,6 +29,20 @@ COLORS = {
 FORM_KEYS = [(c, f) for c in CATEGORIES for f in ("label_score", "filing_score")]
 
 
+def _snapshot_fingerprint(data, settings) -> str:
+    """Bind a displayed selection to all inputs used to construct the draft report."""
+    payload = {
+        "case": data.case,
+        "total_posts": data.total_posts,
+        "labels": data.labels,
+        "references": data.references,
+        "last_run": data.last_run,
+        "bursts": data.bursts,
+        "settings": settings.model_dump(mode="json"),
+    }
+    return hashlib.sha256(json.dumps(payload, sort_keys=True, default=str).encode()).hexdigest()
+
+
 def _field_id(category: str, field: str) -> str:
     return f"al-th-{category}-{field}".replace("_", "-")
 
@@ -34,7 +51,9 @@ def _field_id(category: str, field: str) -> str:
 
 
 def _compact(n) -> str:
-    n = int(n or 0)
+    if n is None:
+        return "Unknown"
+    n = int(n)
     for div, suffix in ((1_000_000, "M"), (1_000, "K")):
         if n >= div:
             return f"{n / div:.1f}".rstrip("0").rstrip(".") + suffix
@@ -51,9 +70,10 @@ def _date(ts) -> str:
 
 
 def _link(url: str | None, label: str = "Open post") -> Any:
-    if not url:
-        return html.Span("No URL", className="al-muted")
-    return html.A(label, href=url, target="_blank", rel="noopener noreferrer", className="al-link")
+    safe = safe_source_url(url)
+    if not safe:
+        return html.Span("Source link unavailable", className="al-muted")
+    return html.A(label, href=safe, target="_blank", rel="noopener noreferrer", className="al-link")
 
 
 def _pill(text: str, kind: str) -> html.Span:
@@ -87,7 +107,7 @@ def _settings_panel(settings: AlertSettings) -> html.Details:
     for c in CATEGORIES:
         values = settings.categories[c]
         cells = [html.Th(CATEGORY_LABELS[c], scope="row")]
-        for field, label in (("label_score", "violation"), ("filing_score", "reporting")):
+        for field, label in (("label_score", "candidate"), ("filing_score", "review")):
             cells.append(
                 html.Td(
                     html.Label(
@@ -131,14 +151,14 @@ def _settings_panel(settings: AlertSettings) -> html.Details:
                         [
                             html.H3("Scores", className="al-h3"),
                             html.P(
-                                "Violation: the post breaks the rule. Reporting: confident "
-                                "enough to report. Scores run from 0 to 1.",
+                                "Score thresholds select candidates; they do not establish "
+                                "a violation or a human decision. Scores run from 0 to 1.",
                                 className="al-hint",
                             ),
                             html.Table(
                                 [
-                                    html.Thead(html.Tr([html.Th("Category"), html.Th("Violation"),
-                                                        html.Th("Reporting")])),
+                                    html.Thead(html.Tr([html.Th("Category"), html.Th("Candidate"),
+                                                        html.Th("Evidence review")])),
                                     html.Tbody(rows),
                                 ],
                                 className="al-table al-table--compact",
@@ -150,14 +170,14 @@ def _settings_panel(settings: AlertSettings) -> html.Details:
                         [
                             html.H3("Evidence rules", className="al-h3"),
                             field(
-                                "Report the account after",
+                                "Group accounts after",
                                 dcc.Input(id="al-account-ready", type="number", min=1, step=1,
                                           value=settings.account_ready_posts,
                                           className="al-input al-input--num"),
-                                "posts ready to report",
+                                "candidate posts",
                             ),
                             field(
-                                "High reach from",
+                                "High recorded views from",
                                 dcc.Input(id="al-high-reach", type="number", min=0, step=100,
                                           value=settings.high_reach_views,
                                           className="al-input al-input--num"),
@@ -215,16 +235,17 @@ def alerts_page(store: AlertSettingsStore) -> html.Section:
         html.Div(
             [
                 dcc.Store(id="al-settings-rev", data=0),
+                dcc.Store(id="al-selection-snapshot", data=None),
                 dcc.Download(id="al-download"),
                 html.Header(
                     [
                         html.Div(
                             [
-                                html.Span("Takedown readiness", className="al-eyebrow"),
-                                html.H1("Evidence for takedown reports", className="al-title"),
+                                html.Span("Review candidates", className="al-eyebrow"),
+                                html.H1("Evidence for human review", className="al-title"),
                                 html.P(
-                                    "Which posts about the subject can be reported to X now, "
-                                    "and the evidence behind each one.",
+                                    "Inspect model-labeled posts and their available evidence. "
+                                    "A human must decide whether any report is appropriate.",
                                     className="al-lede",
                                 ),
                             ],
@@ -253,9 +274,9 @@ def alerts_page(store: AlertSettingsStore) -> html.Section:
                 _notice(problem, "warning") if problem else None,
                 dcc.Loading(html.Div(id="al-summary"), type="dot", color="#038095"),
                 _section(
-                    "Ready to report",
-                    "Every required type of evidence is present. Selected posts go into the "
-                    "evidence report.",
+                    "Candidates for review",
+                    "Selected candidates have the listed material. They are model proposals, "
+                    "not confirmed violations or review decisions.",
                     html.Div(
                         [
                             dcc.Checklist(id="al-ev-select", options=[], value=[],
@@ -268,7 +289,7 @@ def alerts_page(store: AlertSettingsStore) -> html.Section:
                     section_id="al-ready",
                     extra=html.Div(
                         [
-                            html.Button("Download PDF evidence report", id="al-download-selected",
+                            html.Button("Download draft evidence PDF", id="al-download-selected",
                                         n_clicks=0, className="al-btn al-btn--primary"),
                             html.Span(id="al-download-message", className="al-sub",
                                       **{"aria-live": "polite"}),
@@ -277,30 +298,30 @@ def alerts_page(store: AlertSettingsStore) -> html.Section:
                     ),
                 ),
                 _section(
-                    "Needs evidence",
-                    "Strong violations that are missing a required element.",
+                    "Other model candidates",
+                    "Model candidates below the review threshold or missing evidence.",
                     html.Div(id="al-needs"),
                     section_id="al-needs-section",
                 ),
                 _section(
                     "Accounts",
-                    "Accounts behind the violations. Report the account when several of its "
-                    "posts are ready to report.",
+                    "Account grouping of model candidates; inspect evidence before deciding "
+                    "whether any action is appropriate.",
                     html.Div(id="al-accounts"),
                     section_id="al-accounts-section",
                 ),
                 _section(
-                    "Violations over time",
-                    "Violations by others about the subject, per UTC day. Red markers: posts "
-                    "ready to report.",
+                    "Model candidates over time",
+                    "Model-labeled posts by UTC day in the saved sample. Markers show candidates "
+                    "with the listed material available.",
                     dcc.Graph(id="al-timeline", config={"displayModeBar": False},
                               responsive=True, className="al-chart"),
                     section_id="al-timeline-section",
                 ),
                 _settings_panel(settings),
                 html.P(
-                    "Labels are model-assisted assessments with a saved rationale. A reviewer "
-                    "confirms each post before it is reported.",
+                    "Labels and scores are model proposals. No human decision is recorded here. "
+                    "Check saved sources, context, and platform rules independently.",
                     className="al-footnote",
                 ),
             ],
@@ -320,15 +341,17 @@ def _summary(data, assessments, accounts, settings) -> html.Div:
     ready = [a for a in assessments if a.status == READY]
     needs = [a for a in assessments if a.status == NEEDS]
     ready_accounts = [x for x in accounts if x["status"] == READY]
+    lower = [a for a in assessments if a.status == analysis.MONITOR]
     labeled = sum(1 for r in data.labels if analysis.is_classified(r))
-    pct = labeled / data.total_posts * 100 if data.total_posts else 0
     icon = {"red": "!", "amber": "…", "clear": "✓"}[verdict["level"]]
+    known_views = [a.row["view_count"] for a in ready if a.row.get("view_count") is not None]
+    unknown_views = sum(a.row.get("view_count") is None for a in ready)
     stats = [
-        ("Ready to report", len(ready), "posts", "red"),
-        ("Needs evidence", len(needs), "posts", "amber"),
-        ("Accounts to report", len(ready_accounts), "accounts", "red" if ready_accounts else ""),
-        ("Reach of ready posts", _compact(sum(a.row.get("view_count") or 0 for a in ready)),
-         "views", ""),
+        ("Candidates for review", len(ready), "posts", "amber"),
+        ("Other model candidates", len(needs) + len(lower), "posts", "amber"),
+        ("Accounts with candidates", len(ready_accounts), "accounts", "amber"),
+        ("Known recorded views", _compact(sum(known_views)) if known_views else "Unknown",
+         f"{unknown_views} posts unknown", ""),
     ]  # fmt: skip
     return html.Div(
         [
@@ -338,9 +361,11 @@ def _summary(data, assessments, accounts, settings) -> html.Div:
                     html.Div(
                         [
                             html.Span(
-                                {"red": "Red alert", "amber": "Not ready", "clear": "All clear"}[
-                                    verdict["level"]
-                                ],
+                                {
+                                    "red": "Review",
+                                    "amber": "Review required",
+                                    "clear": "No candidates",
+                                }[verdict["level"]],
                                 className="al-verdict-kicker",
                             ),
                             html.H2(verdict["headline"], className="al-verdict-title"),
@@ -368,8 +393,8 @@ def _summary(data, assessments, accounts, settings) -> html.Div:
             html.P(
                 [
                     html.Strong(f"{data.case['subject_name']}"),
-                    f" · {labeled:,} of {data.total_posts:,} collected posts assessed "
-                    f"({pct:.1f}%). Results cover assessed posts only.",
+                    f" · {data.total_posts:,} saved items; {labeled:,} have classified labels. "
+                    "Labeled items do not establish collection completeness.",
                 ],
                 className="al-coverage",
             ),
@@ -405,13 +430,13 @@ def _proof(a: Assessment, references: dict) -> Any:
                 className="al-quote al-quote--record",
             )
             if refs
-            else html.P("No matching post from the subject.", className="al-muted")
+            else html.P("No case-scoped linked context is available.", className="al-muted")
         )  # fmt: skip
         return html.Div(
             [
                 html.Div([html.Span("Claim", className="al-mini"),
                           html.P(row.get("claim_summary") or "—", className="al-claim")]),
-                html.Div([html.Span("The subject's own record", className="al-mini"), record]),
+                html.Div([html.Span("Linked context (verify)", className="al-mini"), record]),
             ],
             className="al-proof al-proof--split",
         )  # fmt: skip
@@ -433,7 +458,7 @@ def _ready_option(a: Assessment, references: dict, settings: AlertSettings) -> d
             [
                 html.Div(
                     [
-                        _pill("Ready", "red"),
+                        _pill("Candidate", "amber"),
                         _cat(a.category),
                         html.Span(a.route["rule"], className="al-rule"),
                         html.Span(f"score {a.score:.2f}", className="al-score"),
@@ -478,6 +503,7 @@ def _needs_table(needs: list[Assessment]) -> Any:
                 html.Td([html.Strong(f"@{a.row.get('handle') or 'unknown'}"), html.Br(),
                          html.Span(_excerpt(a.row.get("text"), 120), className="al-muted")]),
                 html.Td(_cat(a.category)),
+                html.Td(analysis.STATUS_LABELS[a.status]),
                 html.Td(f"{a.score:.2f}", className="al-num"),
                 html.Td([html.Span(m.label, className="al-check-chip al-check-chip--miss")
                          for m in a.missing], className="al-missing"),
@@ -487,20 +513,24 @@ def _needs_table(needs: list[Assessment]) -> Any:
         for a in needs[:20]
     ]  # fmt: skip
     return html.Div(
+        [html.P(f"Showing first 20 of {len(needs)} candidates; refine the case to see the rest.")
+         if len(needs) > 20 else None,
         html.Table(
-            [html.Thead(html.Tr([html.Th("Post"), html.Th("Category"), html.Th("Score"),
+            [html.Thead(html.Tr([html.Th("Post"), html.Th("Category"), html.Th("Status"),
+                                 html.Th("Score"),
                                  html.Th("Missing"), html.Th("")])),
              html.Tbody(rows)],
             className="al-table",
-        ),
+        )],
         className="al-table-wrap",
     )  # fmt: skip
 
 
 def _accounts_table(accounts: list[dict], settings: AlertSettings) -> Any:
-    shown = [x for x in accounts if x["status"] in (READY, NEEDS)][:20]
+    eligible = [x for x in accounts if x["status"] in (READY, NEEDS)]
+    shown = eligible[:20]
     if not shown:
-        return html.P("No account has a post ready to file.", className="al-empty")
+        return html.P("No account has a candidate with the listed material.", className="al-empty")
     rows = []
     for x in shown:
         report = x["status"] == READY
@@ -511,18 +541,20 @@ def _accounts_table(accounts: list[dict], settings: AlertSettings) -> Any:
             html.Td(str(x["ready"]), className="al-num"),
             html.Td(str(x["violations"]), className="al-num"),
             html.Td([_cat(c) for c in x["categories"]], className="al-cats"),
-            html.Td(_pill("Report account", "red") if report else
-                    [_pill("Report posts", "amber"), html.Br(),
-                     html.Span(f"{x['ready']} of {settings.account_ready_posts} ready posts "
-                               "needed for an account report", className="al-muted")]),
+            html.Td(_pill("Review account", "amber") if report else
+                    [_pill("Review posts", "amber"), html.Br(),
+                     html.Span(f"{x['ready']} of {settings.account_ready_posts} candidates "
+                               "needed for this grouping", className="al-muted")]),
         ]))  # fmt: skip
     return html.Div(
+        [html.P(f"Showing first 20 of {len(eligible)} account groups.")
+         if len(eligible) > 20 else None,
         html.Table(
-            [html.Thead(html.Tr([html.Th(h) for h in ("Account", "Followers", "Ready",
-                                                      "Violations", "Categories", "Action")])),
+            [html.Thead(html.Tr([html.Th(h) for h in ("Account", "Followers", "Candidates",
+                                                      "Labels", "Categories", "Review")])),
              html.Tbody(rows)],
             className="al-table",
-        ),
+        )],
         className="al-table-wrap",
     )  # fmt: skip
 
@@ -546,11 +578,11 @@ def timeline_figure(days: list[dict]) -> go.Figure:
             x=ready_x,
             y=[d[READY] for d in days if d[READY]],
             mode="markers",
-            name="Ready to report",
+            name="Candidates for review",
             marker=dict(
                 color="#C81E1E", size=11, symbol="diamond", line=dict(color="#FDFCFD", width=1.5)
             ),
-            hovertemplate="%{y} ready<extra></extra>",
+            hovertemplate="%{y} candidates<extra></extra>",
         )
     fig.update_layout(
         height=300,
@@ -637,11 +669,12 @@ def register_alert_callbacks(app, service) -> None:
     def _load(case_id, refresh=False):
         data = repo.case_data(case_id, refresh=refresh)
         settings, _ = store.load()
-        assessments = analysis.assess_all(data.labels, settings)
+        assessments = analysis.assess_all(data.labels, settings, data.references)
         accounts = analysis.accounts(assessments, settings, data.bursts)
         return data, settings, assessments, accounts
 
     @app.callback(
+        Output("al-selection-snapshot", "data"),
         Output("al-summary", "children"),
         Output("al-ev-select", "options"),
         Output("al-ev-select", "value"),
@@ -652,12 +685,12 @@ def register_alert_callbacks(app, service) -> None:
         Input("al-case", "value"),
         Input("al-settings-rev", "data"),
         Input("al-refresh", "n_clicks"),
-        State("rv-page", "value"),
+        Input("rv-page", "value"),
         State("al-ev-select", "value"),
     )
     def render(case_id, _rev, _refresh, page, selected):
-        if page != "alerts" and ctx.triggered_id != "al-case":
-            return (no_update,) * 7
+        if page != "alerts":
+            return (no_update,) * 8
         empty_fig = timeline_figure([])
         if not case_id:
             try:
@@ -665,26 +698,27 @@ def register_alert_callbacks(app, service) -> None:
                 message = "No analytics subjects found in the database."
             except AnalyticsUnavailable as exc:
                 message = str(exc)
-            return _notice(message, "warning"), [], [], "", "", "", empty_fig
+            return None, _notice(message, "warning"), [], [], "", "", "", empty_fig
         try:
             data, settings, assessments, accounts = _load(case_id, ctx.triggered_id == "al-refresh")
         except AnalyticsUnavailable as exc:
-            return _notice(str(exc), "warning"), [], [], "", "", "", empty_fig
+            return None, _notice(str(exc), "warning"), [], [], "", "", "", empty_fig
         ready = [a for a in assessments if a.status == READY]
-        needs = [a for a in assessments if a.status == NEEDS]
+        needs = [a for a in assessments if a.status in (NEEDS, analysis.MONITOR)]
         options = [_ready_option(a, data.references, settings) for a in ready]
         ids = [o["value"] for o in options]
         kept = [v for v in (selected or []) if v in ids]
-        value = kept if ctx.triggered_id == "al-settings-rev" and kept else ids
+        value = [] if ctx.triggered_id == "al-case" else kept
         empty = (
             ""
             if ready
             else html.P(
-                "No post has every type of evidence yet. See “Needs evidence” for what is missing.",
+                "No candidate has the listed material available. See other candidates below.",
                 className="al-empty",
             )
         )
         return (
+            _snapshot_fingerprint(data, settings),
             _summary(data, assessments, accounts, settings),
             options,
             value,
@@ -736,19 +770,33 @@ def register_alert_callbacks(app, service) -> None:
         Input("al-download-selected", "n_clicks"),
         State("al-ev-select", "value"),
         State("al-case", "value"),
+        State("al-selection-snapshot", "data"),
         prevent_initial_call=True,
     )
-    def download(_clicks, selected, case_id):
+    def download(_clicks, selected, case_id, displayed_fingerprint):
         if not case_id:
             return no_update, "Choose a subject first."
         if not selected:
             return no_update, "Select at least one post."
         try:
-            data, settings, assessments, accounts = _load(case_id)
+            data = repo.case_snapshot(case_id, list(selected))
+            settings, _ = store.load()
+            if not displayed_fingerprint or displayed_fingerprint != _snapshot_fingerprint(
+                data, settings
+            ):
+                return (
+                    no_update,
+                    "The saved case or settings changed; refresh and review your selection.",
+                )
+            assessments = analysis.assess_all(data.labels, settings, data.references)
+            accounts = analysis.accounts(assessments, settings, data.bursts)
             chosen = [a for a in assessments if a.id in set(selected) and a.status == READY]
-            if not chosen:
-                return no_update, "The selected posts no longer meet the evidence standard."
-            provenance = repo.provenance([a.id for a in chosen])
+            if len(set(selected)) != len(selected) or {a.id for a in chosen} != set(selected):
+                return (
+                    no_update,
+                    "The selection changed or is no longer available; refresh and review it.",
+                )
+            provenance = data.provenance
             content, filename, digest = build_pdf(
                 data.case, chosen, data.references, provenance, accounts, settings
             )

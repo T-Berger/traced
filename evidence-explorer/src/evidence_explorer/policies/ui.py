@@ -6,6 +6,7 @@ from typing import Any
 
 from dash import Input, Output, State, ctx, dcc, html, no_update
 
+from ..review.comparison_ui import safe_source_url
 from .catalog import Catalog, load_catalog
 
 PAGE_ID = "rv-policies-page"
@@ -16,9 +17,10 @@ GENERAL = "__general__"
 
 
 def _a(title: str, url: str | None, cls: str = "al-link") -> Any:
-    if not url:
-        return html.Span(title)
-    return html.A(title, href=url, target="_blank", rel="noopener noreferrer", className=cls)
+    safe = safe_source_url(url)
+    if not safe:
+        return html.Span(f"{title} (link unavailable)")
+    return html.A(title, href=safe, target="_blank", rel="noopener noreferrer", className=cls)
 
 
 def _section(title: str, subtitle: str | None, body, *, section_id: str | None = None):
@@ -256,8 +258,8 @@ def _documentation(doc: dict) -> html.Section | None:
                         html.Span("Evidence types to collect", className="al-mini"),
                         types,
                         html.P(
-                            "Traced's Alerts tab checks these automatically for labeled posts and "
-                            "produces the PDF evidence report.",
+                            "Alerts shows model candidates and available records. Human review "
+                            "of evidence and current policy is required before any decision.",
                             className="pg-callout",
                         ),
                     ]
@@ -271,14 +273,15 @@ def _documentation(doc: dict) -> html.Section | None:
 
 
 def _case_guide(case: dict, platform: dict) -> html.Section:
-    strategy = case.get("strategy") or {}
     accounts = [a for a in case.get("official_accounts", []) if a["platform"] == platform["id"]]
     cats = []
     for cat in case["categories"]:
         examples = [
             html.Div(
-                [html.Blockquote(e["quote"], className="al-quote"),
-                 html.P(e["analysis"], className="al-why")],
+                [html.Strong("Unsupported, unreviewed example: source unavailable"),
+                 html.Blockquote(e["quote"], className="al-quote"),
+                 html.P([html.Strong("Supplied interpretation (unverified): "), e["analysis"]],
+                        className="al-why")],
                 className="pg-example",
             )
             for e in cat.get("examples", [])
@@ -290,7 +293,8 @@ def _case_guide(case: dict, platform: dict) -> html.Section:
                                   html.Span(f"{len(examples)} examples", className="al-muted")]),
                     html.Div(
                         [
-                            html.P(cat["definition"]),
+                            html.P([html.Strong("Supplied working definition (not a finding): "),
+                                    cat["definition"]]),
                             html.P([html.Span("Evidence needed ", className="al-mini"),
                                     cat.get("evidence_needed", "")]),
                             *examples,
@@ -306,15 +310,16 @@ def _case_guide(case: dict, platform: dict) -> html.Section:
             [
                 html.Div(
                     [
-                        html.Span(strategy.get("title", "Strategy"), className="al-mini"),
-                        html.Ul([html.Li(p) for p in strategy.get("points", [])],
-                                className="pg-list"),
+                        html.Span("Review guidance", className="al-mini"),
+                        html.P("The examples below have no supplied exact source references. "
+                               "Check original records, context and current rules; a human "
+                               "decides whether a report is appropriate."),
                     ],
                     className="pg-strategy",
                 ),
                 html.Div(
                     [
-                        html.Span("The subject's verified accounts (the record)",
+                        html.Span("Declared account references (verify independently)",
                                   className="al-mini"),
                         html.Ul([html.Li([_a(a["handle"], a.get("url")), f" · {a['note']}"])
                                  for a in accounts] or [html.Li("None listed for this platform.")],
@@ -326,7 +331,8 @@ def _case_guide(case: dict, platform: dict) -> html.Section:
             className="pg-case-top",
         ),
         html.Div(cats, className="pg-cats"),
-        html.P(case.get("notes", ""), className="al-muted"),
+        html.P("Case examples and interpretations are unsupported planning material, "
+               "not verified findings or review decisions.", className="al-muted"),
     ]  # fmt: skip
     return _section(
         f"Case guide: {case['subject']}",

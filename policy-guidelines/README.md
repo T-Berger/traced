@@ -2,9 +2,13 @@
 
 Reference material for the **Policies** tab in the integrated desk. It explains how to
 report disinformation and abuse to each platform, which platform rule applies, and what
-evidence to keep. Everything here comes from official sources: platform help centres,
-platform filings, and government pages. Each entry records the URL and the date it was
-last checked.
+evidence to keep. Platform reference entries link to platform help centres, filings,
+and government pages and record the stated check date and method where supplied.
+
+Case guide definitions, examples, interpretations, account descriptions, and strategy
+points are supplied planning material. They have no saved evidence references and are
+**unsupported and unreviewed** unless separately linked to exact saved records. They
+are not official-source verification, factual findings, or human reporting decisions.
 
 ```
 policy-guidelines/
@@ -28,8 +32,9 @@ policy-guidelines/
 3. Put new official PDFs in the platform's `documents/` folder and list them under
    `regulatory_reports` with the official URL.
 4. To add a platform, copy `twitter/platform.json` into a new folder (for example
-   `instagram/`). To add a case, copy `cases/zohran-mamdani.json`. The Policies tab picks
-   up new files after a refresh.
+   `instagram/`). Treat case files as unsupported planning material unless exact saved
+   evidence is bound and independently reviewed. The Policies tab picks up new files
+   after a refresh.
 
 The page reads this folder from the project root. To use a different location, set
 `TRACED_POLICY_DIR`.

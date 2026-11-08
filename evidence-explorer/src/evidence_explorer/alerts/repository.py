@@ -28,6 +28,7 @@ class CaseData:
     references: dict[str, dict[str, Any]]
     last_run: dict[str, Any] | None
     bursts: list[dict[str, Any]] = field(default_factory=list)
+    provenance: dict[str, dict[str, Any]] = field(default_factory=dict)
 
 
 class AnalyticsRepository:
@@ -91,8 +92,13 @@ class AnalyticsRepository:
             self._cache[case_id] = (now, data)
         return data
 
-    def _load(self, case_id: str) -> CaseData:
+    def case_snapshot(self, case_id: str, item_ids: list[str]) -> CaseData:
+        """Capture fresh labels, case-scoped references and selected raw records together."""
+        return self._load(case_id, capture_ids=item_ids)
+
+    def _load(self, case_id: str, *, capture_ids: list[str] | None = None) -> CaseData:
         with self._connection() as conn:
+            conn.execute("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY")
             case = conn.execute(
                 """SELECT id::text AS id, slug, subject_name, subject_role, description,
                           window_start, window_end FROM cases WHERE id::text = %s""",
@@ -105,7 +111,8 @@ class AnalyticsRepository:
             ).fetchone()["n"]
             labels = conn.execute(
                 """
-                SELECT l.content_item_id::text AS id, l.attribution, l.posted_at, l.status,
+                SELECT l.content_item_id::text AS id, l.case_id::text AS case_id,
+                       l.attribution, l.posted_at, l.status,
                        l.disinformation, l.racism, l.hate_speech, l.harassment, l.harassment_volume,
                        l.disinfo_verdict, l.claim_summary, l.hate_speech_basis, l.racism_target,
                        l.harassment_target, l.rationale, l.signals, l.model, l.prompt_version,
@@ -116,26 +123,34 @@ class AnalyticsRepository:
                        c.archive_url,
                        c.content_sha256, c.collected_at, c.is_reply, c.view_count, c.like_count,
                        c.repost_count, c.reply_count, c.lang,
-                       -- SHA-256 of the captured platform record (jsonb text is canonical:
-                       -- keys are stored sorted), so the saved copy can be authenticated.
+                       -- Export-time hash of the saved jsonb text; not a collection-time hash.
                        encode(sha256(convert_to(c.raw::text, 'UTF8')), 'hex') AS capture_sha256,
                        a.handle, a.display_name, a.followers_count, a.is_verified,
                        a.platform_user_id
                 FROM analytics_content_labels l
-                JOIN content_items c ON c.id = l.content_item_id
+                JOIN content_items c ON c.id = l.content_item_id AND c.case_id = l.case_id
                 LEFT JOIN authors a ON a.id = l.author_id
                 WHERE l.case_id::text = %s
                 ORDER BY l.posted_at
                 """,
                 (case_id,),
             ).fetchall()
+            label_ids = [row["id"] for row in labels]
+            if len(label_ids) != len(set(label_ids)):
+                raise AnalyticsUnavailable(
+                    "Multiple labels share a record ID; select an unambiguous saved run first."
+                )
             ref_ids = sorted({r for row in labels for r in row["reference_ids"]})
             references = {}
             if ref_ids:
                 for r in conn.execute(
-                    """SELECT id::text AS id, attribution::text AS attribution, posted_at, text, url
-                       FROM content_items WHERE id::text = ANY(%s)""",
-                    (ref_ids,),
+                    """SELECT id::text AS id, case_id::text AS case_id,
+                              attribution::text AS attribution, posted_at, text, url,
+                              raw::text AS raw,
+                              encode(sha256(convert_to(raw::text, 'UTF8')), 'hex')
+                                  AS capture_sha256
+                       FROM content_items WHERE case_id::text = %s AND id::text = ANY(%s)""",
+                    (case_id, ref_ids),
                 ):
                     references[r["id"]] = r
             last_run = None
@@ -155,6 +170,7 @@ class AnalyticsRepository:
                        WHERE case_id::text = %s ORDER BY post_count DESC, window_start LIMIT 50""",
                     (case_id,),
                 ).fetchall()
+            provenance = self._provenance(conn, capture_ids or [], case_id=case_id)
         return CaseData(
             case=case,
             total_posts=total,
@@ -162,6 +178,7 @@ class AnalyticsRepository:
             references=references,
             last_run=last_run,
             bursts=bursts,
+            provenance=provenance,
         )
 
     def captures(self, item_ids: list[str]) -> dict[str, str]:
@@ -172,22 +189,31 @@ class AnalyticsRepository:
         """Native capture plus the collection run that acquired it (chain of custody)."""
         if not item_ids:
             return {}
-        has_runs = False
         with self._connection() as conn:
-            has_runs = _table_exists(conn, "collection_runs")
-            run_cols = (
-                "r.id::text AS run_id, r.tier, r.actor_id, r.query, r.status AS run_status, "
-                "r.started_at AS run_started_at, r.finished_at AS run_finished_at, "
-                "r.items_returned"
-                if has_runs
-                else "NULL AS run_id"
-            )
-            join = "LEFT JOIN collection_runs r ON r.id = c.collection_run_id" if has_runs else ""
-            rows = conn.execute(
-                f"""SELECT c.id::text AS id, c.raw::text AS raw, {run_cols}
-                    FROM content_items c {join} WHERE c.id::text = ANY(%s)""",
-                (list(item_ids),),
-            ).fetchall()
+            return self._provenance(conn, item_ids)
+
+    @staticmethod
+    def _provenance(
+        conn, item_ids: list[str], *, case_id: str | None = None
+    ) -> dict[str, dict[str, Any]]:
+        if not item_ids:
+            return {}
+        has_runs = _table_exists(conn, "collection_runs")
+        run_cols = (
+            "r.id::text AS run_id, r.tier, r.actor_id, r.query, r.status AS run_status, "
+            "r.started_at AS run_started_at, r.finished_at AS run_finished_at, "
+            "r.items_returned"
+            if has_runs
+            else "NULL AS run_id"
+        )
+        join = "LEFT JOIN collection_runs r ON r.id = c.collection_run_id" if has_runs else ""
+        scope = " AND c.case_id::text = %s" if case_id is not None else ""
+        params = (list(item_ids), case_id) if case_id is not None else (list(item_ids),)
+        rows = conn.execute(
+            f"""SELECT c.id::text AS id, c.raw::text AS raw, {run_cols}
+                FROM content_items c {join} WHERE c.id::text = ANY(%s){scope}""",
+            params,
+        ).fetchall()
         out = {}
         for r in rows:
             raw = r.pop("raw")

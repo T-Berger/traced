@@ -12,13 +12,14 @@ from .analysis import STATUS_LABELS, Assessment
 from .settings import CATEGORY_LABELS
 
 PREPARER_STATEMENT = (
-    "This report was prepared from records collected and preserved as described in Section 3. "
-    "The SHA-256 values in Section 6 were computed from the attached records when this report "
-    "was generated, and each matches the value recorded at assessment."
+    "The attached saved records were captured in one database read snapshot. SHA-256 hashes "
+    "were calculated from the attached bytes at export. They do not establish the collection-time "
+    "contents, authenticity, or the relationship between extracted text and the native record."
 )
 REVIEW_NOTE = (
-    "Classifications are model-assisted assessments with a saved rationale. A reviewer confirms "
-    "each evidence item before it is reported to the platform."
+    "This document is a draft of model proposals and linked records. No human review decision "
+    "or policy violation is established here. A reviewer must check the original records, "
+    "attribution, context and current platform rules before deciding on any action."
 )
 
 
@@ -28,19 +29,31 @@ def _iso(value) -> str | None:
 
 def evidence_item(a: Assessment, references: dict[str, dict], capture: str | None) -> dict:
     row = a.row
-    # The subject's own posts are contextual evidence for false claims only.
+    # Linked records must resolve within the same case snapshot; their meaning is unreviewed.
     disinfo = a.category == "disinformation"
-    refs = (
-        [references[r] for r in row.get("reference_ids") or [] if r in references]
-        if disinfo
-        else []
-    )
-    capture_hash = row.get("capture_sha256")
-    if capture is not None:
-        computed = hashlib.sha256(capture.encode("utf-8")).hexdigest()
-        if capture_hash and computed != capture_hash:
-            raise ValueError(f"Capture for {row['id']} changed since it was assessed.")
-        capture_hash = computed
+    ref_ids = row.get("reference_ids") or [] if disinfo else []
+    refs = []
+    for ref_id in ref_ids:
+        ref = references.get(ref_id)
+        if (
+            not ref
+            or ref.get("id") != ref_id
+            or not row.get("case_id")
+            or ref.get("case_id") != row["case_id"]
+        ):
+            raise ValueError(f"Linked context {ref_id} is unavailable in the selected case.")
+        raw = ref.get("raw")
+        recorded_hash = ref.get("capture_sha256")
+        if not isinstance(raw, str) or not recorded_hash:
+            raise ValueError(f"Linked context {ref_id} has no saved capture.")
+        if hashlib.sha256(raw.encode("utf-8")).hexdigest() != recorded_hash:
+            raise ValueError(f"Linked context {ref_id} changed since capture.")
+        refs.append(ref)
+    if not isinstance(capture, str) or not row.get("capture_sha256"):
+        raise ValueError(f"Saved capture for {row['id']} is unavailable.")
+    capture_hash = hashlib.sha256(capture.encode("utf-8")).hexdigest()
+    if capture_hash != row["capture_sha256"]:
+        raise ValueError(f"Capture for {row['id']} changed since assessment.")
     return {
         "id": row["id"],
         "status": STATUS_LABELS[a.status],
@@ -53,6 +66,7 @@ def evidence_item(a: Assessment, references: dict[str, dict], capture: str | Non
             "text": row.get("text"),
         },
         "attribution": {
+            "source_attribution": row.get("attribution"),
             "handle": row.get("handle"),
             "user_id": row.get("platform_user_id"),
             "display_name": row.get("display_name"),
@@ -62,7 +76,7 @@ def evidence_item(a: Assessment, references: dict[str, dict], capture: str | Non
         "preservation": {
             "collected_at": _iso(row.get("collected_at")),
             "capture_sha256": capture_hash,
-            "capture_file": f"captures/{row['id']}.json" if capture is not None else None,
+            "capture_file": f"{row['id']}.json" if capture is not None else None,
             "archive_url": row.get("archive_url"),
         },
         "classification": {
@@ -73,14 +87,23 @@ def evidence_item(a: Assessment, references: dict[str, dict], capture: str | Non
             "claim": row.get("claim_summary") if disinfo else None,
             "protected_group": row.get("racism_target")
             or ", ".join(b.replace("_", " ") for b in row.get("hate_speech_basis") or []),
-            "score": round(a.score, 3),
+            "score": a.score,
+            "classified_at": _iso(row.get("classified_at")),
+            "run_id": None,
             "model": row.get("model"),
             "prompt_version": row.get("prompt_version"),
         },
         "context": {
             "verdict": row.get("disinfo_verdict") if disinfo else None,
             "subject_posts": [
-                {"url": r.get("url"), "posted_at": _iso(r.get("posted_at")), "text": r.get("text")}
+                {
+                    "id": r["id"],
+                    "url": r.get("url"),
+                    "posted_at": _iso(r.get("posted_at")),
+                    "text": r.get("text"),
+                    "capture_sha256": r["capture_sha256"],
+                    "capture_file": f"context-{r['id']}.json",
+                }
                 for r in refs
             ],
         },
@@ -92,7 +115,9 @@ def evidence_item(a: Assessment, references: dict[str, dict], capture: str | Non
         },
         "pattern": {
             "target": row.get("harassment_target") if a.category == "harassment" else None,
-            "repeated_targeting": (row.get("harassment_volume") or 0) > 0,
+            "repeated_targeting": (row["harassment_volume"] > 0)
+            if row.get("harassment_volume") is not None
+            else None,
         },
         "checks": [
             {"element": c.label, "met": c.ok, "required": c.required, "detail": c.detail}

@@ -1,34 +1,28 @@
-"""Reporting readiness: does a labeled post carry every type of evidence a report needs?
+"""Screen model-labeled posts for human evidence review.
 
-Evidence types collected for each post:
-- Content evidence: the post as published, with its exact URL and post ID.
-- Attribution evidence: the account that posted it (handle and platform user ID).
-- Preservation evidence: the native platform record, collection time and SHA-256 hash.
-- Classification evidence: the X rule it breaks, the reason, and the assessment score.
-- Contextual evidence: for false claims, the subject's own verified posts that contradict them.
-- Reach evidence: engagement at collection.
-- Pattern evidence: repeated posting at one target, or repeated violations by one account.
-
-Preservation follows the Berkeley Protocol on Digital Open Source Investigations (capture, time,
-hash, chain of custody). A post is READY when every required check passes, NEEDS EVIDENCE when
-the violation is at reporting confidence but a required check fails, and MONITOR when it is a
-violation below reporting confidence. Labels are model-assisted; a reviewer confirms each post.
+Thresholds select candidates; they do not establish truth, policy violations or review decisions.
 """
 
 from __future__ import annotations
 
+import hashlib
 from collections import defaultdict
 from dataclasses import dataclass, field
 from datetime import date
 from typing import Any
 
+from ..review.comparison_ui import safe_source_url
 from .settings import CATEGORIES, CATEGORY_LABELS, AlertSettings
 
 SUBJECT_ATTRIBUTIONS = {"subject_own", "subject_affiliated"}
 CONTRADICTED = {"contradicted_by_subject", "contradicted_by_credible_source"}
 
 READY, NEEDS, MONITOR = "ready", "needs_evidence", "monitor"
-STATUS_LABELS = {READY: "Ready to report", NEEDS: "Needs evidence", MONITOR: "Monitor"}
+STATUS_LABELS = {
+    READY: "Candidate for review",
+    NEEDS: "Needs evidence",
+    MONITOR: "Below review threshold",
+}
 
 # The X rule each category is reported under.
 ROUTES = {
@@ -41,17 +35,15 @@ ROUTES = {
 }
 
 EVIDENCE_TYPES = [
-    ("Content evidence", "The post as published, verbatim, with its exact URL and post ID."),
-    ("Attribution evidence", "The account that posted it: handle, platform user ID, profile."),
-    ("Preservation evidence", "The native platform record captured at collection, its "
-     "collection time and SHA-256 hash."),
-    ("Classification evidence", "The X rule the post breaks, the reason, and the assessment "
-     "score."),
-    ("Contextual evidence", "For false claims: the subject's own verified posts that "
-     "contradict them."),
+    ("Content evidence", "Provided extracted text, URL and post ID; source mapping needs review."),
+    ("Attribution evidence", "Provided account metadata; attribution needs independent review."),
+    ("Preservation evidence", "The saved record, reported collection time, and SHA-256 "
+     "computed at export; origin and extraction require review."),
+    ("Classification evidence", "The proposed category, rationale, policy reference, "
+     "and score; not a human decision."),
+    ("Contextual evidence", "Case-linked records; relevance and extracted text need review."),
     ("Reach evidence", "Views, likes, reposts and replies at the time of collection."),
-    ("Pattern evidence", "Repeated posting at one target, or repeated violations by one "
-     "account."),
+    ("Pattern evidence", "Model-identified patterns that require independent review."),
 ]  # fmt: skip
 
 
@@ -83,6 +75,10 @@ class Assessment:
         return self.row["id"]
 
 
+def is_supported_platform(row: dict) -> bool:
+    return str(row.get("platform") or "").strip().lower() in {"x", "twitter"}
+
+
 def is_classified(row: dict) -> bool:
     return row.get("status") == "classified"
 
@@ -107,25 +103,56 @@ def route_for(row: dict, category: str) -> dict[str, str]:
     return ROUTES[category]
 
 
-def _checks(row: dict, category: str, settings: AlertSettings) -> list[Check]:
+def _checks(
+    row: dict, category: str, settings: AlertSettings, references: dict[str, dict]
+) -> list[Check]:
     score = row.get(category) or 0
     filing = settings.categories[category].filing_score
+    attribution = row.get("attribution")
+    attribution_known = bool(
+        attribution
+        and str(attribution).strip().casefold()
+        not in {"unknown", "unclear", "unavailable", "none", "null"}
+    )
     checks = [
         Check(
             "violation",
-            f"{CATEGORY_LABELS[category]} at reporting confidence",
+            f"{CATEGORY_LABELS[category]} model score meets candidate threshold",
             score >= filing,
-            detail=f"score {score:.2f}, reporting standard {filing:.2f}",
+            detail=f"model score {score:.2f}, threshold {filing:.2f}; not a human decision",
+        ),
+        Check(
+            "platform",
+            "Supported X platform recorded",
+            is_supported_platform(row),
+            detail=f"provided platform: {row.get('platform') or 'unknown'}; "
+            "other platforms require separate policy references",
+        ),
+        Check(
+            "attribution",
+            "Provided attribution available (unverified)",
+            attribution_known,
+            detail=f"provided attribution: {attribution}"
+            if attribution_known
+            else "attribution unknown; do not assume a third-party origin",
+        ),
+        Check(
+            "text",
+            "Provided extracted text available",
+            bool(isinstance(row.get("text"), str) and row["text"].strip()),
+            detail="Extracted text must be verified against the saved record.",
         ),
         Check(
             "location",
             "Exact post URL and ID",
-            bool(row.get("url") and row.get("platform_item_id")),
-            detail=row.get("url") or "",
+            bool(safe_source_url(row.get("url")) and row.get("platform_item_id")),
+            detail="A safe source link is available."
+            if safe_source_url(row.get("url"))
+            else "Source URL missing or unavailable.",
         ),
         Check(
             "author",
-            "Author account identified",
+            "Provided account metadata available",
             bool(row.get("handle") and row.get("platform_user_id")),
             detail=f"@{row['handle']} · user id {row.get('platform_user_id')}"
             if row.get("handle")
@@ -133,7 +160,7 @@ def _checks(row: dict, category: str, settings: AlertSettings) -> list[Check]:
         ),
         Check(
             "capture",
-            "Preserved capture: timestamp and SHA-256",
+            "Saved record and export hash available",
             bool(row.get("collected_at") and row.get("capture_sha256")),
             detail=f"collected {row['collected_at']:%Y-%m-%d %H:%M UTC}"
             if row.get("collected_at")
@@ -145,11 +172,20 @@ def _checks(row: dict, category: str, settings: AlertSettings) -> list[Check]:
         checks.append(
             Check(
                 "proof",
-                "Falsity shown by the subject's own record",
-                row.get("disinfo_verdict") in CONTRADICTED and bool(refs),
-                detail="contradicted by the subject's verified posts"
-                if row.get("disinfo_verdict") in CONTRADICTED
-                else "claim not contradicted by the record (unverified)",
+                "Case-scoped context records available",
+                bool(refs)
+                and all(
+                    r in references
+                    and row.get("case_id")
+                    and references[r].get("case_id") == row.get("case_id")
+                    and references[r].get("id") == r
+                    and references[r].get("text")
+                    and isinstance(references[r].get("raw"), str)
+                    and references[r].get("capture_sha256")
+                    == hashlib.sha256(references[r]["raw"].encode("utf-8")).hexdigest()
+                    for r in refs
+                ),
+                detail="Context availability does not establish falsity or verify a model verdict.",
             )
         )
     elif category in ("racism", "hate_speech"):
@@ -158,7 +194,7 @@ def _checks(row: dict, category: str, settings: AlertSettings) -> list[Check]:
         checks.append(
             Check(
                 "proof",
-                "Protected group targeted",
+                "Model-identified target available",
                 bool(target),
                 detail=f"targets: {target}" if target else "no protected group identified",
             )
@@ -167,7 +203,7 @@ def _checks(row: dict, category: str, settings: AlertSettings) -> list[Check]:
         checks.append(
             Check(
                 "proof",
-                "Repeated targeting of one person",
+                "Model-identified pattern available",
                 (row.get("harassment_volume") or 0) > 0 and bool(row.get("harassment_target")),
                 detail=f"target: {row.get('harassment_target') or 'unknown'}",
             )
@@ -175,16 +211,18 @@ def _checks(row: dict, category: str, settings: AlertSettings) -> list[Check]:
     checks.append(
         Check(
             "archive",
-            "Independent archive copy",
-            bool(row.get("archive_url")),
+            "Independently saved archive copy",
+            False,
             required=settings.require_archive_copy,
-            detail=row.get("archive_url") or "none saved; recommended before reporting",
+            detail="Archive links are not verified saved copies; check and preserve independently.",
         )
     )
     return checks
 
 
-def assess(row: dict, settings: AlertSettings) -> Assessment | None:
+def assess(
+    row: dict, settings: AlertSettings, references: dict[str, dict] | None = None
+) -> Assessment | None:
     """Best readiness across the post's violation categories, or None if not a violation."""
     if not is_third_party(row):
         return None
@@ -194,7 +232,7 @@ def assess(row: dict, settings: AlertSettings) -> Assessment | None:
     rank = {READY: 0, NEEDS: 1, MONITOR: 2}
     best: Assessment | None = None
     for c in cats:
-        checks = _checks(row, c, settings)
+        checks = _checks(row, c, settings, references or {})
         violation_ok = checks[0].ok
         missing = [x for x in checks if x.required and not x.ok]
         status = READY if not missing else NEEDS if violation_ok else MONITOR
@@ -204,24 +242,22 @@ def assess(row: dict, settings: AlertSettings) -> Assessment | None:
     return best
 
 
-def assess_all(rows: list[dict], settings: AlertSettings) -> list[Assessment]:
-    out = [a for r in rows if (a := assess(r, settings))]
+def assess_all(
+    rows: list[dict], settings: AlertSettings, references: dict[str, dict] | None = None
+) -> list[Assessment]:
+    out = [a for r in rows if (a := assess(r, settings, references))]
     rank = {READY: 0, NEEDS: 1, MONITOR: 2}
     return sorted(out, key=lambda a: (rank[a.status], -a.score, -(a.row.get("view_count") or 0)))
 
 
 def accounts(
-    assessments: list[Assessment], settings: AlertSettings, bursts: list[dict]
+    assessments: list[Assessment], settings: AlertSettings, _bursts: list[dict]
 ) -> list[dict]:
     """Accounts behind violations; READY when enough of their posts are ready to file."""
     by_author: dict[str, list[Assessment]] = defaultdict(list)
     for a in assessments:
         if a.row.get("author_id"):
             by_author[a.row["author_id"]].append(a)
-    burst_count: dict[str, int] = defaultdict(int)
-    for b in bursts:
-        if b.get("author_handle"):
-            burst_count[b["author_handle"].lower()] += 1
     out = []
     for author_id, items in by_author.items():
         row = items[0].row
@@ -238,8 +274,13 @@ def accounts(
                 "ready": len(ready),
                 "violations": len(items),
                 "categories": sorted({c for a in items for c in a.categories}),
-                "bursts": burst_count.get((row.get("handle") or "").lower(), 0),
-                "views": sum(a.row.get("view_count") or 0 for a in items),
+                "bursts": None,  # Handle alone does not bind a burst to a native account ID.
+                "views": sum(
+                    a.row["view_count"] for a in items if a.row.get("view_count") is not None
+                )
+                if any(a.row.get("view_count") is not None for a in items)
+                else None,
+                "views_unknown": sum(a.row.get("view_count") is None for a in items),
                 "status": status,
             }
         )
@@ -262,41 +303,16 @@ def timeline(assessments: list[Assessment]) -> list[dict]:
 
 
 def verdict(assessments: list[Assessment], account_rows: list[dict]) -> dict:
-    """The one message at the top of the page."""
-    ready = [a for a in assessments if a.status == READY]
-    needs = [a for a in assessments if a.status == NEEDS]
-    ready_accounts = [x for x in account_rows if x["status"] == READY]
-    if ready:
-        rules = sorted({a.route["rule"] for a in ready})
-        return {
-            "level": "red",
-            "headline": f"{len(ready)} post{'s' if len(ready) != 1 else ''} ready for a "
-            "takedown report",
-            "detail": "Every required type of evidence is present. Platform rules: "
-            + "; ".join(rules)
-            + (
-                f". {len(ready_accounts)} account{'s' if len(ready_accounts) != 1 else ''} "
-                "also meet the account-report standard."
-                if ready_accounts
-                else "."
-            ),
-        }
-    if needs:
-        common: dict[str, int] = defaultdict(int)
-        for a in needs:
-            for m in a.missing:
-                common[m.label] += 1
-        top = max(common, key=common.get)
-        return {
-            "level": "amber",
-            "headline": "Not ready to report yet",
-            "detail": f"{len(needs)} strong violation{'s' if len(needs) != 1 else ''} "
-            f"found, but evidence is incomplete. Most often missing: {top.lower()}.",
-        }
+    """Summarize model candidates without assigning a human decision."""
+    ready = sum(a.status == READY for a in assessments)
+    needs = sum(a.status == NEEDS for a in assessments)
+    lower = sum(a.status == MONITOR for a in assessments)
     return {
-        "level": "clear",
-        "headline": "No reportable violations",
-        "detail": "None of the labeled posts reach the evidence standard."
-        if not assessments
-        else f"{len(assessments)} lower-confidence violations are being monitored.",
+        "level": "amber" if assessments else "clear",
+        "headline": f"{ready} candidate{'s' if ready != 1 else ''} with listed material",
+        "detail": (
+            f"{needs} candidates need evidence; {lower} are below the review threshold. "
+            "Model scores are proposals; "
+            "no human decision or policy violation is recorded here."
+        ),
     }

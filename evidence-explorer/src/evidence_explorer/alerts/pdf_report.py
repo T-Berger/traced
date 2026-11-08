@@ -1,11 +1,4 @@
-"""Digital evidence report (PDF): posts on X that break platform rules, organised by evidence type.
-
-Evidence types (see analysis.EVIDENCE_TYPES): content, attribution, preservation,
-classification, context, reach and pattern. Preservation follows the Berkeley Protocol on
-Digital Open Source Investigations: the original platform record, its collection time and tool,
-a SHA-256 hash, and the chain of custody. The original records and a JSON manifest are attached
-to the PDF, so the document is self-contained and each hash can be checked independently.
-"""
+"""Draft review PDF with saved case records and export-time integrity hashes."""
 
 from __future__ import annotations
 
@@ -19,7 +12,7 @@ from typing import Any
 from fpdf import FPDF, XPos, YPos
 from fpdf.fonts import FontFace
 
-from .analysis import EVIDENCE_TYPES, Assessment
+from .analysis import EVIDENCE_TYPES, READY, Assessment, assess, is_supported_platform
 from .evidence import PREPARER_STATEMENT, REVIEW_NOTE, evidence_item
 from .settings import CATEGORY_LABELS, AlertSettings
 
@@ -228,7 +221,7 @@ class EvidencePDF(FPDF):
         self.set_y(9)
         self.font(8)
         self.set_text_color(*MUTED)
-        self.cell(0, 4, self.clean(f"Digital evidence report · {self.subject}"))
+        self.cell(0, 4, self.clean(f"Draft evidence for review · {self.subject}"))
         self.set_x(self.l_margin)
         self.cell(0, 4, self.report_id, align="R", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
         self.set_y(self.t_margin)
@@ -244,14 +237,25 @@ class EvidencePDF(FPDF):
         self.cell(
             0,
             4,
-            f"Manifest SHA-256 {self.manifest_hash[:16]}…  ·  "
-            "Prepared for reporting to the platform",
+            f"Manifest SHA-256 {self.manifest_hash[:16]}…  ·  Draft for human review",
         )
         self.set_x(self.l_margin)
         self.cell(0, 4, f"Page {self.page_no()} of {{nb}}", align="R")
 
 
 # --------------------------------------------------------------------------- sections
+
+
+def _number(value):
+    return f"{value:,}" if value is not None else "Unknown"
+
+
+def _known_views(items):
+    known = [item["reach"]["views"] for item in items if item["reach"]["views"] is not None]
+    unknown = sum(item["reach"]["views"] is None for item in items)
+    if not known:
+        return f"Recorded views unknown; {unknown} posts unknown"
+    return f"{_number(sum(known))} known recorded views; {unknown} posts unknown"
 
 
 def _cover(pdf: EvidencePDF, case, items, accounts, settings, generated, manifest_hash):
@@ -261,14 +265,14 @@ def _cover(pdf: EvidencePDF, case, items, accounts, settings, generated, manifes
     pdf.set_fill_color(*YELLOW)
     pdf.rect(0, 92, pdf.w, 2.2, style="F")
     pdf.set_xy(20, 24)
-    pdf.pill("Digital evidence report", YELLOW, INK)
+    pdf.pill("Draft evidence for review", YELLOW, INK)
     pdf.set_xy(20, 36)
     pdf.font(24, "B")
     pdf.set_text_color(255, 255, 255)
     pdf.multi_cell(
         170,
         10,
-        pdf.clean(f"Evidence of violating posts about {case.get('subject_name')}"),
+        pdf.clean(f"Draft evidence candidates about {case.get('subject_name')}"),
         align="L",
         new_x=XPos.LMARGIN,
         new_y=YPos.NEXT,
@@ -300,23 +304,22 @@ def _cover(pdf: EvidencePDF, case, items, accounts, settings, generated, manifes
             ("Generated", _utc(generated)),
             ("Prepared by", prepared),
             ("Subject", case.get("subject_name")),
-            ("Evidence items", f"{len(items)} posts ready to report"),
-            ("Pattern evidence", f"{len(accounts)} accounts with repeated violations"),
+            ("Evidence items", f"{len(items)} model candidates"),
+            ("Pattern evidence", f"{len(accounts)} accounts with grouped candidates"),
             ("Posting period", period),
-            ("Total reach", f"{sum(i['reach']['views'] or 0 for i in items):,} views"),
+            ("Known views", _known_views(items)),
             ("Manifest SHA-256", manifest_hash),
         ]
     )
     pdf.box(
-        "This report documents posts on X that meet the evidence standard for reporting to the "
-        "platform. Each evidence item records what was posted, who posted it, how it was "
-        "preserved, which platform rule it breaks and why, and how far it reached. The original "
-        "platform records are attached to this PDF so their integrity can be checked."
+        "This is a draft of model-labeled posts and case-scoped saved records for human review. "
+        "No human decision or policy violation is established. Extracted text and source mapping "
+        "require independent verification. Attached saved bytes are hashed at export."
     )
     pdf.para(
-        "Sections: 1 Summary · 2 Evidence types · 3 Collection and chain of custody · "
+        "Sections: 1 Summary · 2 Evidence types · 3 Collection metadata and saved records · "
         "4 Evidence items · 5 Pattern evidence · 6 Integrity and verification · 7 Preparation "
-        "and review. Original platform records and the evidence manifest are attached.",
+        "and review. Saved raw records and the evidence manifest are attached.",
         size=9,
         color=MUTED,
     )
@@ -333,7 +336,7 @@ def _summary(pdf: EvidencePDF, items, accounts):
                 f"@{it['attribution']['handle']}",
                 f"{it['classification']['category']}\n{it['classification']['platform_rule']}",
                 _utc(it["content"]["posted_at"])[:16],
-                f"{it['reach']['views'] or 0:,}",
+                _number(it["reach"]["views"]),
                 "Open post",
             ]
         )
@@ -344,12 +347,10 @@ def _summary(pdf: EvidencePDF, items, accounts):
         (16, 34, 56, 32, 16, 22),
         links,
     )
-    pdf.heading("Requested platform action", 2)
-    ids = f"E-1 to E-{len(items)}" if len(items) > 1 else "E-1"
+    pdf.heading("Human review required", 2)
     pdf.para(
-        f"Remove the posts in evidence items {ids}, each of which breaks the X rule stated in the "
-        "item"
-        + (", and review the accounts in Section 5 for repeated violations." if accounts else ".")
+        "The model labels, source mapping, context and relevant platform rules require independent "
+        "human review. No reporting or removal decision is recorded in this draft."
     )
 
 
@@ -364,32 +365,20 @@ def _evidence_types(pdf: EvidencePDF):
 
 
 def _method(pdf: EvidencePDF, items, provenance, generated):
-    pdf.heading("3. Collection and chain of custody")
+    pdf.heading("3. Collection metadata and saved records")
     pdf.para(
-        "Collection. Posts were collected from X by an automated collector that returns the "
-        "platform's own record for each post (identifiers, author, timestamps, engagement and "
-        "text). Each record was stored unaltered in an evidence database at the time of "
-        "collection. The SHA-256 value in each evidence item is computed over that stored record, "
-        "which is attached to this PDF so it can be re-hashed independently."
+        "Collection metadata and saved native records are read from the selected analytics case "
+        "in one read snapshot. SHA-256 hashes identify the attached bytes at export; "
+        "they do not prove collection-time integrity, authenticity or text extraction."
     )
     pdf.ln(1)
     pdf.para(
-        "Classification. Each post was assessed against X's rules by a language model with a "
-        "saved rationale, then checked against an evidence standard: violation at reporting "
-        "confidence, exact URL and post ID, identified account, preserved record, and the "
-        "evidence specific to the category (for false claims, contradiction by the subject's own "
-        "verified posts; for hate speech, an identified protected group; for harassment, repeated "
-        "targeting). A reviewer confirms each item before it is reported."
-    )
-    pdf.ln(1)
-    pdf.para(
-        "Method. Collection and preservation follow the Berkeley Protocol on Digital Open Source "
-        "Investigations: record what was captured, when and with which tool, hash it, and keep "
-        "the original unchanged.",
-        color=MUTED,
+        "Classification scores and rationales are model proposals. Their labels and linked "
+        "records do not establish factual truth, violations, independent corroboration or a "
+        "human review decision. Verify originals, context, attribution and rules."
     )
     pdf.ln(2)
-    pdf.heading("Chain of custody", 2)
+    pdf.heading("Recorded collection metadata", 2)
     runs: dict[str, dict] = {}
     for p in provenance.values():
         if p.get("run"):
@@ -413,10 +402,10 @@ def _method(pdf: EvidencePDF, items, provenance, generated):
     rows.append(["Classified", "See items", "Traced content analytics", "; ".join(models)])
     rows.append(
         [
-            "Reported",
+            "Exported",
             _utc(generated),
             "Traced alert centre",
-            f"{len(items)} evidence items; original records re-hashed and attached",
+            f"{len(items)} evidence items; saved raw records hashed at export and attached",
         ]
     )
     pdf.grid(["Event", "Time", "Tool", "Detail"], rows, (22, 38, 44, 72))
@@ -440,7 +429,7 @@ def _evidence_item(pdf: EvidencePDF, n: int, item: dict):
     top = pdf.get_y()
     pdf.cell(pdf.get_string_width(title) + 4, 9, title)
     pdf.set_xy(pdf.get_x() + 2, top + 1.8)
-    pdf.pill("Ready to report", RED)
+    pdf.pill("Candidate for review", YELLOW, INK)
     pdf.set_xy(pdf.get_x() + 2, top + 1.8)
     pdf.pill(cl["category"], YELLOW, INK)
     pdf.set_xy(pdf.l_margin, top + 12)
@@ -458,27 +447,29 @@ def _evidence_item(pdf: EvidencePDF, n: int, item: dict):
 
     pdf.heading("Attribution evidence", 2)
     name = f"@{at['handle']}" + (f" ({at['display_name']})" if at["display_name"] else "")
-    followers = f"{at['followers'] or 0:,}" + ("  ·  verified" if at["verified"] else "")
+    followers = _number(at["followers"]) + (
+        "  ·  platform verification flag present" if at["verified"] else ""
+    )
     pdf.kv([("Account", name), ("Platform user ID", at["user_id"]), ("Followers", followers)])
 
     pdf.heading("Classification evidence", 2)
-    rows = [("X rule", cl["platform_rule"]), ("Category", ", ".join(cl["all_categories"]))]
+    rows = [("Possible X rule", cl["platform_rule"]), ("Category", ", ".join(cl["all_categories"]))]
     if cl["claim"]:
-        rows.append(("False claim", cl["claim"]))
+        rows.append(("Model-extracted claim", cl["claim"]))
     if cl["protected_group"]:
-        rows.append(("Protected group", cl["protected_group"]))
+        rows.append(("Model-identified target", cl["protected_group"]))
     rows += [
         ("Reason", cl["explanation"]),
         (
             "Assessment",
-            f"score {cl['score']:.2f} (reporting standard met) · {cl['model']} · "
+            f"score {cl['score']:.2f} (candidate threshold met) · {cl['model']} · "
             f"prompt {cl['prompt_version']}",
         ),
     ]
     pdf.kv(rows)
 
     if cx["subject_posts"]:
-        pdf.heading("Contextual evidence: the subject's own verified posts", 2)
+        pdf.heading("Linked context (source and relevance unverified)", 2)
         for r in cx["subject_posts"]:
             pdf.box(
                 f"{r['text']}\n{_utc(r['posted_at'])} · {r['url']}",
@@ -487,13 +478,13 @@ def _evidence_item(pdf: EvidencePDF, n: int, item: dict):
                 size=9.5,
             )
 
-    pdf.heading("Reach evidence", 2)
+    pdf.heading("Recorded engagement (not audience reach)", 2)
     pdf.kv(
         [
             (
                 "Engagement at collection",
-                f"{re_['views'] or 0:,} views · {re_['likes'] or 0:,} likes · "
-                f"{re_['reposts'] or 0:,} reposts · {re_['replies'] or 0:,} replies",
+                f"{_number(re_['views'])} views · {_number(re_['likes'])} likes · "
+                f"{_number(re_['reposts'])} reposts · {_number(re_['replies'])} replies",
             )
         ]
     )
@@ -502,7 +493,14 @@ def _evidence_item(pdf: EvidencePDF, n: int, item: dict):
         pdf.kv(
             [
                 ("Person targeted", pa["target"]),
-                ("Repeated targeting", "Yes" if pa["repeated_targeting"] else "No"),
+                (
+                    "Model-identified pattern",
+                    "Unknown"
+                    if pa["repeated_targeting"] is None
+                    else "Present"
+                    if pa["repeated_targeting"]
+                    else "Not marked",
+                ),
             ]
         )
 
@@ -510,7 +508,7 @@ def _evidence_item(pdf: EvidencePDF, n: int, item: dict):
     pdf.kv(
         [
             ("Collected", _utc(pr["collected_at"])),
-            ("Original record", pr["capture_file"] or "Not attached"),
+            ("Saved raw record", pr["capture_file"] or "Not attached"),
             ("SHA-256", pr["capture_sha256"]),
             ("Archive copy", pr["archive_url"] or "None (recommended)"),
         ]
@@ -536,16 +534,15 @@ def _evidence_item(pdf: EvidencePDF, n: int, item: dict):
 
 def _accounts(pdf: EvidencePDF, accounts):
     pdf.add_page()
-    pdf.heading("5. Pattern evidence: accounts with repeated violations")
+    pdf.heading("5. Accounts with grouped model candidates")
     if not accounts:
         pdf.para(
-            "No account in this report meets the standard for an account-level report. "
-            "The posts are reported individually.",
+            "No grouped accounts are available in this draft.",
             color=MUTED,
         )
         return
     pdf.grid(
-        ["Account", "Platform user ID", "Ready", "Violations", "Categories"],
+        ["Account", "Platform user ID", "Candidates", "Labels", "Categories"],
         [
             [
                 f"@{a['handle']}",
@@ -563,7 +560,7 @@ def _accounts(pdf: EvidencePDF, accounts):
 def _integrity(pdf: EvidencePDF, items, manifest_hash):
     pdf.heading("6. Integrity and verification")
     pdf.para(
-        "Each original platform record is attached to this PDF (open the attachments panel of a "
+        "Each selected saved raw record is attached to this PDF (open the attachments panel of a "
         "PDF reader). To verify, save the attachment and compute its SHA-256, for example with  "
         "shasum -a 256 <file>  (macOS/Linux) or  certutil -hashfile <file> SHA256  (Windows). "
         "The result must equal the value below."
@@ -625,6 +622,18 @@ def build_pdf(
     generated: datetime | None = None,
 ) -> tuple[bytes, str, str]:
     """Return (pdf bytes, filename, sha256 of the pdf)."""
+    if not assessments or len({a.id for a in assessments}) != len(assessments):
+        raise ValueError("Choose distinct saved records for the draft.")
+    fresh = [assess(a.row, settings, references) for a in assessments]
+    if any(a is None or a.status != READY or not is_supported_platform(a.row) for a in fresh):
+        raise ValueError(
+            "Each selection must be an available candidate for the supported X platform."
+        )
+    assessments = fresh
+    if not case.get("id") or any(a.row.get("case_id") != case["id"] for a in assessments):
+        raise ValueError("Every selected record must belong to the selected case.")
+    if set(provenance) != {a.id for a in assessments}:
+        raise ValueError("Saved captures do not match the selected records.")
     generated = generated or datetime.now(UTC)
     captures = {k: v["raw"] for k, v in provenance.items()}
     items = [evidence_item(a, references, captures.get(a.id)) for a in assessments]
@@ -633,12 +642,13 @@ def build_pdf(
     manifest = {
         "kind": "traced-digital-evidence-report/v2",
         "generated_at": generated.isoformat(),
-        "case": {k: case.get(k) for k in ("slug", "subject_name", "subject_role")},
+        "case": {k: case.get(k) for k in ("id", "slug", "subject_name", "subject_role")},
         "prepared_by": {
             "name": settings.notifier_name,
             "email": settings.notifier_email,
             "organisation": settings.notifier_organisation,
         },
+        "screening_settings": settings.model_dump(mode="json"),
         "evidence_types": [{"type": t, "description": d} for t, d in EVIDENCE_TYPES],
         "collection_runs": [p["run"] for p in provenance.values() if p.get("run")],
         "accounts": accounts,
@@ -650,10 +660,10 @@ def build_pdf(
 
     pdf = EvidencePDF(report_id, case.get("subject_name") or "", manifest_hash)
     pdf.set_title(f"Digital evidence report {report_id}")
-    pdf.set_subject(f"Evidence of violating posts about {case.get('subject_name')}")
+    pdf.set_subject(f"Draft evidence candidates about {case.get('subject_name')}")
     pdf.set_author(settings.notifier_name or "Traced")
     pdf.set_creator("Traced alert centre")
-    pdf.set_keywords("evidence, X, platform report, SHA-256, chain of custody")
+    pdf.set_keywords("draft evidence, X, model proposals, SHA-256")
     pdf.set_creation_date(generated)
     pdf.set_lang("en-US")
 
@@ -672,7 +682,7 @@ def build_pdf(
     if pdf.replaced_glyphs:
         pdf.para(
             "Note: characters the report fonts cannot print (such as emoji) are shown as □ "
-            "or ?. The exact text is in the attached original record.",
+            "or ?. Verify the displayed extracted text against the attached saved record.",
             size=8.5,
             color=MUTED,
         )
@@ -683,9 +693,18 @@ def build_pdf(
             pdf.embed_file(
                 bytes=raw.encode("utf-8"),
                 basename=item["preservation"]["capture_file"].split("/")[-1],
-                desc=f"Original platform record, post {item['content']['post_id']}",
+                desc=f"Saved raw record, post {item['content']['post_id']}",
                 modification_date=generated,
             )
+    # Include every referenced raw record so each exported reference resolves to saved bytes.
+    context_ids = sorted({r["id"] for item in items for r in item["context"]["subject_posts"]})
+    for ref_id in context_ids:
+        pdf.embed_file(
+            bytes=references[ref_id]["raw"].encode("utf-8"),
+            basename=f"context-{ref_id}.json",
+            desc=f"Saved context record {ref_id}",
+            modification_date=generated,
+        )
     pdf.embed_file(
         bytes=manifest_bytes,
         basename="evidence.json",

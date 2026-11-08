@@ -37,7 +37,7 @@
 }
 :is(#rv-alerts-page, #rv-policies-page) * { font-family: inherit; box-sizing: border-box; }
 :is(#rv-alerts-page, #rv-policies-page) :is(h1, h2, h3, p, blockquote) { margin: 0; }
-:is(#rv-alerts-page, #rv-policies-page) .al-shell { max-width: 1120px; margin: 0 auto; display: grid; gap: 24px; }
+:is(#rv-alerts-page, #rv-policies-page) .al-shell { max-width: 1120px; min-width: 0; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; }
 
 /* Type */
 :is(#rv-alerts-page, #rv-policies-page) .al-h2 { font-size: 18px; font-weight: 700; color: var(--al-ink); }
@@ -110,8 +110,9 @@
 
 /* Cards */
 :is(#rv-alerts-page, #rv-policies-page) .al-card {
+  min-width: 0;
   background: var(--al-surface); border: 1px solid var(--al-line); border-radius: var(--al-radius);
-  padding: 24px; display: grid; gap: 16px; box-shadow: var(--al-shadow);
+  padding: 24px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; box-shadow: var(--al-shadow);
 }
 :is(#rv-alerts-page, #rv-policies-page) .al-section-head { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: flex-start; justify-content: space-between; }
 :is(#rv-alerts-page, #rv-policies-page) .al-head-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
@@ -169,7 +170,7 @@
 :is(#rv-alerts-page, #rv-policies-page) .al-missing { display: flex; flex-wrap: wrap; gap: 6px; }
 
 /* Tables */
-:is(#rv-alerts-page, #rv-policies-page) .al-table-wrap { overflow-x: auto; margin: 0 -8px; }
+:is(#rv-alerts-page, #rv-policies-page) .al-table-wrap { min-width: 0; max-width: 100%; overflow-x: auto; }
 :is(#rv-alerts-page, #rv-policies-page) .al-table { width: 100%; border-collapse: collapse; font-size: 14px; }
 :is(#rv-alerts-page, #rv-policies-page) .al-table :is(th, td) { padding: 12px 8px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--al-line); }
 :is(#rv-alerts-page, #rv-policies-page) .al-table thead th { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--al-ink-3); padding-top: 0; }
@@ -178,7 +179,7 @@
 :is(#rv-alerts-page, #rv-policies-page) .al-table--compact :is(th, td) { padding: 8px; vertical-align: middle; }
 
 /* Chart */
-:is(#rv-alerts-page, #rv-policies-page) .al-chart { min-height: 300px; }
+:is(#rv-alerts-page, #rv-policies-page) .al-chart { min-width: 0; max-width: 100%; min-height: 300px; overflow: hidden; }
 
 /* Settings */
 :is(#rv-alerts-page, #rv-policies-page) .al-settings > summary { list-style: none; cursor: pointer; display: grid; gap: 2px; }
