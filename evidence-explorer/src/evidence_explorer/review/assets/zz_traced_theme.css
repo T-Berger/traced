@@ -1,5 +1,6 @@
 /* Application bridge to the canonical Traced role tokens. */
 .review-app {
+  color-scheme: light;
   --rv-bg: light-dark(var(--traced-background), var(--traced-color-ink));
   --rv-surface: light-dark(var(--traced-surface), color-mix(in srgb, var(--traced-color-ink) 92%, var(--traced-color-paper)));
   --rv-subtle: light-dark(var(--traced-surface-subtle), color-mix(in srgb, var(--traced-color-ink) 96%, var(--traced-color-paper)));
@@ -53,12 +54,8 @@
   --Dash-Fill-Interactive-Weak: var(--rv-selected);
   --Dash-Stroke-Strong: var(--rv-input-border);
 }
-/* The graph uses one high-contrast reading surface in both schemes. */
+/* The graph uses one high-contrast light reading surface. */
 .review-app #rv-graph { background: var(--traced-color-paper); border: 1px solid var(--traced-color-slate); }
-@media (prefers-color-scheme: dark) {
-  .review-app .traced-logo--light { display: none; }
-  .review-app .traced-logo--dark { display: block; }
-}
 @media (max-width: 600px) {
   .review-app .rv-brand { gap: 4px 16px; }
   .review-app .rv-brand-tagline { font-size: 12px; }

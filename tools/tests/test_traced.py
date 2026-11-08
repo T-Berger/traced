@@ -187,20 +187,29 @@ class TracedConfigurationTests(unittest.TestCase):
         self.assert_selection(selected, self.root / "selected cases")
         self.assertFalse((self.root / "selected cases").exists())
 
-    def test_default_dispatch_uses_one_combined_worker_with_integrated_defaults(self):
-        arguments = self.capture_dispatch([])
-        self.assertEqual(arguments[0], "web")
-        self.assertEqual(arguments.count("--with-worker"), 1)
-        self.assertEqual(arguments[arguments.index("--host") + 1], "127.0.0.1")
-        self.assertEqual(arguments[arguments.index("--port") + 1], "8053")
+    def capture_workbench(self, arguments):
+        captured = {}
+
+        def run_workbench(host, port, with_worker=True):
+            captured.update(host=host, port=port, with_worker=with_worker)
+
+        with patch("tools.workbench.run_workbench", side_effect=run_workbench) as run:
+            traced.main(arguments, root=self.root)
+            run.assert_called_once()
+        return captured
+
+    def test_default_dispatch_serves_the_combined_workbench_with_integrated_defaults(self):
+        captured = self.capture_workbench([])
+        self.assertTrue(captured["with_worker"])
+        self.assertEqual(captured["host"], "127.0.0.1")
+        self.assertEqual(captured["port"], 8053)
 
     def test_start_uses_root_host_and_port_and_can_disable_worker(self):
         self.write_env(self.root, "EVIDENCE_HOST=127.0.0.2\nTRACED_PORT=8097\n")
-        arguments = self.capture_dispatch(["start", "--no-worker"])
-        self.assertEqual(arguments[0], "web")
-        self.assertNotIn("--with-worker", arguments)
-        self.assertEqual(arguments[arguments.index("--host") + 1], "127.0.0.2")
-        self.assertEqual(arguments[arguments.index("--port") + 1], "8097")
+        captured = self.capture_workbench(["start", "--no-worker"])
+        self.assertFalse(captured["with_worker"])
+        self.assertEqual(captured["host"], "127.0.0.2")
+        self.assertEqual(captured["port"], 8097)
 
     def test_supabase_dispatch_loads_settings_without_starting_worker_or_store(self):
         self.write_env(self.root, "SUPABASE_PASSWORD=private-fixture\n")

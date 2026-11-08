@@ -31,6 +31,10 @@ def create_app(
     review_service: ReviewServiceProtocol | None = None,
     delivery_service=None,
     diff_service=None,
+    *,
+    flask_server=None,
+    url_base_pathname: str = "/",
+    workbench_links: list[tuple[str, str]] | None = None,
 ) -> Dash:
     """Wire supplied services or initialize defaults in the specialist database.
 
@@ -69,6 +73,8 @@ def create_app(
         __name__,
         title="Traced · Historical Evidence Workbench",
         assets_folder=str(Path(__file__).with_name("assets")),
+        url_base_pathname=url_base_pathname,
+        **({"server": flask_server} if flask_server is not None else {}),
         suppress_callback_exceptions=True,
         update_title="Loading evidence…",
     )
@@ -86,6 +92,7 @@ def create_app(
         review_repository,
         brief_repository,
         release_comparison,
+        workbench_links=workbench_links,
     )
 
     def require_release(release_id: str) -> dict:
@@ -122,7 +129,7 @@ def create_app(
         response.headers["X-Content-Type-Options"] = "nosniff"
         return response
 
-    @server.get("/health")
+    @server.get(url_base_pathname.rstrip("/") + "/health", endpoint="silent-storm-health")
     def health():
         releases = repository.list_releases()
         return {

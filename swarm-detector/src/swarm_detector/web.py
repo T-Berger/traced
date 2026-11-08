@@ -61,7 +61,13 @@ def _scoped_detail(detail: dict) -> dict:
     return detail
 
 
-def create_app(workbench: Workbench | None = None) -> Dash:
+def create_app(
+    workbench: Workbench | None = None,
+    *,
+    server=None,
+    url_base_pathname: str = "/",
+    workbench_links: list[tuple[str, str]] | None = None,
+) -> Dash:
     """Build the specialist app and run its existing sample-initialization step.
 
     ``ensure_sample`` is called even for an injected workbench. On an empty
@@ -87,14 +93,18 @@ def create_app(workbench: Workbench | None = None) -> Dash:
         __name__,
         title="Traced · Swarm Detector",
         assets_folder=str(Path(__file__).with_name("assets")),
+        url_base_pathname=url_base_pathname,
+        **({"server": server} if server is not None else {}),
         suppress_callback_exceptions=True,
         update_title="Loading evidence…",
     )
     application.server.config["WORKBENCH"] = wb
 
+    health_path = url_base_pathname.rstrip("/") + "/health"
+
     @application.server.before_request
     def authenticate():
-        if not auth_user or request.path == "/health":
+        if not auth_user or request.path == health_path:
             return None
         supplied = request.authorization
         if (
@@ -110,7 +120,7 @@ def create_app(workbench: Workbench | None = None) -> Dash:
             headers={"WWW-Authenticate": 'Basic realm="Swarm Detector", charset="UTF-8"'},
         )
 
-    @application.server.get("/health")
+    @application.server.get(health_path, endpoint="swarm-health")
     def health():
         try:
             result = wb.health()
@@ -128,10 +138,10 @@ def create_app(workbench: Workbench | None = None) -> Dash:
             readiness = wb.readiness()
             run_id = readiness.get("run_id")
             overview = wb.overview(run_id=run_id) if run_id else wb.overview()
-            return create_layout(overview, boot_error, readiness)
+            return create_layout(overview, boot_error, readiness, workbench_links=workbench_links)
         except Exception as exc:
             logger.exception("Unable to load workspace readiness")
-            return create_layout({}, str(exc), {})
+            return create_layout({}, str(exc), {}, workbench_links=workbench_links)
 
     application.layout = layout
 

@@ -27,7 +27,10 @@ def _dropdown(identifier, options=None, value=None, **kwargs):
 
 
 def create_layout(
-    overview: dict, boot_error: str | None = None, readiness: dict | None = None
+    overview: dict,
+    boot_error: str | None = None,
+    readiness: dict | None = None,
+    workbench_links: list[tuple[str, str]] | None = None,
 ) -> html.Div:
     readiness = readiness or overview.get("readiness") or {}
     synthetic = bool(overview.get("synthetic", readiness.get("synthetic", True)))
@@ -77,6 +80,16 @@ def create_layout(
                         ],
                         className="brand traced-brand",
                     ),
+                    html.Nav(
+                        [
+                            html.A(label, href=href, className="traced-switcher-link")
+                            for label, href in (workbench_links or [])
+                        ],
+                        className="traced-switcher traced-switcher--inverse",
+                        **{"aria-label": "Traced workbench surfaces"},
+                    )
+                    if workbench_links
+                    else None,
                     html.P(
                         "From coordinated activity to inspectable evidence.", className="brand-note"
                     ),

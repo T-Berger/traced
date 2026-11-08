@@ -46,13 +46,19 @@ from .workspace_views import linked_sources
 logger = logging.getLogger(__name__)
 
 
-def create_app(service: ReviewService, prefix: str = "/") -> Dash:
+def create_app(
+    service: ReviewService,
+    prefix: str = "/",
+    server=None,
+    workbench_links: list[tuple[str, str]] | None = None,
+) -> Dash:
     """Create an independent reviewer app using the supplied ReviewService."""
     prefix = "/" + prefix.strip("/") + "/" if prefix.strip("/") else "/"
     app = Dash(
         __name__,
         assets_folder=str(Path(__file__).with_name("assets")),
         url_base_pathname=prefix,
+        **({"server": server} if server is not None else {}),
         suppress_callback_exceptions=True,
         title="Traced · Evidence review",
         update_title=None,
@@ -66,7 +72,9 @@ def create_app(service: ReviewService, prefix: str = "/") -> Dash:
         cases = service.list_cases()
         case_id = str(cases[0]["id"]) if cases else None
         try:
-            return build_layout(cases, session_for_case(service, case_id))
+            return build_layout(
+                cases, session_for_case(service, case_id), workbench_links=workbench_links
+            )
         except Exception as exc:
             logger.exception("Could not load the initial review case")
             return build_layout(cases, {}, html.Div(str(exc), role="alert"))

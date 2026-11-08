@@ -82,9 +82,9 @@ def _case_upload_message(exc: Exception) -> str:
     return reason + " Ask the sender for a corrected case file, then upload it again."
 
 
-def create_app(service: WorkspaceService):
+def create_app(service: WorkspaceService, *, server=None, workbench_links=None):
     """Reuse review layout/callbacks; keep domain additions outside that shared module."""
-    app = create_review_app(service)
+    app = create_review_app(service, server=server, workbench_links=workbench_links)
     app.server.config["MAX_CONTENT_LENGTH"] = MAX_UPLOAD_HTTP_BYTES
     original_layout = app.layout
 

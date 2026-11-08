@@ -24,7 +24,11 @@ def page_heading(title: str, description: str) -> html.Div:
     )
 
 
-def case_header(cases: list[dict[str, Any]], session: dict[str, Any]) -> html.Header:
+def case_header(
+    cases: list[dict[str, Any]],
+    session: dict[str, Any],
+    workbench_links: list[tuple[str, str]] | None = None,
+) -> html.Header:
     return html.Header(
         [
             html.Div(
@@ -54,6 +58,16 @@ def case_header(cases: list[dict[str, Any]], session: dict[str, Any]) -> html.He
                 ],
                 className="rv-brand",
             ),
+            html.Nav(
+                [
+                    html.A(label, href=href, className="traced-switcher-link")
+                    for label, href in (workbench_links or [])
+                ],
+                className="traced-switcher",
+                **{"aria-label": "Traced workbench surfaces"},
+            )
+            if workbench_links
+            else None,
             html.Div(
                 [
                     html.Label("Current case", htmlFor="rv-case", className="rv-small rv-muted"),
