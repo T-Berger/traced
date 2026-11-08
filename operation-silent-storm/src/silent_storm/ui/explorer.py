@@ -119,6 +119,7 @@ def create_layout(
     review_service: ReviewServiceProtocol | None = None,
     delivery_service: Any = None,
     diff_service: Any = None,
+    workbench_links: list[tuple[str, str]] | None = None,
 ) -> html.Div:
     """Build the shell; completed imports only, with no image requests by default."""
     releases, release_id, boot_error = _initial_releases(store)
@@ -168,6 +169,16 @@ def create_layout(
                                 ],
                                 className="ss-brand",
                             ),
+                            html.Nav(
+                                [
+                                    html.A(label, href=href, className="traced-switcher-link")
+                                    for label, href in (workbench_links or [])
+                                ],
+                                className="traced-switcher traced-switcher--inverse",
+                                **{"aria-label": "Traced workbench surfaces"},
+                            )
+                            if workbench_links
+                            else None,
                             html.P(
                                 "Inspect supplied historical media and its limits.",
                                 className="ss-brand-note",

@@ -8,7 +8,7 @@ Use Manrope for interface text and IBM Plex Mono for identifiers and timestamps.
 
 Use the semantic success, review, error and information roles with visible words. Brand orange indicates an action or the logo endpoint; it is not a truth, confidence or risk rating. Preserve Observation, Inference, Assumption, model proposal, specialist output and human decision as distinct concepts.
 
-Dark review surfaces map the canonical Ink/Paper/link-on-dark roles to the existing application theme. Semantic dark tints are application accessibility mappings, not new identity masters. Check both colour schemes when changing these mappings. Keep the graph on its labelled light reading surface so its text, edges and exact-evidence outline remain readable in either scheme.
+All surfaces render the light colour scheme only: bridges pin `color-scheme: light`, so the canonical Ink/Paper roles apply regardless of the browser preference. Keep the graph on its labelled light reading surface so its text, edges and exact-evidence outline remain readable. `./traced start` serves the review desk at `/`, Swarm Detector at `/swarm/`, and Silent Storm at `/silent-storm/` on one server; each surface shows the same `traced-switcher` navigation from `ui/traced-base.css`.
 
 ## Reuse and workflow
 

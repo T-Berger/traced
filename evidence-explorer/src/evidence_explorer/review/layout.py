@@ -18,7 +18,12 @@ from .components import (
 from .graph import GRAPH_STYLE
 
 
-def build_layout(cases: list[dict[str, Any]], session: dict[str, Any], error=None):
+def build_layout(
+    cases: list[dict[str, Any]],
+    session: dict[str, Any],
+    error=None,
+    workbench_links: list[tuple[str, str]] | None = None,
+):
     """Build one stable component tree for text, behavior, and historical media."""
     return html.Div(
         [
@@ -28,7 +33,7 @@ def build_layout(cases: list[dict[str, Any]], session: dict[str, Any], error=Non
             dcc.Store(id="rv-scroll-marker", storage_type="memory"),
             dcc.Interval(id="rv-poll", interval=1200, disabled=True),
             html.A("Skip to review workspace", href="#rv-workspace", className="rv-skip"),
-            case_header(cases, session),
+            case_header(cases, session, workbench_links),
             page_navigation("review" if cases else "cases"),
             html.Main(
                 [

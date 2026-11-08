@@ -5,6 +5,7 @@
  * Workflow status colors remain distinct from the Vermilion brand accent.
  */
 .ss-workbench.traced-app {
+  color-scheme: light;
   --ss-font-family: var(--traced-font-sans);
   --ss-font-size-base: var(--traced-font-size-body);
   --ss-line-height: var(--traced-line-height-body);

@@ -19,7 +19,10 @@ From this workspace folder, launch the integrated review desk:
 ./traced start
 ```
 
-Open [the shared workbench](http://127.0.0.1:8053) and follow
+One server now serves all three surfaces behind the shared workbench switcher:
+the review desk at [the root](http://127.0.0.1:8053/),
+[Swarm Detector](http://127.0.0.1:8053/swarm/), and
+[Silent Storm](http://127.0.0.1:8053/silent-storm/). On the review desk, follow
 **Cases → Review → Compare → Briefing**. On Cases, choose **Start investigation**
 to open the editor, then **Save plan**. Follow **Gather evidence** and continue
 the saved plan with the selected case. Review and save its sources, explicitly

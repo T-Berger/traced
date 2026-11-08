@@ -142,10 +142,12 @@ def main(argv: list[str] | None = None, *, root: Path | None = None) -> None:
             raise ValueError
     except ValueError:
         parser.error("TRACED_PORT / --port must be an integer between 1 and 65535.")
-    arguments = ["web", "--host", host, "--port", str(port)]
-    if not start_args.no_worker:
-        arguments.append("--with-worker")
-    _run_review(root, arguments)
+    try:
+        from . import workbench
+    except ImportError:
+        import workbench
+
+    workbench.run_workbench(host, port, with_worker=not start_args.no_worker)
 
 
 if __name__ == "__main__":

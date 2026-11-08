@@ -19,7 +19,28 @@
     animation-duration: 0ms !important;
   }
 }
+.traced-switcher { display: flex; flex-wrap: wrap; gap: var(--traced-space-2); margin: 0; }
+.traced-switcher-link {
+  display: inline-flex; align-items: center; min-height: 32px; padding: 4px 12px;
+  border: 1px solid var(--traced-border-subtle); border-radius: var(--traced-radius-small);
+  background: var(--traced-surface); color: var(--traced-foreground-secondary);
+  font-family: var(--traced-font-sans); font-size: var(--traced-font-size-caption);
+  text-decoration: none;
+}
+.traced-switcher-link:hover {
+  background: var(--traced-selection-background); color: var(--traced-foreground);
+  border-color: var(--traced-border-strong);
+}
+.traced-switcher--inverse .traced-switcher-link {
+  background: transparent; color: var(--traced-foreground-inverse);
+  border-color: var(--traced-focus-ring-on-dark);
+}
+.traced-switcher--inverse .traced-switcher-link:hover {
+  background: var(--traced-action-secondary-hover-background);
+  color: var(--traced-foreground-inverse); border-color: var(--traced-foreground-inverse);
+}
 @media print {
   .traced-lockup .traced-logo--light { display: block !important; }
   .traced-lockup .traced-logo--dark { display: none !important; }
+  .traced-switcher { display: none; }
 }
