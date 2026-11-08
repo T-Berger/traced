@@ -23,6 +23,9 @@ dev = ["pytest>=8.0", "ruff>=0.11"]
 [project.scripts]
 swarm-detector = "swarm_detector.cli:main"
 
+[dependency-groups]
+analysis = ["pandas>=3.0", "matplotlib>=3.10"]
+
 [tool.hatch.build.targets.wheel]
 packages = ["src/swarm_detector"]
 

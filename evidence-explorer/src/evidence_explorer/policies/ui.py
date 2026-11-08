@@ -332,7 +332,7 @@ def _case_guide(case: dict, platform: dict) -> html.Section:
         f"Case guide: {case['subject']}",
         case.get("role"),
         html.Div(body),
-        section_id="pg-case",
+        section_id="pg-case-overview",
     )
 
 

@@ -1,0 +1,33 @@
+<!doctype html><meta charset="utf-8"><title>3 Timing alone</title><link rel="stylesheet" href="style.css"><svg id="s" viewBox="0 0 1280 720"></svg><script src="lib.js"></script><script>
+const svg=document.getElementById('s');bg(svg);
+T(svg,640,100,'Timing alone is not enough',{size:54,weight:800,anchor:'middle'});
+const sub=T(svg,640,150,'',{size:28,fill:C.soft,anchor:'middle'});
+el('rect',{x:100,y:190,width:300,height:70,rx:18,fill:C.card,stroke:C.line,'stroke-width':2},svg);
+T(svg,125,222,'Post: strike news',{size:26,weight:700,fill:C.green});T(svg,125,248,'posted at 0:00',{size:20,fill:C.soft});
+el('line',{x1:90,y1:490,x2:1190,y2:490,stroke:C.grey,'stroke-width':3},svg);
+T(svg,1190,525,'time →',{size:22,fill:C.soft,anchor:'end'});
+const R=rng(5),dots=[];
+for(let i=0;i<40;i++){dots.push({bot:i<10,x:215+R()*295,y:410+R()*60,s:1+R()*2,win:true})}
+for(let i=0;i<22;i++){const x=R()<.3?120+R()*70:570+R()*600;dots.push({bot:false,x,y:440+R()*35,s:.2+R()*.6,win:false})}
+dots.forEach(d=>d.c=el('circle',{r:10,stroke:'#fff','stroke-width':2},svg));
+const rings=dots.filter(d=>d.win).map(d=>el('circle',{r:16,fill:'none',stroke:C.red,'stroke-width':3},svg));
+const br=el('path',{d:'M205 515 v14 h320 v-14',fill:'none',stroke:C.red,'stroke-width':4,'stroke-linecap':'round'},svg);
+const brT=T(svg,365,565,'within 5 minutes → flagged',{size:26,weight:700,fill:C.red,anchor:'middle'});
+const cnt=T(svg,1190,320,'',{size:60,weight:800,fill:C.red,anchor:'end'});
+const real=T(svg,1190,368,'In our data: 8.4M pairs flagged',{size:26,fill:C.soft,anchor:'end'});
+const l1=el('g',{},svg);el('circle',{cx:700,cy:565,r:10,fill:C.amber},l1);T(l1,722,574,'swarm',{size:24,fill:C.amber,weight:700});
+el('circle',{cx:830,cy:565,r:10,fill:C.green},l1);T(l1,852,574,'genuine readers',{size:24,fill:C.green,weight:700});
+run(10,t=>{
+ sub.textContent=t<3.2?'Something happens. People react.':t<6.4?'Timing says: close together = coordinated.':'But most are just readers. Timing can\'t tell them apart.';
+ const reveal=seg(t,6.4,7.2);
+ dots.forEach(d=>{const st=d.win?1+d.s*.8:.3;const p=seg(t,st,st+.5);const y=lerp(250,d.y,p);
+  d.c.setAttribute('cx',d.x);d.c.setAttribute('cy',y);d.c.setAttribute('opacity',p);
+  const col=d.bot?C.amber:C.green;
+  d.c.setAttribute('fill',reveal>0&&d.win?col:C.grey);d.c.setAttribute('fill-opacity',d.win?1:.55)});
+ const fl=seg(t,4.2,4.8);
+ rings.forEach(r=>{});let k=0;dots.forEach(d=>{if(d.win){const r=rings[k++];r.setAttribute('cx',d.x);r.setAttribute('cy',d.y);r.setAttribute('opacity',fl*(1-.55*reveal))}});
+ const b=seg(t,3.4,4.2);br.setAttribute('opacity',b);brT.setAttribute('opacity',b);
+ const n=Math.round(780*seg(t,4.4,5.6));cnt.textContent=n>0?n+' pairs flagged':'';
+ cnt.setAttribute('opacity',fl);real.setAttribute('opacity',lin(t,5.4,5.9));l1.setAttribute('opacity',reveal);
+});
+</script>
