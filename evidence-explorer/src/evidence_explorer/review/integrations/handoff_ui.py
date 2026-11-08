@@ -22,6 +22,31 @@ def handoff_panel() -> html.Section:
                 "Use Download case package for the complete handoff.",
                 className="rv-small rv-muted",
             ),
+            dcc.Checklist(
+                id="trail-dossier-category",
+                options=[
+                    {
+                        "label": "Include selected category scope from Compare",
+                        "value": "include",
+                    }
+                ],
+                value=[],
+            ),
+            dcc.Checklist(
+                id="trail-dossier-swarm",
+                options=[
+                    {
+                        "label": "Also include selected Swarm context (separate and unreviewed)",
+                        "value": "include",
+                    }
+                ],
+                value=[],
+            ),
+            html.P(
+                "First select a target, record kinds and any Swarm runs in Compare. "
+                "Behavioral context stays separate from category decisions.",
+                className="rv-small rv-muted",
+            ),
             html.Div(
                 [
                     html.Button(
@@ -281,6 +306,18 @@ def render_handoff(handoff: dict, view: dict, state: dict) -> html.Div:
                 f"{assessment['label']} · Version {assessment['version']}",
                 className="rv-small rv-handoff-context",
             ),
+            html.P(
+                f"Selected category target: {handoff['category_review']['target']} · "
+                f"record kinds: {', '.join(handoff['category_review']['record_kinds'])} · "
+                "Swarm runs: "
+                + (", ".join(handoff["category_review"]["selected_swarm_run_ids"]) or "none")
+                + " · "
+                f"{len(handoff['category_review']['rows'])} category findings. "
+                "Observed saved records only; coverage unknown.",
+                className="rv-notice",
+            )
+            if handoff.get("category_review") is not None
+            else None,
             _counts(
                 counts,
                 [
@@ -452,7 +489,27 @@ def render_import_receipt(receipt: dict) -> html.Div:
     )
 
 
-def _project(service, state, drafts, note, selection, planning_draft=None):
+def _category_selection(include, target, kinds, swarm_runs, include_swarm=None):
+    if "include" not in (include or []):
+        if "include" in (include_swarm or []):
+            raise ValueError("Include the selected category scope to add Swarm context.")
+        return None
+    if (
+        not isinstance(target, str)
+        or not target.strip()
+        or not isinstance(kinds, list)
+        or not kinds
+    ):
+        raise ValueError("Select a target and record kinds in Compare before including them.")
+    if not isinstance(swarm_runs, list):
+        raise ValueError("Choose Swarm runs in Compare or leave the selection empty.")
+    selected_swarm = swarm_runs if "include" in (include_swarm or []) else []
+    if "include" in (include_swarm or []) and not selected_swarm:
+        raise ValueError("Select at least one Swarm run in Compare or deselect Swarm context.")
+    return {"target": target, "record_kinds": kinds, "swarm_run_ids": selected_swarm}
+
+
+def _project(service, state, drafts, note, selection, planning_draft=None, category_selection=None):
     from .handoff_service import load_handoff_context
 
     selection = selection if isinstance(selection, Mapping) else {}
@@ -464,6 +521,7 @@ def _project(service, state, drafts, note, selection, planning_draft=None):
         note=note,
         purpose_id=purpose["purpose_id"] if purpose else None,
         planning_draft=planning_draft,
+        category_selection=category_selection,
     )
     return view, handoff
 
@@ -480,12 +538,31 @@ def register_handoff_callbacks(app: Dash, service) -> None:
         Input("trail-handoff-refresh", "n_clicks"),
         Input("trail-planning-refresh", "data"),
         Input("trail-planning-selected", "data"),
+        Input("trail-dossier-category", "value"),
+        Input("trail-dossier-swarm", "value"),
+        Input("compliance-category-target", "value"),
+        Input("compliance-category-kinds", "value"),
+        Input("compliance-category-swarm-runs", "value"),
     )
     def projection(
-        state, drafts, note, purpose, refresh_clicks=0, planning_refresh=None, planning_draft=None
+        state,
+        drafts,
+        note,
+        purpose,
+        refresh_clicks=0,
+        planning_refresh=None,
+        planning_draft=None,
+        include=None,
+        include_swarm=None,
+        target=None,
+        kinds=None,
+        swarm_runs=None,
     ):
         try:
-            view, handoff = _project(service, state, drafts, note, purpose, planning_draft)
+            category = _category_selection(include, target, kinds, swarm_runs, include_swarm)
+            view, handoff = _project(
+                service, state, drafts, note, purpose, planning_draft, category
+            )
             return (
                 render_handoff(handoff, view, state),
                 not handoff["export_allowed"],
@@ -504,9 +581,27 @@ def register_handoff_callbacks(app: Dash, service) -> None:
         State("trail-use-case-purpose", "data"),
         State("trail-handoff-context", "data"),
         State("trail-planning-selected", "data"),
+        State("trail-dossier-category", "value"),
+        State("trail-dossier-swarm", "value"),
+        State("compliance-category-target", "value"),
+        State("compliance-category-kinds", "value"),
+        State("compliance-category-swarm-runs", "value"),
         prevent_initial_call=True,
     )
-    def download(clicks, state, drafts, note, purpose, expected_context=None, planning_draft=None):
+    def download(
+        clicks,
+        state,
+        drafts,
+        note,
+        purpose,
+        expected_context=None,
+        planning_draft=None,
+        include=None,
+        include_swarm=None,
+        target=None,
+        kinds=None,
+        swarm_runs=None,
+    ):
         if not clicks:
             return no_update, no_update
         from .handoff_service import prepare_dossier
@@ -522,6 +617,9 @@ def register_handoff_callbacks(app: Dash, service) -> None:
                 purpose_id=selected["purpose_id"] if selected else None,
                 expected_context=expected_context,
                 planning_draft=planning_draft,
+                category_selection=_category_selection(
+                    include, target, kinds, swarm_runs, include_swarm
+                ),
             )
             return (
                 dcc.send_string(prepared.content, prepared.filename),
@@ -540,6 +638,11 @@ def register_handoff_callbacks(app: Dash, service) -> None:
         Input("trail-handoff-refresh", "n_clicks"),
         Input("trail-planning-refresh", "data"),
         Input("trail-planning-selected", "data"),
+        Input("trail-dossier-category", "value"),
+        Input("trail-dossier-swarm", "value"),
+        Input("compliance-category-target", "value"),
+        Input("compliance-category-kinds", "value"),
+        Input("compliance-category-swarm-runs", "value"),
         prevent_initial_call=True,
     )
     def clear_message(
@@ -550,5 +653,10 @@ def register_handoff_callbacks(app: Dash, service) -> None:
         _refresh_clicks=0,
         _planning_refresh=None,
         _planning_draft=None,
+        _include=None,
+        _include_swarm=None,
+        _target=None,
+        _kinds=None,
+        _swarm_runs=None,
     ):
         return "", None

@@ -91,6 +91,7 @@ def create_app(service: WorkspaceService, *, server=None, workbench_links=None):
     def layout():
         root = original_layout()
         from ...claim_check.ui import claim_check_panel
+        from ...compliance_review.model_ui import model_proposal_panel
         from ...investigation.ui import check_panel
         from .collection_scope_ui import saved_scope_panel
         from .components import case_tools, comparison_tools, export_tools
@@ -107,6 +108,7 @@ def create_app(service: WorkspaceService, *, server=None, workbench_links=None):
                 html.Div(id="trail-domain-context"),
                 saved_scope_panel(),
                 claim_check_panel(),
+                model_proposal_panel(read_only=service.settings.read_only),
             ],
         }
         for node in _walk(root):
@@ -122,6 +124,8 @@ def create_app(service: WorkspaceService, *, server=None, workbench_links=None):
 
         from ...alerts.settings import AlertSettingsStore
         from ...alerts.ui import alerts_page
+        from ...compliance_review.alerts_ui import alerts_bridge_panel
+        from ...compliance_review.local_alerts_ui import local_alerts_panel
         from ...policies.ui import policies_page
 
         def tab(label, value):
@@ -143,9 +147,25 @@ def create_app(service: WorkspaceService, *, server=None, workbench_links=None):
                 ]
             elif getattr(node, "className", None) == "rv-main":
                 children = list(node.children)
+                page = alerts_page(
+                    AlertSettingsStore(service.settings.data_dir),
+                    read_only=service.settings.read_only,
+                )
+                content = list(page.children.children)
+                header = next(
+                    i
+                    for i, item in enumerate(content)
+                    if getattr(item, "className", None) == "al-top"
+                )
+                content.insert(header + 1, html.Div(local_alerts_panel(), className="rv-case-card"))
+                anchor = next(
+                    i for i, item in enumerate(content) if getattr(item, "id", None) == "al-ready"
+                )
+                content.insert(anchor + 1, alerts_bridge_panel())
+                page.children.children = content
                 # Keep the shared footer last.
                 children[-1:-1] = [
-                    alerts_page(AlertSettingsStore(service.settings.data_dir)),
+                    page,
                     policies_page(),
                 ]
                 node.children = children
@@ -627,9 +647,17 @@ def create_app(service: WorkspaceService, *, server=None, workbench_links=None):
             True,
         )
 
+    from ...alerts.ui import register_alert_callbacks
     from ...claim_check.ui import register_claim_check_callbacks
+    from ...compliance_review.alerts_ui import register_alert_bridge_callbacks
+    from ...compliance_review.category_ui import register_category_review_callbacks
+    from ...compliance_review.local_alerts_ui import register_local_alerts_callbacks
+    from ...compliance_review.model_ui import register_model_proposal_callbacks
+    from ...compliance_review.saved_ui import register_saved_context_callbacks
+    from ...compliance_review.velocity_ui import register_velocity_callbacks
     from ...investigation.intake_ui import register_intake_callbacks
     from ...investigation.ui import register_check_callbacks
+    from ...policies.ui import register_policy_callbacks
     from ...social_dashboard.events_ui import register_event_callbacks
     from ...social_dashboard.ui import register_callbacks as register_social_dashboard_callbacks
     from .activity_ui import register_activity_callbacks
@@ -653,11 +681,13 @@ def create_app(service: WorkspaceService, *, server=None, workbench_links=None):
     register_media_callbacks(app, service)
     register_handoff_callbacks(app, service)
     register_social_dashboard_callbacks(app, service)
+    register_saved_context_callbacks(app, service)
+    register_category_review_callbacks(app, service)
+    register_model_proposal_callbacks(app, service)
+    register_velocity_callbacks(app, service)
     register_event_callbacks(app, service)
-    from ...alerts.ui import register_alert_callbacks
-
     register_alert_callbacks(app, service)
-    from ...policies.ui import register_policy_callbacks
-
+    register_alert_bridge_callbacks(app, service)
+    register_local_alerts_callbacks(app, service)
     register_policy_callbacks(app)
     return app

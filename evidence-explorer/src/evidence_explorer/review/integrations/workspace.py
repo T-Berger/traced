@@ -376,6 +376,49 @@ class WorkspaceService(ReviewService):
             view.setdefault("computation", None)
         return view
 
+    def queue_category_proposal(
+        self,
+        case_id: str,
+        finding_id: str,
+        scenario_id: str,
+        record_id: str,
+        record_hash: str,
+        target: str,
+        expected_fingerprint: str,
+        expected_scenario_version: int,
+        record_manifest: list[dict[str, str]] | None = None,
+    ) -> ReviewJob:
+        """Queue one local model proposal against the exact selected saved record."""
+        from ...compliance_review.proposals import (
+            PROMPT_VERSION,
+            require_local_ollama,
+            require_model_identity,
+        )
+        from ...models_client import OllamaClient
+
+        if self.settings.read_only:
+            raise PermissionError("A read-only workspace cannot queue model proposals.")
+        if not isinstance(target, str) or not target.strip() or len(target) > 500:
+            raise ValueError("Enter an explicit target of at most 500 characters.")
+        require_local_ollama(self.settings)
+        with OllamaClient(self.settings) as client:
+            identity = require_model_identity(client.model_key("chat"))
+        return self.repository.enqueue_job_state(
+            case_id,
+            finding_id,
+            scenario_id,
+            "category_proposal",
+            model=self.settings.chat_model,
+            model_identity=identity,
+            prompt_version=PROMPT_VERSION,
+            record_id=record_id,
+            record_content_hash=record_hash,
+            record_manifest=record_manifest or [{"id": record_id, "content_hash": record_hash}],
+            target=target.strip(),
+            expected_fingerprint=expected_fingerprint,
+            expected_scenario_version=expected_scenario_version,
+        )
+
     def queue_recomputation(self, case_id: str, finding_id: str, scenario_id: str) -> ReviewJob:
         scenario = self.load_scenario(scenario_id)
         if scenario.case_id != case_id:
@@ -450,6 +493,18 @@ class WorkspaceService(ReviewService):
 
     def load_job(self, job_id: str) -> ReviewJob | None:
         job = super().load_job(job_id)
+        if job and job.mode == "category_proposal" and job.status == "completed" and job.result:
+            output_fingerprint = getattr(job.result, "output_fingerprint", None)
+            scenario = self.load_scenario(job.scenario_id)
+            return job.model_copy(
+                update={
+                    "stale": (
+                        not output_fingerprint
+                        or self.case_fingerprint(job.case_id) != output_fingerprint
+                        or scenario.version != job.payload.scenario_version
+                    )
+                }
+            )
         if job and job.mode == "swarm_recompute":
             scenario = self.load_scenario(job.scenario_id)
             return job.model_copy(

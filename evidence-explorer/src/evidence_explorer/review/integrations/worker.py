@@ -137,6 +137,56 @@ class WorkspaceWorker:
         self, bundle: EvidenceBundle, payload: ReviewJobPayload
     ) -> tuple[dict[str, Any], EvidenceBundle | None]:
         mode = payload.mode
+        if mode == "category_proposal":
+            from ...compliance_review.producer import category_batch_bundle
+            from ...compliance_review.proposals import (
+                PROMPT_VERSION as CATEGORY_PROMPT_VERSION,
+            )
+            from ...compliance_review.proposals import (
+                propose_for_record,
+                require_local_ollama,
+                require_model_identity,
+            )
+
+            if payload.prompt_version != CATEGORY_PROMPT_VERSION:
+                raise CheckError("Proposal method changed. Submit a fresh operation.")
+            records = {r.id: r for r in bundle.records}
+            selected = []
+            for item in payload.record_manifest:
+                record = records.get(item.id)
+                if item.id in payload.excluded_record_ids:
+                    raise StaleWorkspaceJob("A selected record is excluded from this assessment.")
+                if (
+                    record is None
+                    or record.text is None
+                    or record.content_hash != item.content_hash
+                ):
+                    raise StaleWorkspaceJob("A selected saved record changed or is unavailable.")
+                selected.append(record)
+            settings = (
+                replace(self.settings, chat_model=payload.model) if payload.model else self.settings
+            )
+            require_local_ollama(settings)
+            require_model_identity(payload.model_identity)
+            with OllamaClient(settings) as client:
+                if require_model_identity(client.model_key("chat")) != payload.model_identity:
+                    raise CheckError("The installed local model changed after queueing.")
+                proposals = [
+                    propose_for_record(record.model_dump(mode="json"), payload.target, client)
+                    for record in selected
+                ]
+            computed = category_batch_bundle(bundle, proposals)
+            count = sum(len(proposal["annotations"]) for proposal in proposals)
+            return {
+                "kind": "category_proposal",
+                "mode": "category_proposal",
+                "label": "Local model proposals — human review required",
+                "message": f"Saved {count} model proposals for review.",
+                "result_run_id": computed.runs[-1].id,
+                "output_fingerprint": computed.fingerprint(),
+                "record_ids": [record.id for record in selected],
+                "proposal_count": count,
+            }, computed
         if mode in {"ollama", "openrouter"} and (
             payload.prompt_version not in {None, PROMPT_VERSION}
             or payload.retrieval_version not in {None, RETRIEVAL_VERSION}
@@ -244,6 +294,16 @@ class WorkspaceWorker:
             self._validate_context(transaction, job)
             if computed is not None:
                 transaction.import_bundle(computed)
+            if job.mode == "category_proposal" and computed is not None:
+                assessment = transaction.create_scenario_state(
+                    job.case_id, result["result_run_id"], assessment_kind="scenario"
+                )
+                result["result_scenario_id"] = assessment.id
+                from ...compliance_review.package_guard import ensure_transaction_bundle_fits
+
+                ensure_transaction_bundle_fits(
+                    self.repository, connection, self.settings, job.case_id
+                )
             validated = ReviewResult.model_validate(result)
             transaction.finish_job(
                 job.id,

@@ -102,7 +102,7 @@ def _section(title: str, subtitle: str, body, *, section_id: str, extra=None) ->
 # --------------------------------------------------------------------------- layout
 
 
-def _settings_panel(settings: AlertSettings) -> html.Details:
+def _settings_panel(settings: AlertSettings, *, read_only: bool = False) -> html.Details:
     rows = []
     for c in CATEGORIES:
         values = settings.categories[c]
@@ -215,10 +215,12 @@ def _settings_panel(settings: AlertSettings) -> html.Details:
             ),
             html.Div(
                 [
-                    html.Button("Save", id="al-save", n_clicks=0,
+                    html.Button("Save", id="al-save", n_clicks=0, disabled=read_only,
                                 className="al-btn al-btn--primary"),
-                    html.Button("Restore defaults", id="al-reset", n_clicks=0,
+                    html.Button("Restore defaults", id="al-reset", n_clicks=0, disabled=read_only,
                                 className="al-btn al-btn--ghost"),
+                    html.P("Settings cannot be changed in this read-only workspace.",
+                           className="al-hint") if read_only else None,
                     html.Div(id="al-settings-message", **{"aria-live": "polite"}),
                 ],
                 className="al-actions",
@@ -229,7 +231,7 @@ def _settings_panel(settings: AlertSettings) -> html.Details:
     )  # fmt: skip
 
 
-def alerts_page(store: AlertSettingsStore) -> html.Section:
+def alerts_page(store: AlertSettingsStore, *, read_only: bool = False) -> html.Section:
     settings, problem = store.load()
     return html.Section(
         html.Div(
@@ -258,7 +260,7 @@ def alerts_page(store: AlertSettingsStore) -> html.Section:
                                     [
                                         dcc.Dropdown(id="al-case", options=[], value=None,
                                                      clearable=False, searchable=False,
-                                                     placeholder="Loading…",
+                                                     placeholder="Select an analytics subject",
                                                      className="al-dropdown"),
                                         html.Button("Refresh", id="al-refresh", n_clicks=0,
                                                     className="al-btn al-btn--ghost-light"),
@@ -318,7 +320,7 @@ def alerts_page(store: AlertSettingsStore) -> html.Section:
                               responsive=True, className="al-chart"),
                     section_id="al-timeline-section",
                 ),
-                _settings_panel(settings),
+                _settings_panel(settings, read_only=read_only),
                 html.P(
                     "Labels and scores are model proposals. No human decision is recorded here. "
                     "Check saved sources, context, and platform rules independently.",
@@ -744,6 +746,8 @@ def register_alert_callbacks(app, service) -> None:
     def save(_save, _reset, *args):
         values, extra, rev = list(args[: len(field_ids)]), args[len(field_ids) : -1], args[-1]
         keep = [no_update] * len(all_ids)
+        if service.settings.read_only:
+            return (no_update, _notice("This workspace is read-only.", "warning"), *keep)
         if ctx.triggered_id == "al-reset":
             settings = store.reset()
             message = _notice("Defaults restored.", "success")

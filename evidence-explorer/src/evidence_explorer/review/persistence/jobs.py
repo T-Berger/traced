@@ -2,13 +2,15 @@
 
 from __future__ import annotations
 
+import json
 import sqlite3
 from collections.abc import Callable
 from datetime import UTC, datetime, timedelta
 from typing import Any
 from uuid import uuid4
 
-from ..models import ReviewJob, ReviewJobPayload, ReviewResult
+from ..contracts import EvidenceBundle
+from ..models import CategoryRecord, ReviewJob, ReviewJobPayload, ReviewResult
 from .common import (
     ConnectionFactory,
     job_from_row,
@@ -36,10 +38,51 @@ class ReviewJobRepository:
         prompt_version: str | None = None,
         retrieval_version: str | None = None,
         reason: str | None = None,
+        record_id: str | None = None,
+        record_content_hash: str | None = None,
+        record_manifest: list[dict[str, str]] | None = None,
+        target: str | None = None,
+        expected_fingerprint: str | None = None,
+        expected_scenario_version: int | None = None,
     ) -> ReviewJob:
         mode = required_text(mode, "Mode")
         with self._connect(write=True) as connection:
             context = review_context(connection, case_id, finding_id, scenario_id)
+            if mode == "category_proposal" and not expected_fingerprint:
+                raise ValueError("The selected case fingerprint is required.")
+            if mode == "category_proposal" and (
+                type(expected_scenario_version) is not int
+                or expected_scenario_version != context.scenario.version
+            ):
+                raise ValueError("The selected assessment changed. Reopen it before analysis.")
+            if (
+                expected_fingerprint is not None
+                and expected_fingerprint != context.case.fingerprint
+            ):
+                raise ValueError(
+                    "The saved case changed. Reopen the evidence before running analysis."
+                )
+            if mode == "category_proposal":
+                row = connection.execute(
+                    "SELECT bundle_json FROM review_cases WHERE id = ?", (case_id,)
+                ).fetchone()
+                bundle = EvidenceBundle.model_validate(json.loads(row["bundle_json"]))
+                manifest = [CategoryRecord.model_validate(item) for item in record_manifest or []]
+                ids = [item.id for item in manifest]
+                if not 1 <= len(ids) <= 20 or len(ids) != len(set(ids)):
+                    raise ValueError("Select 1 to 20 distinct saved records.")
+                records = {r.id: r for r in bundle.records}
+                for item in manifest:
+                    record = records.get(item.id)
+                    if (
+                        record is None
+                        or not record.text
+                        or len(record.text) > 12000
+                        or record.content_hash != item.content_hash
+                    ):
+                        raise ValueError("A selected saved text or its version is unavailable.")
+                    if item.id in context.scenario.excluded_record_ids:
+                        raise ValueError("A selected record is excluded from this assessment.")
             configuration = {
                 key: value
                 for key, value in {
@@ -48,6 +91,10 @@ class ReviewJobRepository:
                     "prompt_version": prompt_version,
                     "retrieval_version": retrieval_version,
                     "reason": reason,
+                    "record_id": record_id,
+                    "record_content_hash": record_content_hash,
+                    "record_manifest": record_manifest,
+                    "target": target,
                 }.items()
                 if value is not None
             }

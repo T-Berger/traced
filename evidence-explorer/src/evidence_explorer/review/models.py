@@ -16,7 +16,7 @@ from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictInt, model_
 from .contracts import Case, EvidenceBundle, Finding
 from .verifier import Objection
 
-ReviewMode = Literal["demo", "openrouter", "ollama", "swarm_recompute"]
+ReviewMode = Literal["demo", "openrouter", "ollama", "swarm_recompute", "category_proposal"]
 Disposition = Literal["use", "qualify", "withhold"]
 
 
@@ -171,12 +171,17 @@ class ReviewResult(BaseModel):
     message: str | None = None
     stale: StrictBool = False
     cached: StrictBool | None = None
-    kind: Literal["swarm_recompute"] | None = None
+    kind: Literal["swarm_recompute", "category_proposal"] | None = None
     scenario_id: str | None = None
     scenario_version: StrictInt | None = Field(default=None, ge=1)
     computed_scenario_id: str | None = None
     result_run_id: str | None = None
     correspondences: tuple[FindingCorrespondence, ...] = ()
+
+
+class CategoryRecord(WorkflowRecord):
+    id: str = Field(min_length=1)
+    content_hash: str = Field(min_length=1)
 
 
 class ReviewJobPayload(WorkflowRecord):
@@ -194,10 +199,10 @@ class ReviewJobPayload(WorkflowRecord):
     prompt_version: str | None = None
     retrieval_version: str | None = None
     reason: str | None = None
-    model: str | None = None
-    model_identity: str | None = None
-    prompt_version: str | None = None
-    retrieval_version: str | None = None
+    record_id: str | None = None
+    record_content_hash: str | None = None
+    record_manifest: tuple[CategoryRecord, ...] = ()
+    target: str | None = None
 
     @model_validator(mode="after")
     def snapshot_matches_context(self) -> ReviewJobPayload:
@@ -205,6 +210,33 @@ class ReviewJobPayload(WorkflowRecord):
             raise ValueError("Queued finding ID does not match its snapshot")
         if self.base_run_id != self.finding_snapshot.run_id:
             raise ValueError("Queued baseline run does not match its finding snapshot")
+        if self.mode == "category_proposal":
+            if not all(
+                isinstance(v, str) and v.strip()
+                for v in (
+                    self.record_id,
+                    self.record_content_hash,
+                    self.target,
+                    self.model_identity,
+                )
+            ):
+                raise ValueError(
+                    "Category proposals require a saved text, target and model identity"
+                )
+            if len(self.target) > 500:
+                raise ValueError("Category proposal target is too long")
+            if self.record_id in self.excluded_record_ids:
+                raise ValueError("The selected record is excluded from this assessment")
+            ids = [item.id for item in self.record_manifest]
+            if not 1 <= len(ids) <= 20 or len(ids) != len(set(ids)):
+                raise ValueError("Select 1 to 20 distinct saved records")
+            if (
+                self.record_manifest[0].id != self.record_id
+                or self.record_manifest[0].content_hash != self.record_content_hash
+            ):
+                raise ValueError("The selected record does not match the pinned manifest")
+            if set(ids).intersection(self.excluded_record_ids):
+                raise ValueError("An input record is excluded from this assessment")
         return self
 
 

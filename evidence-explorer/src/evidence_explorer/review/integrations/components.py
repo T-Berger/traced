@@ -153,6 +153,10 @@ def export_tools() -> html.Section:
 
 def comparison_tools() -> html.Section:
     """Reveal specialist replay on demand while keeping progress messages visible."""
+    from ...compliance_review.category_ui import category_review_panel
+    from ...compliance_review.saved_ui import saved_context_panel
+    from ...compliance_review.ui import fictional_compliance_panel
+    from ...compliance_review.velocity_ui import velocity_panel
     from ...social_dashboard.events_ui import event_clusters_panel
     from ...social_dashboard.ui import dashboard_panel
     from .sources_ui import source_browser
@@ -208,6 +212,16 @@ def comparison_tools() -> html.Section:
             dcc.Interval(id="trail-tick", interval=1800, disabled=True),
             dashboard_panel(),
             event_clusters_panel(),
+            saved_context_panel(),
+            category_review_panel(),
+            velocity_panel(),
+            html.Details(
+                [
+                    html.Summary("Fictional category timeline and evidence matrix"),
+                    fictional_compliance_panel(),
+                ],
+                className="rv-details",
+            ),
         ],
         **{"aria-label": "Specialist scenario comparison"},
     )

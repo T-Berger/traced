@@ -71,7 +71,14 @@ def check_artifact_availability(service, bundle) -> dict[str, bool]:
 
 
 def load_handoff_context(
-    service, state, drafts=None, note=None, purpose_id=None, *, planning_draft=None
+    service,
+    state,
+    drafts=None,
+    note=None,
+    purpose_id=None,
+    *,
+    planning_draft=None,
+    category_selection=None,
 ):
     """Load the current assessment, preserving the existing draft/version guards."""
     state = state or {}
@@ -81,6 +88,19 @@ def load_handoff_context(
         view = snapshot.view(state["case_id"], state.get("scenario_id"))
         binding = navigation_context(view, state)
         captured = snapshot.capture_case_package(state["case_id"])
+        category = None
+        if category_selection is not None:
+            from ...compliance_review.swarm_context import project_category_swarm_context
+
+            if not isinstance(category_selection, Mapping):
+                raise ValueError("Choose a category scope in Compare before preparing the dossier.")
+            category = project_category_swarm_context(
+                view,
+                captured.bundle,
+                target=category_selection.get("target"),
+                record_kinds=category_selection.get("record_kinds"),
+                swarm_run_ids=category_selection.get("swarm_run_ids"),
+            )
     planning_dirty = _planning_dirty(state, planning_draft)
     dirty = unsaved_for_export(state, view, drafts, note) or planning_dirty
     # Typing a draft must not rehash all media on every keystroke. A clean view
@@ -97,6 +117,14 @@ def load_handoff_context(
     handoff["planning"] = planning_summary(captured)
     handoff["planning_dirty"] = planning_dirty
     handoff["download_context"] = _download_context(view, binding, captured)
+    if category is not None:
+        # Bind both the explicit selection and the entire detached projection to
+        # the preview, including review changes not reflected in a case hash.
+        payload = json.dumps([category_selection, category], sort_keys=True, separators=(",", ":"))
+        handoff["download_context"]["category_context"] = (
+            "category-handoff-v1:" + hashlib.sha256(payload.encode()).hexdigest()
+        )
+        handoff["category_review"] = category
     return view, handoff, binding
 
 
@@ -185,13 +213,20 @@ def prepare_dossier(
     *,
     expected_context=_UNSET,
     planning_draft=None,
+    category_selection=None,
 ) -> PreparedExport:
     """Render a draft from one captured evidence and planning snapshot."""
     from .handoff import render_dossier
     from .planning_handoff import planning_dossier_section
 
     _, handoff, binding = load_handoff_context(
-        service, state, drafts, note, purpose_id, planning_draft=planning_draft
+        service,
+        state,
+        drafts,
+        note,
+        purpose_id,
+        planning_draft=planning_draft,
+        category_selection=category_selection,
     )
     if handoff["planning_dirty"]:
         raise ValueError(
@@ -200,7 +235,13 @@ def prepare_dossier(
     if handoff["dirty"]:
         raise ValueError("Unsaved changes. Save your decision in Review before downloading.")
     validate_download_context(handoff["download_context"], expected_context)
+    if handoff.get("category_review") is not None:
+        from ...compliance_review.dossier import redact_category_brief, render_category_dossier
+
+        handoff = redact_category_brief(handoff)
     content = render_dossier(handoff) + "\n\n" + planning_dossier_section(handoff["planning"])
+    if handoff.get("category_review") is not None:
+        content += "\n\n" + render_category_dossier(handoff["category_review"])
     return PreparedExport(
         "traced-draft-dossier.md",
         content,

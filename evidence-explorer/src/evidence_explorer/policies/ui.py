@@ -51,7 +51,9 @@ def policies_page(catalog: Catalog | None = None) -> html.Section:
     cases = [{"label": f"Case: {c['subject']}", "value": k} for k, c in catalog.cases.items()]
     cases.append({"label": "General guidance (no case)", "value": GENERAL})
     platform = "twitter" if "twitter" in catalog.platforms else (platforms or [{}])[0].get("value")
-    case = next(iter(catalog.cases), GENERAL)
+    # Case examples are independently supplied planning material, not the
+    # current review case. Start with general guidance until selected explicitly.
+    case = GENERAL
     return html.Section(
         html.Div(
             [

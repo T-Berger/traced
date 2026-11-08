@@ -68,7 +68,8 @@
 :is(#rv-alerts-page, #rv-policies-page) .al-top-controls { display: grid; gap: 6px; min-width: 300px; }
 :is(#rv-alerts-page, #rv-policies-page) .al-top-controls .al-label { color: rgba(253, 252, 253, 0.85); }
 :is(#rv-alerts-page, #rv-policies-page) .al-top-row { display: flex; gap: 8px; }
-:is(#rv-alerts-page, #rv-policies-page) .al-dropdown { flex: 1; min-width: 200px; color: var(--al-ink); }
+:is(#rv-alerts-page, #rv-policies-page) .al-dropdown { flex: 1; min-width: 0; color: var(--al-ink); }
+:is(#rv-alerts-page, #rv-policies-page) .al-top-row .al-btn { flex-shrink: 0; white-space: nowrap; }
 :is(#rv-alerts-page, #rv-policies-page) .al-dropdown .Select-control { border-radius: 8px; border: 0; min-height: 40px; }
 
 /* Verdict */

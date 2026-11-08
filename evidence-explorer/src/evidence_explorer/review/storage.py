@@ -213,6 +213,12 @@ class ReviewRepository:
         prompt_version: str | None = None,
         retrieval_version: str | None = None,
         reason: str | None = None,
+        record_id: str | None = None,
+        record_content_hash: str | None = None,
+        record_manifest: list[dict[str, str]] | None = None,
+        target: str | None = None,
+        expected_fingerprint: str | None = None,
+        expected_scenario_version: int | None = None,
     ) -> ReviewJob:
         return self.jobs.enqueue(
             case_id,
@@ -224,6 +230,12 @@ class ReviewRepository:
             prompt_version=prompt_version,
             retrieval_version=retrieval_version,
             reason=reason,
+            record_id=record_id,
+            record_content_hash=record_content_hash,
+            record_manifest=record_manifest,
+            target=target,
+            expected_fingerprint=expected_fingerprint,
+            expected_scenario_version=expected_scenario_version,
         )
 
     def enqueue_job(
