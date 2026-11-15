@@ -57,5 +57,11 @@ services:
         sync: false
       - key: SUPABASE_ID_COLUMN
         value: id
+      # Column mapping for the server's content_items table (checked with
+      # `traced supabase check`): the post text is in `text`, not `content`.
       - key: SUPABASE_TEXT_COLUMN
-        value: content
+        value: text
+      - key: SUPABASE_URL_COLUMN
+        value: url
+      - key: SUPABASE_PUBLISHED_AT_COLUMN
+        value: posted_at
