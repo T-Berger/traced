@@ -2,11 +2,15 @@
 
 from __future__ import annotations
 
+import logging
 import os
 import threading
 import time
 from dataclasses import dataclass, field
 from typing import Any
+from urllib.parse import unquote, urlsplit
+
+LOGGER = logging.getLogger(__name__)
 
 DEFAULT_DSN = "postgresql://localhost:5432/disinfo"
 REQUIRED_TABLES = ("analytics_content_labels", "content_items", "cases")
@@ -32,6 +36,18 @@ def _connect_options(dsn: str) -> dict[str, Any]:
     if "pooler.supabase.com" in dsn or ":6543" in dsn:
         options["prepare_threshold"] = None
     return options
+
+
+def _safe_reason(exc: Exception, dsn: str) -> str:
+    """One line of the driver error, with the connection password removed."""
+    text = " ".join(str(exc).split()) or type(exc).__name__
+    try:
+        password = urlsplit(dsn).password
+    except ValueError:
+        password = None
+    for secret in {password, unquote(password or "")} - {None, ""}:
+        text = text.replace(secret, "***")
+    return f"{type(exc).__name__}: {text}"[:300]
 
 
 class AnalyticsUnavailable(RuntimeError):
@@ -69,9 +85,11 @@ class AnalyticsRepository:
         try:
             conn = connect(self.dsn, row_factory=dict_row, **_connect_options(self.dsn))
         except Exception as exc:
+            reason = _safe_reason(exc, self.dsn)
+            LOGGER.warning("Analytics database connection failed: %s", reason)
             raise AnalyticsUnavailable(
                 "Cannot reach the analytics database. Check TRACED_ANALYTICS_DATABASE_URL "
-                "(or SUPABASE_DATABASE_URL) and that PostgreSQL is running."
+                f"(or SUPABASE_DATABASE_URL) and that PostgreSQL is running. Reason: {reason}"
             ) from exc
         conn.read_only = True
         conn.execute("SET statement_timeout = '15s'")
