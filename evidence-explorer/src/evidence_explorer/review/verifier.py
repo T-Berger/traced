@@ -20,7 +20,7 @@ import httpx
 from pydantic import BaseModel, ConfigDict, Field
 
 from ..config import Settings
-from ..models_client import ModelError, OllamaClient
+from ..models_client import ModelError, OllamaClient, OpenRouterClient
 
 MAX_PROMPT_BYTES = 28000
 MAX_RESPONSE_BYTES = 256 * 1024
@@ -112,7 +112,7 @@ def _local_passage_aliases(passages: list[Passage]) -> tuple[list[Passage], dict
 def _local_settings(model: str | None = None) -> Settings:
     settings = Settings.from_env()
     endpoint = urlsplit(settings.ollama_url)
-    if (
+    if not settings.uses_openrouter and (
         endpoint.scheme not in {"http", "https"}
         or endpoint.hostname not in {"localhost", "127.0.0.1", "::1"}
         or endpoint.username
@@ -143,7 +143,8 @@ class OllamaVerifier:
     def from_env(
         cls, model: str | None = None, *, model_identity: str | None = None
     ) -> OllamaVerifier:
-        client = OllamaClient(_local_settings(model))
+        settings = _local_settings(model)
+        client = (OpenRouterClient if settings.uses_openrouter else OllamaClient)(settings)
         try:
             verifier = cls(client, owns_client=True)
             if model_identity is not None and verifier.model != model_identity:
@@ -200,7 +201,7 @@ def challenge_configuration() -> dict[str, Any]:
     try:
         settings = _local_settings()
         local["model"] = settings.chat_model
-        with OllamaClient(settings) as client:
+        with (OpenRouterClient if settings.uses_openrouter else OllamaClient)(settings) as client:
             identity = client.model_key("chat")
         local.update(
             ready=True, model_identity=identity, message="Local model is ready on this computer."

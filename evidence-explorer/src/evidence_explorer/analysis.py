@@ -16,7 +16,7 @@ from .db import Repository
 from .demo import DEMO_CLAIMS_KEY, DEMO_EMBEDDING_KEY, demo_claims, demo_embed
 from .grounding import validate_claims as validate_claims
 from .grounding import validate_extractive_claims
-from .models_client import OllamaClient
+from .models_client import OllamaClient, OpenRouterClient
 from .records import (
     AnalysisRequest,
     AnalysisResult,
@@ -85,7 +85,11 @@ def process_job(
         raise ValueError(f"Unknown job kind: {kind}")
     request = (SearchRequest if kind == "search" else AnalysisRequest).model_validate(payload)
     article_ids, total = _articles(repo, request)
-    context = OllamaClient(settings) if request.mode == "ollama" else nullcontext(None)
+    context = (
+        (OpenRouterClient if settings.uses_openrouter else OllamaClient)(settings)
+        if request.mode == "ollama"
+        else nullcontext(None)
+    )
     with context as model:
         embedding_key = model.model_key("embedding") if model else DEMO_EMBEDDING_KEY
         embed = model.embed if model else demo_embed

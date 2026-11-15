@@ -14,6 +14,19 @@ label, committed file, or exported case. The root launcher also accepts remainin
 settings from `evidence-explorer/.env` under its existing precedence rules. See
 [Common project root](PROJECT_ROOT.md).
 
+The simplest setting is one connection string, copied from Supabase → **Connect →
+Session pooler** (the same value as data-explorer's `DATABASE_URL_CLOUD`, which is
+also accepted). The project reference is read from the `postgres.<ref>` username.
+URL-encode the password if it contains `@ : / ? #` or `%`.
+
+```dotenv
+SUPABASE_DATABASE_URL=postgresql://postgres.<ref>:<password>@aws-0-<region>.pooler.supabase.com:5432/postgres
+SUPABASE_ID_COLUMN=id
+SUPABASE_TEXT_COLUMN=content
+```
+
+Alternatively, set the parts individually:
+
 ```dotenv
 SUPABASE_HOST=db.your-project-ref.supabase.co
 SUPABASE_PORT=5432

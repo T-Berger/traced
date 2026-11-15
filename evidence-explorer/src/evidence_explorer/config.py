@@ -16,6 +16,9 @@ class Settings:
     host: str = "127.0.0.1"
     port: int = 8051
     read_only: bool = False
+    # "ollama" (local, default) or "openrouter" (cloud; needs OPENROUTER_API_KEY).
+    model_provider: str = "ollama"
+    openrouter_url: str = "https://openrouter.ai/api/v1"
 
     @property
     def db_path(self) -> Path:
@@ -32,4 +35,13 @@ class Settings:
             host=os.getenv("EVIDENCE_HOST", "127.0.0.1"),
             port=int(os.getenv("PORT", os.getenv("EVIDENCE_PORT", "8051"))),
             read_only=os.getenv("EVIDENCE_READ_ONLY", "false").lower() in {"true", "1", "yes"},
+            model_provider=os.getenv("EVIDENCE_MODEL_PROVIDER", "ollama").strip().lower()
+            or "ollama",
+            openrouter_url=os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1").rstrip(
+                "/"
+            ),
         )
+
+    @property
+    def uses_openrouter(self) -> bool:
+        return self.model_provider == "openrouter"

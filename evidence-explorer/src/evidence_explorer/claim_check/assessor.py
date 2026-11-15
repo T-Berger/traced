@@ -10,7 +10,7 @@ from urllib.parse import urlsplit
 from pydantic import BaseModel, ConfigDict, Field
 
 from ..config import Settings
-from ..models_client import OllamaClient
+from ..models_client import OllamaClient, OpenRouterClient
 from .challenge import PROMPT_VERSION as CHALLENGE_PROMPT_VERSION
 from .challenge import challenge_saved_passages
 from .contracts import (
@@ -144,7 +144,7 @@ class OllamaClaimAssessor:
 
     def __init__(self, settings: Settings):
         endpoint = urlsplit(settings.ollama_url)
-        if (
+        if not settings.uses_openrouter and (
             endpoint.scheme not in {"http", "https"}
             or endpoint.hostname not in {"localhost", "127.0.0.1", "::1"}
             or endpoint.username
@@ -195,7 +195,9 @@ class OllamaClaimAssessor:
             },
             {"role": "user", "content": data},
         ]
-        with OllamaClient(self.settings) as client:
+        with (OpenRouterClient if self.settings.uses_openrouter else OllamaClient)(
+            self.settings
+        ) as client:
             identity = client.model_key("chat")
             raw = client.generate_structured(messages, _ModelAssessment, max_tokens=1600)
             if any(citation.fragment_id not in aliases for citation in raw.citations):
@@ -212,7 +214,7 @@ class OllamaClaimAssessor:
                 **raw.model_dump(exclude={"citations"}),
                 citations=citations,
                 model=identity,
-                provider="ollama",
+                provider=self.settings.model_provider,
                 prompt_version=PROMPT_VERSION,
                 metadata={
                     **client.last_generation_metadata,

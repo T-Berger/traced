@@ -12,7 +12,8 @@ workers = 1
 worker_class = "gthread"
 threads = int(os.environ.get("TRACED_THREADS", "8"))
 preload_app = False
-timeout = 120
+# Slow CPUs (Render free: 0.1 CPU) need longer to load the three dashboards.
+timeout = int(os.environ.get("GUNICORN_TIMEOUT", "120"))
 graceful_timeout = 30
 keepalive = 5
 accesslog = "-"

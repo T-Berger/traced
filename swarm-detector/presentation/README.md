@@ -1,6 +1,6 @@
 # Swarm Detector: 3-minute talk
 
-- `visuals/`: four small animated visuals, one per slide. Each is a self-contained HTML file (open it in a browser, it loops) with a ready-made `.mp4` and `.gif` for PowerPoint (Insert > Video).
+- `visuals/`: four small animated visuals, one per slide. Each is a self-contained HTML file (open it in a browser, it loops) with a ready-made `.gif` for PowerPoint. The `.mp4` exports are not kept in the repository; regenerate one with `export.mjs` when needed.
   1. `1_flip`: bot or human, then flip the labels
   2. `2_attack`: a swarm acts on a post: coordinated, directed, intentional
   3. `3_timing_alone`: timing alone flags everyone

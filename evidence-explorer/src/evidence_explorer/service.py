@@ -8,7 +8,7 @@ from datetime import UTC, datetime
 
 from .config import Settings
 from .db import Repository
-from .models_client import OllamaClient
+from .models_client import OllamaClient, OpenRouterClient
 from .records import AnalysisRequest, CollectionView, IngestionRequest, SearchRequest
 
 
@@ -197,7 +197,9 @@ class ExplorerService:
             online = False
         else:
             if time.monotonic() - self._status_at > 10 or not self._ollama_status:
-                with OllamaClient(self.settings) as model:
+                with (OpenRouterClient if self.settings.uses_openrouter else OllamaClient)(
+                    self.settings
+                ) as model:
                     self._ollama_status = model.status()
                 self._status_at = time.monotonic()
             ollama = deepcopy(self._ollama_status)

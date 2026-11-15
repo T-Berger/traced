@@ -54,8 +54,10 @@ ENV EVIDENCE_HOST=0.0.0.0 \
     SILENT_STORM_DB=/app/data/silent-storm/silent-storm.sqlite3 \
     PORT=8053
 EXPOSE 8053
-HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
-    CMD python -c "import os, urllib.request; urllib.request.urlopen('http://127.0.0.1:' + os.environ.get('PORT', '8053') + '/health', timeout=4).read()"
+# No Docker HEALTHCHECK: Render and Railway probe /health themselves (render.yaml,
+# railway.toml). A Docker probe would start a Python process every 30 s, which
+# costs real CPU on small plans, and gunicorn (PID 1) logs each failed probe as
+# "Worker exited with code 1" while the app is still starting.
 
 # Starts as root only to take ownership of a mounted volume, then runs as traced.
 CMD ["/app/deploy/start.sh"]

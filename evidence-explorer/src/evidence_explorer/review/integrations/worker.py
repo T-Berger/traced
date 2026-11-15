@@ -27,7 +27,7 @@ from ...collection.runtime import CollectionRuntime
 from ...config import Settings
 from ...db import Repository
 from ...feeds.runtime import FeedScheduler
-from ...models_client import OllamaClient
+from ...models_client import OllamaClient, OpenRouterClient
 from ...worker import worker_lock
 from ...worker_runtime import run_article_job, worker_heartbeat, worker_session
 from ..analysis import challenge_finding
@@ -186,7 +186,9 @@ class WorkspaceWorker:
             settings = (
                 replace(self.settings, chat_model=payload.model) if payload.model else self.settings
             )
-            with OllamaClient(settings) as client:
+            with (OpenRouterClient if settings.uses_openrouter else OllamaClient)(
+                settings
+            ) as client:
                 verifier = _OllamaVerifier(client)
                 if payload.model_identity is not None and verifier.model != payload.model_identity:
                     raise CheckError(

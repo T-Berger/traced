@@ -1,0 +1,61 @@
+# Render Blueprint for the Traced workbench on the FREE plan.
+# Render → New → Blueprint → pick this repository; it reads this file from the root.
+#
+# One web service builds the root Dockerfile: review desk at /, Swarm Detector at
+# /swarm/, Silent Storm at /silent-storm/, health check at /health.
+#
+# Free-plan limits this config is tuned for:
+#   - 512 MB RAM, 0.1 CPU: one gunicorn process, few threads, fewer malloc arenas
+#     (the whole workbench peaks around 150 MB).
+#   - No persistent disk: /app/data is wiped on every deploy, restart, and spin-down.
+#     Keep durable content in Supabase; the demo cases are re-seeded on each start.
+#   - Spins down after 15 minutes idle; the first request after that takes ~1 min.
+#   - No Ollama: model calls go to OpenRouter (EVIDENCE_MODEL_PROVIDER=openrouter).
+#
+# Variables marked `sync: false` are secrets: Render asks for them when the
+# Blueprint is created. Leave any unused one empty.
+services:
+  - type: web
+    name: traced-workbench
+    runtime: docker
+    plan: free
+    region: frankfurt
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    autoDeployTrigger: commit
+    envVars:
+      # Small footprint for 512 MB / 0.1 CPU.
+      - key: TRACED_THREADS
+        value: "4"
+      - key: MALLOC_ARENA_MAX
+        value: "2"
+      - key: GUNICORN_TIMEOUT
+        value: "300"
+      # Re-create the labelled synthetic demo cases on each (ephemeral) start.
+      - key: TRACED_SEED_DEMO
+        value: "1"
+
+      # Models through OpenRouter instead of a local Ollama.
+      - key: EVIDENCE_MODEL_PROVIDER
+        value: openrouter
+      - key: EVIDENCE_CHAT_MODEL
+        value: anthropic/claude-sonnet-5.5
+      - key: EVIDENCE_EMBEDDING_MODEL
+        value: baai/bge-m3
+      - key: EVIDENCE_REVIEW_MODEL
+        value: anthropic/claude-sonnet-5.5
+      - key: OPENROUTER_API_KEY
+        sync: false
+
+      # Supabase content source (docs/SUPABASE_SOURCE.md): one connection string,
+      # the same value as data-explorer's DATABASE_URL_CLOUD. Use Supabase → Connect →
+      # Session pooler (IPv4); the direct db.* host is IPv6-only. URL-encode the
+      # password if it contains @ : / ? # or %.
+      #   postgresql://postgres.<ref>:<password>@aws-0-<region>.pooler.supabase.com:5432/postgres
+      - key: SUPABASE_DATABASE_URL
+        sync: false
+      - key: SUPABASE_ID_COLUMN
+        value: id
+      - key: SUPABASE_TEXT_COLUMN
+        value: content

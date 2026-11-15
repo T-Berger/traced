@@ -14,6 +14,7 @@ import re
 from contextlib import contextmanager
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
+from urllib.parse import unquote, urlsplit
 
 from ..source_contracts import SourceItem
 from .models import CollectedBatch, CollectionFailure, CollectionSource
@@ -54,14 +55,62 @@ def _column(name: str, default: str = "") -> str | None:
     return value
 
 
+_POOLER_USER = re.compile(r"[^.]+\.([a-z0-9][a-z0-9-]{0,62})\Z")
+
+
+def _connection_url() -> dict[str, str] | None:
+    """Split a Supabase connection string, as data-explorer's ``DATABASE_URL_CLOUD``.
+
+    ``postgresql://postgres.<ref>:<password>@aws-0-<region>.pooler.supabase.com:5432/postgres``
+    (Supabase → Connect → Session pooler). The password must be URL-encoded when it
+    contains ``@ : / ? #`` or ``%``. Query parameters are ignored: TLS is always
+    required and the connector sets its own read-only options.
+    """
+    url = (
+        os.environ.get("SUPABASE_DATABASE_URL", "").strip()
+        or os.environ.get("DATABASE_URL_CLOUD", "").strip()
+    )
+    if not url:
+        return None
+    try:
+        parts = urlsplit(url)
+        port = parts.port
+    except ValueError:
+        raise CollectionFailure("Check the format of SUPABASE_DATABASE_URL.") from None
+    if parts.scheme not in {"postgres", "postgresql"} or not parts.hostname:
+        raise CollectionFailure(
+            "SUPABASE_DATABASE_URL must look like postgresql://user:password@host:5432/postgres."
+        )
+    user = unquote(parts.username or "postgres")
+    values = {
+        "SUPABASE_HOST": parts.hostname,
+        "SUPABASE_PASSWORD": unquote(parts.password or ""),
+        "SUPABASE_USER": user,
+        "SUPABASE_PORT": str(port or 5432),
+        "SUPABASE_DATABASE": unquote(parts.path.lstrip("/")) or "postgres",
+    }
+    pooler_ref = _POOLER_USER.fullmatch(user)
+    if pooler_ref and not os.environ.get("SUPABASE_PROJECT_REF", "").strip():
+        values["SUPABASE_PROJECT_REF"] = pooler_ref.group(1)
+    return values
+
+
 def _settings() -> _Settings:
-    host = os.environ.get("SUPABASE_HOST", "").strip().lower()
-    password = os.environ.get("SUPABASE_PASSWORD", "")
+    from_url = _connection_url() or {}
+
+    def setting(name: str, default: str = "") -> str:
+        return from_url.get(name) or os.environ.get(name, default)
+
+    host = setting("SUPABASE_HOST").strip().lower()
+    password = setting("SUPABASE_PASSWORD")
     if not host or not password:
-        raise CollectionFailure("Configure SUPABASE_HOST and SUPABASE_PASSWORD on the server.")
+        raise CollectionFailure(
+            "Configure SUPABASE_DATABASE_URL (or SUPABASE_HOST and SUPABASE_PASSWORD) "
+            "on the server."
+        )
     if not _HOST.fullmatch(host) or ".." in host or any(ord(char) < 32 for char in password):
         raise CollectionFailure("Check the server-side Supabase host and password settings.")
-    project = os.environ.get("SUPABASE_PROJECT_REF", "").strip()
+    project = setting("SUPABASE_PROJECT_REF").strip()
     direct = _DIRECT_HOST.fullmatch(host)
     if direct:
         if project and project != direct.group(1):
@@ -70,13 +119,13 @@ def _settings() -> _Settings:
     if not _PROJECT.fullmatch(project):
         raise CollectionFailure("Set SUPABASE_PROJECT_REF explicitly when using a pooler host.")
     try:
-        port = int(os.environ.get("SUPABASE_PORT", "5432"))
+        port = int(setting("SUPABASE_PORT", "5432"))
         if not 1 <= port <= 65535:
             raise ValueError
     except ValueError:
         raise CollectionFailure("SUPABASE_PORT must be an integer between 1 and 65535.") from None
-    database = os.environ.get("SUPABASE_DATABASE", "postgres")
-    user = os.environ.get("SUPABASE_USER", "postgres")
+    database = setting("SUPABASE_DATABASE", "postgres")
+    user = setting("SUPABASE_USER", "postgres")
     if any(
         not value or len(value.encode("utf-8")) > 63 or any(ord(char) < 32 for char in value)
         for value in (database, user)
@@ -124,6 +173,10 @@ def normalize_locator(locator: str) -> str:
     return ".".join(parts)
 
 
+def _pooled(settings: _Settings) -> bool:
+    return "pooler.supabase.com" in settings.host or settings.port == 6543
+
+
 @contextmanager
 def _connection(settings: _Settings, connect):
     try:
@@ -140,6 +193,8 @@ def _connection(settings: _Settings, connect):
             password=settings.password,
             sslmode="require",
             connect_timeout=8,
+            # Supabase poolers (Supavisor) reject server-side prepared statements.
+            **({"prepare_threshold": None} if _pooled(settings) else {}),
             options="-c statement_timeout=10000 -c default_transaction_read_only=on",
             row_factory=dict_row,
         ) as connection:
