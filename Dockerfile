@@ -8,6 +8,11 @@
 # No BuildKit cache mounts: Railway rejects cache mounts without its service ID.
 # uv comes from PyPI, which the build needs anyway, pinned to the workspace's version.
 FROM python:3.12-slim-bookworm
+# DejaVu fonts let the Alerts evidence PDF render Unicode post text (the PDF looks in
+# /usr/share/fonts/truetype/dejavu); without them it falls back to Latin-1 core fonts.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends fonts-dejavu-core \
+    && rm -rf /var/lib/apt/lists/*
 RUN pip install --no-cache-dir --disable-pip-version-check uv==0.11.3
 WORKDIR /app
 ENV UV_COMPILE_BYTECODE=1 \

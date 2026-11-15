@@ -237,7 +237,7 @@ class EvidencePDF(FPDF):
         self.cell(
             0,
             4,
-            f"Manifest SHA-256 {self.manifest_hash[:16]}…  ·  Draft for human review",
+            self.clean(f"Manifest SHA-256 {self.manifest_hash[:16]}…  ·  Draft for human review"),
         )
         self.set_x(self.l_margin)
         self.cell(0, 4, f"Page {self.page_no()} of {{nb}}", align="R")
