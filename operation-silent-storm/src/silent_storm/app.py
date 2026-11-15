@@ -210,6 +210,7 @@ def create_app(
         component_id="ss-view",
         prop="value",
         routes={"evidence": "evidence", "reviews": "reviews", "delivery": "release-diff"},
+        default="evidence",
     )
     register_review_callbacks(application, repository, review_repository, brief_repository)
     register_review_routes(server, review_repository)

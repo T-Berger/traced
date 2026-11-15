@@ -294,6 +294,7 @@ def create_app(
         component_id="screen-select",
         prop="data",
         routes={"find": "find", "verify": "verify", "review": "review"},
+        default="find",
     )
 
     @application.callback(

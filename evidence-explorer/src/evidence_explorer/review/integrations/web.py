@@ -176,6 +176,7 @@ def create_app(service: WorkspaceService, *, server=None, workbench_links=None):
         component_id="rv-page",
         prop="value",
         routes=PAGE_ROUTES,
+        default="review",
     )
 
     @app.server.get("/trail-artifact")

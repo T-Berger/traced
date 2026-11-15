@@ -29,6 +29,14 @@ COLORS = {
 FORM_KEYS = [(c, f) for c in CATEGORIES for f in ("label_score", "filing_score")]
 
 
+_DOWNLOAD_PDF = "Download draft evidence PDF"
+# Shown while the PDF is built; the spinner is decorative, the text carries the state.
+_PREPARING_PDF = [
+    html.Span(className="al-spinner", **{"aria-hidden": "true"}),
+    "Preparing PDF…",
+]
+
+
 def _snapshot_fingerprint(data, settings) -> str:
     """Bind a displayed selection to all inputs used to construct the draft report."""
     payload = {
@@ -289,7 +297,7 @@ def alerts_page(store: AlertSettingsStore) -> html.Section:
                     section_id="al-ready",
                     extra=html.Div(
                         [
-                            html.Button("Download draft evidence PDF", id="al-download-selected",
+                            html.Button(_DOWNLOAD_PDF, id="al-download-selected",
                                         n_clicks=0, className="al-btn al-btn--primary"),
                             html.Span(id="al-download-message", className="al-sub",
                                       **{"aria-live": "polite"}),
@@ -772,6 +780,17 @@ def register_alert_callbacks(app, service) -> None:
         State("al-case", "value"),
         State("al-selection-snapshot", "data"),
         prevent_initial_call=True,
+        # Building the PDF takes a few seconds: show progress on the button meanwhile.
+        running=[
+            (Output("al-download-selected", "disabled"), True, False),
+            (Output("al-download-selected", "children"), _PREPARING_PDF, _DOWNLOAD_PDF),
+            (
+                Output("al-download-selected", "className"),
+                "al-btn al-btn--primary al-btn--busy",
+                "al-btn al-btn--primary",
+            ),
+            (Output("al-download-selected", "aria-busy"), "true", "false"),
+        ],
     )
     def download(_clicks, selected, case_id, displayed_fingerprint):
         if not case_id:

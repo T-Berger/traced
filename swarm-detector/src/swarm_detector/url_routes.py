@@ -22,22 +22,47 @@ from dash import Dash, Input, Output, dcc
 _SYNC = """function(pathname, value) {
     const prefix = %(prefix)s;
     const routes = %(routes)s;
+    const key = %(menu_prop)s;
+    const initial = %(default)s;
     const pages = {};
     for (const [page, slug] of Object.entries(routes)) { pages[slug] = page; }
+    // The bare app root means the menu's starting page (e.g. back to "/").
+    if (initial !== null && !('' in pages)) { pages[''] = initial; }
     const noUpdate = window.dash_clientside.no_update;
-    const triggered = (window.dash_clientside.callback_context.triggered || [])
-        .map(item => item.prop_id);
     const path = pathname || '';
     const slug = (path.startsWith(prefix) ? path.slice(prefix.length) : '')
         .replace(/^\\/+|\\/+$/g, '');
-    if (triggered.length === 1 && triggered[0] === %(menu_prop)s) {
+    // Compare with the last synced state instead of the trigger list: on a slow
+    // server the first menu click can arrive batched with the initial URL read.
+    const memory = (window.__tracedUrlSync = window.__tracedUrlSync || {});
+    const last = memory[key];
+    if (last === undefined) {
+        const page = pages[slug];
+        if (page !== undefined && slug !== '') {
+            memory[key] = {value: page, slug: slug};
+            return page !== value ? [page, noUpdate] : [noUpdate, noUpdate];
+        }
+        // App root: remember the starting page, so a menu click that arrives in
+        // this first run is still recognised below and gets its own URL.
+        memory[key] = {value: initial !== null ? initial : value, slug: slug};
+        return syncMenu(memory[key]);
+    }
+    return syncMenu(last);
+
+    function syncMenu(last) {
+    if (value !== last.value) {
         const target = routes[value];
-        if (!target || target === slug) { return [noUpdate, noUpdate]; }
+        memory[key] = {value: value, slug: target !== undefined ? target : slug};
+        if (target === undefined || target === slug) { return [noUpdate, noUpdate]; }
         return [noUpdate, prefix + target];
     }
-    const page = pages[slug];
-    if (page !== undefined && page !== value) { return [page, noUpdate]; }
+    if (slug !== last.slug) {
+        const page = pages[slug];
+        memory[key] = {value: page !== undefined ? page : value, slug: slug};
+        if (page !== undefined && page !== value) { return [page, noUpdate]; }
+    }
     return [noUpdate, noUpdate];
+    }
 }"""
 
 
@@ -53,6 +78,7 @@ def register_url_routes(
     component_id: str,
     prop: str,
     routes: Mapping[str, str],
+    default: str | None = None,
 ) -> None:
     """Keep ``component_id.prop`` and the URL path in sync (``routes``: page value -> slug)."""
     prefix = app.config.requests_pathname_prefix or "/"
@@ -64,6 +90,7 @@ def register_url_routes(
             "prefix": json.dumps(prefix),
             "routes": json.dumps(dict(routes)),
             "menu_prop": json.dumps(f"{component_id}.{prop}"),
+            "default": json.dumps(default),
         },
         Output(component_id, prop, allow_duplicate=True),
         Output(location_id, "pathname"),

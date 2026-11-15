@@ -234,3 +234,17 @@
   :is(#rv-alerts-page, #rv-policies-page) .al-meta-right { margin-left: 0; width: 100%; }
   :is(#rv-alerts-page, #rv-policies-page) .al-head-actions { align-items: flex-start; }
 }
+
+/* Busy state for the evidence PDF download (set by the callback's running outputs). */
+:is(#rv-alerts-page, #rv-policies-page) .al-btn--busy,
+:is(#rv-alerts-page, #rv-policies-page) .al-btn--busy:hover { cursor: progress; opacity: 0.85; }
+:is(#rv-alerts-page, #rv-policies-page) .al-btn--busy { display: inline-flex; align-items: center; gap: 0.5em; }
+:is(#rv-alerts-page, #rv-policies-page) .al-spinner {
+  width: 1em; height: 1em; flex: none; border-radius: 50%;
+  border: 2px solid currentColor; border-right-color: transparent;
+  animation: al-spin 0.7s linear infinite;
+}
+@keyframes al-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  :is(#rv-alerts-page, #rv-policies-page) .al-spinner { animation-duration: 2.4s; }
+}
