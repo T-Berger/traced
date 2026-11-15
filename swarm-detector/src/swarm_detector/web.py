@@ -168,7 +168,9 @@ def create_app(
         State("case-select", "value"),
     )
     def update_queue(query, kind, status, screen, workspace, selected):
-        if ctx.triggered_id == "screen-select" and screen != "find":
+        # A deep link (/swarm/verify, /swarm/review) changes the screen before the queue
+        # has loaded; fill it then, so a case is selected and its evidence loads.
+        if ctx.triggered_id == "screen-select" and screen != "find" and selected:
             return no_update, no_update, no_update, no_update
         run_id = (workspace or {}).get("run_id")
         if not run_id:
