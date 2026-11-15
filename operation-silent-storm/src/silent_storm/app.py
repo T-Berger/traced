@@ -201,6 +201,16 @@ def create_app(
         return send_file(path, mimetype=mime, conditional=True, max_age=3600)
 
     register_callbacks(application, repository)
+    # Shareable view links: /silent-storm/evidence, /reviews, /release-diff.
+    from evidence_explorer.url_routes import register_url_routes
+
+    register_url_routes(
+        application,
+        location_id="ss-url",
+        component_id="ss-view",
+        prop="value",
+        routes={"evidence": "evidence", "reviews": "reviews", "delivery": "release-diff"},
+    )
     register_review_callbacks(application, repository, review_repository, brief_repository)
     register_review_routes(server, review_repository)
     register_delivery_callbacks(

@@ -12,6 +12,7 @@ import math
 from typing import Any
 
 from dash import Dash, Input, Output, State, ctx, dcc, get_asset_url, html
+from evidence_explorer.url_routes import url_location
 
 from ..contracts import (
     ALL_FILTER,
@@ -134,6 +135,7 @@ def create_layout(
         views.append({"label": "03  Release diff & brief", "value": "delivery"})
     return html.Div(
         [
+            url_location("ss-url"),
             dcc.Store(id="ss-clip-page", data=1),
             dcc.Store(id="ss-contact-page", data=1),
             html.A("Skip to evidence", href="#ss-main", className="ss-skip-link"),

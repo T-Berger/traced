@@ -13,7 +13,25 @@ REQUIRED_TABLES = ("analytics_content_labels", "content_items", "cases")
 
 
 def analytics_dsn() -> str:
-    return os.getenv("TRACED_ANALYTICS_DATABASE_URL", DEFAULT_DSN)
+    """Analytics database: explicit setting, else the Supabase source, else local."""
+    return (
+        os.getenv("TRACED_ANALYTICS_DATABASE_URL", "").strip()
+        or os.getenv("SUPABASE_DATABASE_URL", "").strip()
+        or os.getenv("DATABASE_URL_CLOUD", "").strip()
+        or DEFAULT_DSN
+    )
+
+
+def _connect_options(dsn: str) -> dict[str, Any]:
+    """Supabase needs TLS, a longer connect timeout, and no prepared statements on poolers."""
+    if "supabase.co" not in dsn and "supabase.com" not in dsn:
+        return {"connect_timeout": 3}
+    options: dict[str, Any] = {"connect_timeout": 10}
+    if "sslmode=" not in dsn:
+        options["sslmode"] = "require"
+    if "pooler.supabase.com" in dsn or ":6543" in dsn:
+        options["prepare_threshold"] = None
+    return options
 
 
 class AnalyticsUnavailable(RuntimeError):
@@ -49,11 +67,11 @@ class AnalyticsRepository:
             raise AnalyticsUnavailable("PostgreSQL support is not installed.") from exc
         connect = self._connect or psycopg.connect
         try:
-            conn = connect(self.dsn, connect_timeout=3, row_factory=dict_row)
+            conn = connect(self.dsn, row_factory=dict_row, **_connect_options(self.dsn))
         except Exception as exc:
             raise AnalyticsUnavailable(
                 "Cannot reach the analytics database. Check TRACED_ANALYTICS_DATABASE_URL "
-                "and that PostgreSQL is running."
+                "(or SUPABASE_DATABASE_URL) and that PostgreSQL is running."
             ) from exc
         conn.read_only = True
         conn.execute("SET statement_timeout = '15s'")

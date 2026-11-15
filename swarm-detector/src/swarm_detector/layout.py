@@ -7,6 +7,7 @@ from dash import dcc, get_asset_url, html
 
 from .service import DECISIONS
 from .ui import GRAPH_STYLES, empty_figure, section_heading
+from .url_routes import url_location
 
 
 def _plot(identifier: str, height: int):
@@ -45,6 +46,7 @@ def create_layout(
     return html.Div(
         [
             dcc.Store(id="workspace-store", data=workspace),
+            url_location("swarm-url"),
             dcc.Store(id="screen-select", data="find"),
             dcc.Store(id="detail-store"),
             dcc.Store(id="selected-pair-store", data={}),

@@ -41,6 +41,7 @@ from .review_state import (
 )
 from .review_state import save_review as save_form
 from .service import Workbench
+from .url_routes import register_url_routes
 
 logger = logging.getLogger(__name__)
 
@@ -283,6 +284,15 @@ def create_app(
             "nav-review": "review",
             "continue-context": "review",
         }.get(ctx.triggered_id, "find")
+
+    # Shareable screen links: /swarm/find, /swarm/verify, /swarm/review.
+    register_url_routes(
+        application,
+        location_id="swarm-url",
+        component_id="screen-select",
+        prop="data",
+        routes={"find": "find", "verify": "verify", "review": "review"},
+    )
 
     @application.callback(
         Output("find-view", "style"),

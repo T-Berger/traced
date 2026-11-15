@@ -30,6 +30,8 @@
 !tools/traced.py
 !tools/workbench.py
 !traced_wsgi.py
+!policy-guidelines/
+!policy-guidelines/**
 !deploy/
 !deploy/**
 **/__pycache__/

@@ -39,6 +39,9 @@ RUN uv sync --locked --no-default-groups --all-packages --no-editable
 COPY tools/traced.py tools/workbench.py tools/
 COPY traced_wsgi.py ./
 COPY deploy/ deploy/
+# Policies tab content (JSON guides and official PDFs). The installed package cannot
+# find it relative to itself, so TRACED_POLICY_DIR below points at it.
+COPY policy-guidelines/ policy-guidelines/
 RUN chmod 0755 deploy/start.sh \
     && groupadd --gid 10001 traced \
     && useradd --uid 10001 --gid traced --create-home --shell /bin/sh traced \
@@ -52,6 +55,7 @@ ENV EVIDENCE_HOST=0.0.0.0 \
     SWARM_DATA_DIR=/app/data/swarm \
     SILENT_STORM_PROJECT=/app/operation-silent-storm \
     SILENT_STORM_DB=/app/data/silent-storm/silent-storm.sqlite3 \
+    TRACED_POLICY_DIR=/app/policy-guidelines \
     PORT=8053
 EXPOSE 8053
 # No Docker HEALTHCHECK: Render and Railway probe /health themselves (render.yaml,

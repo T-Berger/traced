@@ -14,12 +14,29 @@ from dash.development.base_component import Component
 from flask import abort, request, send_file
 from pydantic import ValidationError
 
+from ...url_routes import register_url_routes, url_location
 from ..contracts import EvidenceBundle
 from ..importing import _validation_message
 from ..selectors import initial_selection
 from ..web import create_app as create_review_app
 from .packages import MAX_PACKAGE_BYTES
 from .workspace import WorkspaceService
+
+PAGE_ROUTES = {
+    "cases": "cases",
+    "review": "review",
+    "compare": "compare",
+    "brief": "briefing",
+    "alerts": "alerts",
+    "policies": "policies",
+}
+
+
+def _as_list(children):
+    if children is None:
+        return []
+    return list(children) if isinstance(children, list | tuple) else [children]
+
 
 MAX_UPLOAD_CONTENT_CHARS = 4 * ((MAX_PACKAGE_BYTES + 2) // 3) + 256
 # Dash carries the file as a base64 data URI inside a small JSON callback envelope.
@@ -114,6 +131,7 @@ def create_app(service: WorkspaceService, *, server=None, workbench_links=None):
             if isinstance(node_id, str) and node_id in slots:
                 node.children = slots[node_id]
         _add_alerts_page(root)
+        root.children = [*_as_list(root.children), url_location("rv-url")]
         return root
 
     def _add_alerts_page(root):
@@ -151,6 +169,14 @@ def create_app(service: WorkspaceService, *, server=None, workbench_links=None):
                 node.children = children
 
     app.layout = layout
+    # Shareable page links: /cases, /review, /compare, /briefing, /alerts, /policies.
+    register_url_routes(
+        app,
+        location_id="rv-url",
+        component_id="rv-page",
+        prop="value",
+        routes=PAGE_ROUTES,
+    )
 
     @app.server.get("/trail-artifact")
     def artifact():
