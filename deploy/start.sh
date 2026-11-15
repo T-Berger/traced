@@ -14,6 +14,10 @@ mkdir -p "$data" "$swarm" "$(dirname "$storm_db")"
 
 if [ "$(id -u)" = "0" ]; then
     chown -R traced:traced "$data" "$swarm" "$(dirname "$storm_db")"
+    # setpriv keeps HOME=/root. libpq then probes /root/.postgresql/postgresql.crt,
+    # gets "Permission denied" as traced, and aborts every TLS Postgres connection
+    # (Supabase source and Alerts). Use traced's own home instead.
+    export HOME=/home/traced USER=traced LOGNAME=traced
     exec setpriv --reuid=traced --regid=traced --init-groups "$0" "$@"
 fi
 
