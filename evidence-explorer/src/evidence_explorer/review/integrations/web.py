@@ -690,7 +690,7 @@ def create_app(service: WorkspaceService, *, server=None, workbench_links=None):
     register_alert_callbacks(app, service)
     from ...policies.ui import register_policy_callbacks
 
-    register_policy_callbacks(app)
+    register_policy_callbacks(app, service)
     from ...compliance.ui import register_compliance_callbacks
 
     register_compliance_callbacks(app, service)

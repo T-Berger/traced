@@ -82,3 +82,13 @@
   #rv-policies-page :is(.pg-levels, .pg-doc, .pg-case-top, .pg-two) { grid-template-columns: 1fr; }
   #rv-policies-page .al-top-controls { min-width: 0; width: 100%; }
 }
+
+/* Observed outcomes by rule (under "Which rule applies"). */
+#rv-policies-page .pg-how { margin: 0 0 8px; display: grid; grid-template-columns: max-content 1fr; gap: 4px 12px; font-size: 13px;
+  padding: 10px 14px; border-radius: 8px; background: var(--al-bg); border: 1px solid var(--al-line); }
+#rv-policies-page .pg-how dt { font-weight: 700; color: var(--al-primary-700); }
+#rv-policies-page .pg-how dd { margin: 0; color: var(--al-ink-2); }
+#rv-policies-page .pg-chart { min-height: 0; overflow: hidden; }
+#rv-policies-page .pg-takeaway { margin-top: 8px; padding: 10px 14px; border-radius: 8px; font-size: 14px;
+  background: var(--al-yellow-50); border-left: 4px solid var(--al-yellow); }
+@media (max-width: 640px) { #rv-policies-page .pg-how { grid-template-columns: 1fr; } }

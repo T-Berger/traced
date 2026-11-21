@@ -202,7 +202,9 @@ class AnalyticsRepository:
             if _table_exists(conn, "analytics_harassment_bursts"):
                 bursts = conn.execute(
                     """SELECT author_handle, target, pattern, window_start, window_end, post_count,
-                              reply_count FROM analytics_harassment_bursts
+                              reply_count,
+                              coalesce(item_ids::text[], '{}') AS item_ids
+                       FROM analytics_harassment_bursts
                        WHERE case_id::text = %s ORDER BY post_count DESC, window_start LIMIT 50""",
                     (case_id,),
                 ).fetchall()
