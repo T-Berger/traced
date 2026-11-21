@@ -1,0 +1,81 @@
+/* Compliance audit page (integrated desk). Shares the branded components in alerts.css (.al-*);
+   this file adds visibility and audit-specific layout (.cp-*). Scoped to #rv-compliance-page. */
+
+.review-app > .rv-main > #rv-compliance-page { display: none !important; }
+.review-app:has(#rv-page .rv-navigation-tab--selected-compliance) > .rv-main > #rv-compliance-page { display: block !important; }
+.review-app:has(#rv-page .rv-navigation-tab--selected-compliance) > .rv-main > :is(.rv-assessment-header, #rv-next-action-slot, #rv-scenario-banner, #rv-synthetic) { display: none !important; }
+.review-app #rv-page .rv-navigation-tab--selected-compliance { box-shadow: inset 0 -3px 0 #038095; }
+
+#rv-compliance-page .al-top-controls { min-width: 320px; }
+
+/* Two charts side by side; one column on narrow screens. */
+#rv-compliance-page .cp-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+#rv-compliance-page .cp-grid > .al-card { min-width: 0; }
+
+#rv-compliance-page .cp-legal { display: grid; gap: 10px; font-size: 14px; }
+#rv-compliance-page .cp-gaps { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 14px; color: var(--al-ink-2); }
+
+@media (max-width: 900px) {
+  #rv-compliance-page .cp-grid { grid-template-columns: 1fr; }
+  #rv-compliance-page .al-top-controls { min-width: 0; width: 100%; }
+}
+
+/* Download action under the subject picker. */
+#rv-compliance-page .cp-download-btn { margin-top: 10px; width: 100%; background: var(--al-yellow); color: var(--al-ink);
+  border-color: var(--al-yellow); box-shadow: 0 1px 2px rgba(19, 18, 18, 0.12); }
+#rv-compliance-page .cp-download-btn:hover { background: #F7CC5E; border-color: #F7CC5E; }
+#rv-compliance-page .cp-download-btn:focus-visible { outline: 2px solid #FDFCFD; outline-offset: 2px; }
+#rv-compliance-page .cp-download-btn[disabled] { background: var(--al-yellow-50); border-color: var(--al-yellow-50); color: var(--al-ink-2); cursor: progress; }
+
+/* Graph box follows the figure height set by the callback; never let the plot spill out. */
+#rv-compliance-page .cp-chart { min-height: 0; overflow: hidden; }
+#rv-compliance-page .cp-download-msg { display: block; margin-top: 6px; font-size: 12px; color: rgba(255, 255, 255, 0.85); overflow-wrap: anywhere; }
+
+/* ⓘ tooltips: hover or keyboard focus shows the definition. */
+#rv-compliance-page .cp-tip {
+  position: relative; display: inline-grid; place-items: center; width: 17px; height: 17px; margin-left: 6px;
+  border-radius: 50%; background: var(--al-primary-50); color: var(--al-primary-700); border: 1px solid #BFE0E5;
+  font: italic 700 11px/1 Georgia, serif; text-transform: none; letter-spacing: 0; vertical-align: 2px; cursor: help;
+}
+#rv-compliance-page .cp-tip:focus-visible { outline: 2px solid var(--al-primary); outline-offset: 2px; }
+#rv-compliance-page .cp-tip::after {
+  content: attr(data-tip); position: absolute; z-index: 30; left: 50%; bottom: calc(100% + 8px); transform: translateX(-50%);
+  width: max-content; max-width: 300px; padding: 9px 11px; border-radius: 8px; background: var(--al-ink); color: #FDFCFD;
+  font: 400 12.5px/1.45 "Trebuchet MS", "Lucida Grande", "Segoe UI", sans-serif; text-align: left; white-space: normal;
+  text-transform: none; letter-spacing: 0; box-shadow: 0 6px 20px rgba(19, 18, 18, 0.18);
+  opacity: 0; visibility: hidden; transition: opacity 0.12s; pointer-events: none;
+}
+#rv-compliance-page .cp-tip:is(:hover, :focus)::after { opacity: 1; visibility: visible; }
+/* Inside scrolling tables, open downwards so the tooltip is not clipped. */
+#rv-compliance-page .al-table .cp-tip::after { bottom: auto; top: calc(100% + 8px); left: 0; transform: none; }
+
+/* Reading guide */
+#rv-compliance-page .cp-guide > summary { list-style: none; cursor: pointer; }
+#rv-compliance-page .cp-guide > summary::-webkit-details-marker { display: none; }
+#rv-compliance-page .cp-steps { margin: 0; padding-left: 20px; display: grid; gap: 8px; font-size: 14px; color: var(--al-ink-2); }
+#rv-compliance-page .cp-glossary { margin: 0; display: grid; grid-template-columns: max-content 1fr; gap: 6px 16px; font-size: 13.5px;
+  padding: 14px 16px; border-radius: 10px; background: var(--al-bg); border: 1px solid var(--al-line); }
+#rv-compliance-page .cp-glossary dt { font-weight: 700; }
+#rv-compliance-page .cp-glossary dd { margin: 0; color: var(--al-ink-2); }
+
+/* Per-chart "how to read" and data takeaway */
+#rv-compliance-page .cp-how { margin: 0 0 8px; display: grid; grid-template-columns: max-content 1fr; gap: 4px 12px; font-size: 13px;
+  padding: 10px 14px; border-radius: 8px; background: var(--al-bg); border: 1px solid var(--al-line); }
+#rv-compliance-page .cp-how dt { font-weight: 700; color: var(--al-primary-700); }
+#rv-compliance-page .cp-how dd { margin: 0; color: var(--al-ink-2); }
+#rv-compliance-page .cp-takeaway { margin-top: 8px; padding: 10px 14px; border-radius: 8px; font-size: 14px;
+  background: var(--al-yellow-50); border-left: 4px solid var(--al-yellow); }
+
+/* Coverage threshold selector */
+#rv-compliance-page .cp-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin-bottom: 4px; }
+#rv-compliance-page .cp-radio { display: flex; flex-wrap: wrap; gap: 6px; }
+#rv-compliance-page .cp-radio-label { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 999px;
+  border: 1px solid var(--al-line-2); background: var(--al-surface); font-size: 13px; cursor: pointer; }
+#rv-compliance-page .cp-radio-label:has(input:checked) { background: var(--al-primary); border-color: var(--al-primary); color: #FFFFFF; font-weight: 700; }
+#rv-compliance-page .cp-radio-label:has(input:disabled) { opacity: 0.45; cursor: not-allowed; }
+#rv-compliance-page .cp-radio-input { accent-color: var(--al-primary); margin: 0; }
+
+@media (max-width: 640px) {
+  #rv-compliance-page :is(.cp-glossary, .cp-how) { grid-template-columns: 1fr; }
+  #rv-compliance-page .cp-tip::after { max-width: 240px; }
+}

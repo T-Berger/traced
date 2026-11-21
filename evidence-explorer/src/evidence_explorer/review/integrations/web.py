@@ -29,6 +29,7 @@ PAGE_ROUTES = {
     "brief": "briefing",
     "alerts": "alerts",
     "policies": "policies",
+    "compliance": "compliance",
 }
 
 
@@ -135,11 +136,12 @@ def create_app(service: WorkspaceService, *, server=None, workbench_links=None):
         return root
 
     def _add_alerts_page(root):
-        """Integrated desk only: Alerts and Policies tabs and pages beside the shared pages."""
+        """Integrated desk only: Alerts, Policies and Compliance audit tabs and pages."""
         from dash import dcc
 
         from ...alerts.settings import AlertSettingsStore
         from ...alerts.ui import alerts_page
+        from ...compliance.ui import compliance_page
         from ...policies.ui import policies_page
 
         def tab(label, value):
@@ -158,6 +160,7 @@ def create_app(service: WorkspaceService, *, server=None, workbench_links=None):
                     *node.children,
                     tab("Alerts", "alerts"),
                     tab("Policies", "policies"),
+                    tab("Compliance Audit", "compliance"),
                 ]
             elif getattr(node, "className", None) == "rv-main":
                 children = list(node.children)
@@ -165,11 +168,12 @@ def create_app(service: WorkspaceService, *, server=None, workbench_links=None):
                 children[-1:-1] = [
                     alerts_page(AlertSettingsStore(service.settings.data_dir)),
                     policies_page(),
+                    compliance_page(),
                 ]
                 node.children = children
 
     app.layout = layout
-    # Shareable page links: /cases, /review, /compare, /briefing, /alerts, /policies.
+    # Shareable page links: /cases, /review, /compare, /briefing, /alerts, /policies, /compliance.
     register_url_routes(
         app,
         location_id="rv-url",
@@ -687,4 +691,7 @@ def create_app(service: WorkspaceService, *, server=None, workbench_links=None):
     from ...policies.ui import register_policy_callbacks
 
     register_policy_callbacks(app)
+    from ...compliance.ui import register_compliance_callbacks
+
+    register_compliance_callbacks(app, service)
     return app
