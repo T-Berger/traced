@@ -73,3 +73,23 @@ To exercise the identity boundary and timing-pair regressions without downloadin
 uv --directory swarm-detector run --locked --all-packages --all-extras \
     --group dev --group analysis pytest tests/test_theory_safety.py -q
 ```
+
+## Exploratory scripts on other data
+
+These two scripts are exploratory and use the same engine functions as `run.py`. Like the rest of
+the theory pipeline, their output is **not validated evidence** while the source-identity gate above
+is open; results are git-ignored and stay local.
+
+- `mamdani.py` re-fits the metrics and mixture models on X posts about Zohran Mamdani in
+  `swarm-detector/test-data/` (git-ignored) and writes `results/05_mamdani.html`. It keeps
+  third-party posts, tests the two-population claim against a one-crowd null, and uses account age
+  (decoded from the X user id) only as an outside check, never in the fit.
+- `weeks14.py` profiles the 14-week export in `swarm-detector/data/weeks14/*.json` and writes
+  `results/weeks14_report.html`.
+
+```sh
+uvx uv@0.11.3 run --locked --package swarm-detector --group analysis --group embeddings \
+    python swarm-detector/analysis/mamdani.py
+uvx uv@0.11.3 run --locked --package swarm-detector --group analysis \
+    python swarm-detector/analysis/weeks14.py
+```
